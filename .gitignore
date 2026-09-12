@@ -1,0 +1,21 @@
+# Node
+node_modules/
+
+# Env (絕對不可將私鑰上傳)
+.env
+.env.local
+.env.*.local
+frontend/.env
+frontend/.env.local
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+coverage/
+
+# Next.js
+.next/
+out/
+build/
+.swc/
