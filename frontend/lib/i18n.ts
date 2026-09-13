@@ -8,7 +8,20 @@ export const translations = {
     buyBtn: '立即購買 NFT (Buy)',
     dashboardTitle: '會員中心',
     dashboardDesc: '核銷您的服務憑證，或開通業務推廣權限賺取 25% 獎金。',
-    dashboardBtn: '進入戰情後台 (Dashboard)'
+    dashboardBtn: '進入戰情後台 (Dashboard)',
+    dashAccessDeniedTitle: '⚠️ 拒絕存取',
+    dashAccessDeniedDesc: '請先點擊首頁右上角的按鈕連線您的 Web3 錢包，以驗證業務身分！',
+    dashHeader: '戰情儀表板',
+    dashPendingBonus: '本月未發放獎金',
+    dashPayoutDate: '結帳日：每月 5 號',
+    dashTeamSales: '團隊總業績',
+    dashIncludesTeam: '包含直推與傘下業績',
+    dashCurrentLevel: '目前極差級別',
+    dashNextLevel: '下一階門檻：$600',
+    dashLinkTitle: '您的專屬推廣連結 🔗',
+    dashLinkDesc: '將此連結貼在您的 YouTube 影片下方，或是分享到 LINE 群組。只要客戶點擊此連結購買 NFT，系統將在區塊鏈上永久綁定您為他的推薦人。',
+    dashCopyBtn: '一鍵複製',
+    dashCopied: '已複製到剪貼簿！'
   },
   'zh-CN': {
     title: '全自动 AI 获客系统',
@@ -19,7 +32,20 @@ export const translations = {
     buyBtn: '立即购买 NFT (Buy)',
     dashboardTitle: '会员中心',
     dashboardDesc: '核销您的服务凭证，或开通业务推广权限赚取 25% 奖金。',
-    dashboardBtn: '进入数据后台 (Dashboard)'
+    dashboardBtn: '进入数据后台 (Dashboard)',
+    dashAccessDeniedTitle: '⚠️ 拒绝访问',
+    dashAccessDeniedDesc: '请先点击首页右上角的按钮连接您的 Web3 钱包，以验证业务身份！',
+    dashHeader: '数据仪表盘',
+    dashPendingBonus: '本月未发放奖金',
+    dashPayoutDate: '结账日：每月 5 号',
+    dashTeamSales: '团队总业绩',
+    dashIncludesTeam: '包含直推与伞下业绩',
+    dashCurrentLevel: '目前极差级别',
+    dashNextLevel: '下一阶门槛：$600',
+    dashLinkTitle: '您的专属推广链接 🔗',
+    dashLinkDesc: '将此链接贴在您的 YouTube 视频下方，或是分享到微信群。只要客户点击此链接购买 NFT，系统将在区块链上永久绑定您为他的推荐人。',
+    dashCopyBtn: '一键复制',
+    dashCopied: '已复制到剪贴板！'
   },
   'en-US': {
     title: 'Automated AI Traffic System',
@@ -30,7 +56,20 @@ export const translations = {
     buyBtn: 'Buy NFT Now',
     dashboardTitle: 'Member Center',
     dashboardDesc: 'Redeem your service vouchers or activate promotion rights to earn 25% commission.',
-    dashboardBtn: 'Enter Dashboard'
+    dashboardBtn: 'Enter Dashboard',
+    dashAccessDeniedTitle: '⚠️ Access Denied',
+    dashAccessDeniedDesc: 'Please click the button at the top right of the homepage to connect your Web3 wallet and verify your affiliate identity!',
+    dashHeader: 'Dashboard',
+    dashPendingBonus: 'Pending Monthly Commission',
+    dashPayoutDate: 'Payout Date: 5th of every month',
+    dashTeamSales: 'Total Team Sales',
+    dashIncludesTeam: 'Includes direct and sub-affiliate sales',
+    dashCurrentLevel: 'Current Differential Level',
+    dashNextLevel: 'Next tier threshold: $600',
+    dashLinkTitle: 'Your Exclusive Referral Link 🔗',
+    dashLinkDesc: 'Paste this link under your YouTube videos or share it in groups. When a customer buys an NFT via this link, the system will permanently bind you as their referrer on the blockchain.',
+    dashCopyBtn: 'Copy Link',
+    dashCopied: 'Copied to clipboard!'
   },
   'ja-JP': {
     title: '全自動AI集客システム',
@@ -41,7 +80,20 @@ export const translations = {
     buyBtn: '今すぐNFTを購入 (Buy)',
     dashboardTitle: 'メンバーセンター',
     dashboardDesc: 'サービスバウチャーを使用するか、プロモーション権限を開通して25%の報酬を獲得。',
-    dashboardBtn: 'ダッシュボードに入る (Dashboard)'
+    dashboardBtn: 'ダッシュボードに入る (Dashboard)',
+    dashAccessDeniedTitle: '⚠️ アクセス拒否',
+    dashAccessDeniedDesc: 'ホームページ右上のボタンをクリックしてWeb3ウォレットを接続し、アフィリエイト身分を確認してください！',
+    dashHeader: 'ダッシュボード',
+    dashPendingBonus: '今月の未払い報酬',
+    dashPayoutDate: '支払日：毎月5日',
+    dashTeamSales: 'チーム総売上',
+    dashIncludesTeam: '直紹介および傘下の売上を含む',
+    dashCurrentLevel: '現在の差額レベル',
+    dashNextLevel: '次のしきい値: $600',
+    dashLinkTitle: 'あなた専用のプロモーションリンク 🔗',
+    dashLinkDesc: 'このリンクをYouTube動画の下に貼るか、LINEグループにシェアしてください。顧客がこのリンクをクリックしてNFTを購入すると、システムはブロックチェーン上であなたを推薦者として永久に紐付けます。',
+    dashCopyBtn: 'コピー',
+    dashCopied: 'クリップボードにコピーしました！'
   },
   'ko-KR': {
     title: '전자동 AI 고객 유치 시스템',
@@ -52,6 +104,19 @@ export const translations = {
     buyBtn: '지금 NFT 구매 (Buy)',
     dashboardTitle: '회원 센터',
     dashboardDesc: '서비스 바우처를 사용하거나 프로모션 권한을 활성화하여 25% 커미션을 받으세요.',
-    dashboardBtn: '대시보드 입장 (Dashboard)'
+    dashboardBtn: '대시보드 입장 (Dashboard)',
+    dashAccessDeniedTitle: '⚠️ 접근 거부',
+    dashAccessDeniedDesc: '홈페이지 우측 상단의 버튼을 클릭하여 Web3 지갑을 연결하고 제휴 신분을 확인하세요!',
+    dashHeader: '대시보드',
+    dashPendingBonus: '이번 달 미지급 커미션',
+    dashPayoutDate: '지급일: 매월 5일',
+    dashTeamSales: '팀 총 매출',
+    dashIncludesTeam: '직접 추천 및 산하 매출 포함',
+    dashCurrentLevel: '현재 차액 레벨',
+    dashNextLevel: '다음 임계값: $600',
+    dashLinkTitle: '전용 추천 링크 🔗',
+    dashLinkDesc: '이 링크를 YouTube 동영상 아래에 붙여넣거나 그룹에 공유하세요. 고객이 이 링크를 클릭하여 NFT를 구매하면 시스템이 블록체인에서 귀하를 추천인으로 영구적으로 연결합니다.',
+    dashCopyBtn: '복사하기',
+    dashCopied: '클립보드에 복사되었습니다!'
   }
 }
