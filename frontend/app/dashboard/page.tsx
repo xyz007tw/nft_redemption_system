@@ -59,7 +59,7 @@ export default function Dashboard() {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
             戰情儀表板
           </span> 
-          <span className="text-xl text-gray-400 ml-4 font-normal">({address.substring(0, 6)}...{address.substring(38)})</span>
+          <span className="text-xl text-gray-400 ml-4 font-normal">({address?.substring(0, 6)}...{address?.substring(38)})</span>
         </h1>
         
         {/* 財務數據區塊 */}

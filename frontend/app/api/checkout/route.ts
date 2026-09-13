@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       transport: http(ALCHEMY_URL)
     }).extend(publicActions);
 
-    const vouchersToMint = packageType === 'PACKAGE_3' ? 3n : 1n; // viem 需要 BigInt
+    const vouchersToMint = packageType === 'PACKAGE_3' ? BigInt(3) : BigInt(1); // viem 需要 BigInt
     console.log(`Minting ${vouchersToMint} vouchers to ${buyerWallet}...`);
     
     // 模擬與執行智能合約
