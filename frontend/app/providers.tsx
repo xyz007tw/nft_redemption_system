@@ -18,12 +18,16 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
+import { LanguageProvider } from '@/lib/LanguageContext';
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          {children}
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

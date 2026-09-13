@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { Globe } from 'lucide-react';
+import { useLanguage, Lang } from '@/lib/LanguageContext';
 
 export default function LanguageSwitcher() {
-  const [lang, setLang] = useState('zh-TW');
-  const languages = [
+  const { lang, setLang } = useLanguage();
+  const languages: { code: Lang; name: string }[] = [
     { code: 'zh-TW', name: '繁體中文' },
     { code: 'zh-CN', name: '简体中文' },
     { code: 'en-US', name: 'English' },
