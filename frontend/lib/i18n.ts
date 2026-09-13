@@ -54,4 +54,4 @@ export const translations = {
     dashboardDesc: '서비스 바우처를 사용하거나 프로모션 권한을 활성화하여 25% 커미션을 받으세요.',
     dashboardBtn: '대시보드 입장 (Dashboard)'
   }
-} as const;
+}
