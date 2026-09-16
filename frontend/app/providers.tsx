@@ -20,12 +20,6 @@ const config = getDefaultConfig({
   projectId: '9b9a9131bdc65b6077ebd9f9ed4ab314', // 用戶真實 ID
   chains: [polygon],
   ssr: true,
-  wallets: [
-    {
-      groupName: 'Recommended (推薦錢包)',
-      wallets: [metaMaskWallet, okxWallet, walletConnectWallet, trustWallet, rainbowWallet],
-    },
-  ],
 });
 
 const queryClient = new QueryClient();
