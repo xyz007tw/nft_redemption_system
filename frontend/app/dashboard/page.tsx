@@ -22,7 +22,7 @@ export default function Dashboard() {
     if (address) {
       // 1. 自動為該錢包地址產生專屬推廣連結 (取錢包前綴作為推廣碼)
       const code = address.substring(2, 8).toUpperCase();
-      setReferralLink(`https://weixiang.com/buy?ref=${code}`);
+      setTimeout(() => setReferralLink(`https://weixiang.com/buy?ref=${code}`), 0);
 
       // 2. 即時連線至 Supabase 撈取業績與獎金資料
       const fetchStats = async () => {
