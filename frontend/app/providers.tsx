@@ -2,12 +2,9 @@
 
 import * as React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider, http, createConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 import { polygon } from 'wagmi/chains';
-import { 
-  RainbowKitProvider, 
-  connectorsForWallets,
-} from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { 
   metaMaskWallet, 
   walletConnectWallet, 
@@ -18,27 +15,16 @@ import {
 import '@rainbow-me/rainbowkit/styles.css';
 import { LanguageProvider } from '@/lib/LanguageContext';
 
-const projectId = '9b9a9131bdc65b6077ebd9f9ed4ab314';
-
-const connectors = connectorsForWallets(
-  [
+const config = getDefaultConfig({
+  appName: 'Weixiang AI-ATM',
+  projectId: '9b9a9131bdc65b6077ebd9f9ed4ab314', // 用戶真實 ID
+  chains: [polygon],
+  wallets: [
     {
       groupName: 'Recommended (推薦錢包)',
       wallets: [metaMaskWallet, okxWallet, walletConnectWallet, trustWallet, rainbowWallet],
     },
   ],
-  {
-    appName: 'Weixiang AI-ATM',
-    projectId: projectId,
-  }
-);
-
-const config = createConfig({
-  connectors,
-  chains: [polygon],
-  transports: {
-    [polygon.id]: http(),
-  },
 });
 
 const queryClient = new QueryClient();
