@@ -24,13 +24,7 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended (推薦錢包)',
-      wallets: [
-        metaMaskWallet({ projectId }),
-        okxWallet({ projectId }),
-        walletConnectWallet({ projectId }),
-        trustWallet({ projectId }),
-        rainbowWallet({ projectId })
-      ],
+      wallets: [metaMaskWallet, okxWallet, walletConnectWallet, trustWallet, rainbowWallet],
     },
   ],
   {
