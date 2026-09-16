@@ -20,16 +20,20 @@ export default function Home() {
         </div>
       </nav>
       
-      <div className="flex flex-col items-center text-center max-w-3xl px-2 w-full">
-        <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
-          {t.title} <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-            {t.subtitle}
-          </span>
-        </h2>
-        <p className="mb-12 text-base md:text-xl text-gray-400 px-4">
-          {t.description}
-        </p>
+      <main className="flex-grow container mx-auto px-4 py-12 md:py-24">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-7xl font-extrabold mb-6 tracking-tight">
+            <span className="text-white">全自動 AI 來客系統</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+              Web3 雙軌金流版 (v2.14.0)
+            </span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            購買微享 NFT 憑證，立即解鎖您的專屬影音與 SEO 自動化行銷艦隊。支援錢包支付與信用卡刷卡。
+          </p>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
           {/* 購買卡片 */}
