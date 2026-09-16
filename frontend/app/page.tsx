@@ -20,7 +20,7 @@ export default function Home() {
         </div>
       </nav>
       
-      <main className="flex-grow container mx-auto px-4 py-12 md:py-24">
+      <div className="flex-grow container mx-auto px-4 py-12 md:py-24">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-7xl font-extrabold mb-6 tracking-tight">
             <span className="text-white">全自動 AI 來客系統</span>
