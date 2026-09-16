@@ -9,7 +9,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 const config = getDefaultConfig({
   appName: 'Weixiang AI-ATM',
-  projectId: '3fcc6bba6f1de962d911bb5b5c3dba68', // 真實合法的 WalletConnect Project ID
+  projectId: '9b9a9131bdc65b6077ebd9f9ed4ab314', // 真實合法的 WalletConnect Project ID
   chains: [polygon],
   transports: {
     [polygon.id]: http(),
