@@ -39,13 +39,17 @@ export default function RedeemPage() {
       const message = `我同意使用錢包 ${address} 開通 Web3 自動來客系統權限。\n時間戳: ${Date.now()}`;
       await signMessageAsync({ message });
 
-      // 2. 更新 Supabase 資料庫狀態
-      const { error } = await supabase
-        .from('nft_users')
-        .update({ status: 'ACTIVE' }) // 假設狀態改為 ACTIVE
-        .eq('wallet_address', address);
+      // 2. 呼叫後端 API，開通權限並計算發放極差獎金
+      const response = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address })
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'API 請求失敗');
+      }
 
       alert("🎉 開通成功！您的帳號權限已解鎖，獎金已自動結算。");
       router.push('/dashboard');
