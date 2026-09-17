@@ -40,10 +40,11 @@ export default function RedeemPage() {
       await signMessageAsync({ message });
 
       // 2. 呼叫後端 API，開通權限並計算發放極差獎金
+      const refCode = localStorage.getItem('weixiang_referrer');
       const response = await fetch('/api/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: address })
+        body: JSON.stringify({ walletAddress: address, refCode })
       });
 
       if (!response.ok) {

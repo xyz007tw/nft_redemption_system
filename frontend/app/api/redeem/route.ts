@@ -25,16 +25,39 @@ function getCommissionRate(totalSales: number) {
 
 export async function POST(request: Request) {
   try {
-    const { walletAddress } = await request.json();
+    const { walletAddress, refCode } = await request.json();
 
     if (!walletAddress) {
       return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
     }
 
+    // 尋找推薦人完整的錢包地址
+    let matchedReferrer = null;
+    if (refCode) {
+      const { data: potentialReferrer } = await supabase
+        .from('users')
+        .select('wallet_address')
+        .ilike('wallet_address', `0x${refCode}%`)
+        .single();
+        
+      if (potentialReferrer) {
+        matchedReferrer = potentialReferrer.wallet_address;
+      }
+    }
+
     // 1. 確認並更新買家的帳號狀態為 ACTIVE
+    // 只有當新會員第一次建立時，才會寫入 referrer_address
+    const { data: existingUser } = await supabase.from('users').select('referrer_address').eq('wallet_address', walletAddress).single();
+    
+    const finalReferrer = existingUser?.referrer_address || matchedReferrer;
+
     const { data: user, error: userError } = await supabase
       .from('users')
-      .upsert({ wallet_address: walletAddress, status: 'ACTIVE' }, { onConflict: 'wallet_address' })
+      .upsert({ 
+        wallet_address: walletAddress, 
+        status: 'ACTIVE',
+        ...(existingUser ? {} : { referrer_address: finalReferrer })
+      }, { onConflict: 'wallet_address' })
       .select()
       .single();
 
