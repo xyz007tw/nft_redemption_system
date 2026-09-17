@@ -4,6 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
+import BuyNFTButton from '@/components/BuyNFTButton';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -40,10 +41,7 @@ export default function Home() {
           <div className="bg-gray-800 p-6 md:p-8 rounded-2xl border border-gray-700 hover:border-purple-500 transition-colors">
             <h3 className="text-xl md:text-2xl font-bold mb-4">{t.buyPackageTitle}</h3>
             <p className="text-sm md:text-base text-gray-400 mb-6">{t.buyPackageDesc}</p>
-            <div className="text-3xl md:text-4xl font-bold mb-8">$990 <span className="text-base md:text-lg text-gray-500">USDT</span></div>
-            <button className="w-full py-4 bg-purple-600 hover:bg-purple-700 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
-              {t.buyBtn}
-            </button>
+            <BuyNFTButton />
           </div>
 
           {/* 核銷/推廣卡片 */}

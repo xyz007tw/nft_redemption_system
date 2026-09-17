@@ -34,7 +34,7 @@ export const USDT_ABI = parseAbi([
 ]);
 
 // ⚠️ We will fill this in after deploying the contract
-export const WEIXIANG_NFT_ADDRESS = '0x0000000000000000000000000000000000000000'; // Replace with actual address
+export const WEIXIANG_NFT_ADDRESS = '0xCf65BCcf7b6880d8e212D2a50f0bee66896bDa6A'; // Deployed to Polygon Mainnet
 // USDT Address on Polygon Mainnet
 export const POLYGON_USDT_ADDRESS = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'; 
 // USDT Address on Polygon Amoy Testnet (Mock)
