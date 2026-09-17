@@ -88,7 +88,7 @@ export default function Dashboard() {
           <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-lg">
             <h3 className="text-gray-400 mb-2 font-medium">{t.dashCurrentLevel}</h3>
             <p className="text-5xl font-black text-purple-400">
-              {stats.totalSales >= 6000 ? '10%' : stats.totalSales >= 600 ? '6%' : '3%'}
+              {stats.totalSales >= 15000 ? '10%' : stats.totalSales >= 6000 ? '6%' : stats.totalSales >= 600 ? '3%' : '0%'}
             </p>
             <p className="text-sm text-gray-500 mt-2">{t.dashNextLevel}</p>
           </div>

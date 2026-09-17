@@ -10,9 +10,10 @@ const NFT_PRICE = 990; // USDT
 
 // 極差獎金門檻設定 (未來可改為從系統設定讀取)
 const TIERS = [
-  { threshold: 6000, rate: 0.10 }, // 將軍 (10%)
-  { threshold: 600, rate: 0.06 },  // 隊長 (6%)
-  { threshold: 0, rate: 0.03 }     // 小兵 (3%)
+  { threshold: 15000, rate: 0.10 }, // 10%
+  { threshold: 6000, rate: 0.06 },  // 6%
+  { threshold: 600, rate: 0.03 },   // 3%
+  { threshold: 0, rate: 0.0 }       // 0%
 ];
 
 function getCommissionRate(totalSales: number) {
