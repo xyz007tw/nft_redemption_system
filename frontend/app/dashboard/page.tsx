@@ -26,19 +26,19 @@ export default function Dashboard() {
 
       // 2. 即時連線至 Supabase 撈取業績與獎金資料
       const fetchStats = async () => {
-        // 抓取累積業績 (若剛註冊則為 0)
-        const { data: user } = await supabase.from('nft_users').select('total_personal_sales').eq('wallet_address', address).single();
+        // 取得累積業績 (如果沒註冊會是 0)
+        const { data: user } = await supabase.from('users').select('total_sales').eq('wallet_address', address).single();
         
-        // 抓取未結算獎金總額
-        const { data: commissions } = await supabase.from('nft_commissions')
-          .select('amount_usd')
-          .eq('affiliate_wallet', address)
-          .eq('status', 'Pending');
+        // 取得未結算獎金總和
+        const { data: commissions } = await supabase.from('commissions')
+          .select('amount')
+          .eq('wallet_address', address)
+          .eq('status', 'PENDING');
           
-        const pending = commissions?.reduce((sum, c) => sum + Number(c.amount_usd), 0) || 0;
+        const pending = commissions?.reduce((sum, c) => sum + Number(c.amount), 0) || 0;
 
         setStats({
-          totalSales: user?.total_personal_sales || 0,
+          totalSales: user?.total_sales || 0,
           pendingCommission: pending
         });
       };
