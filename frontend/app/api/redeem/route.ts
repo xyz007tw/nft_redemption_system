@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder_key' // Use service role for backend logic
 );
 
-const NFT_PRICE = 990; // USDT
+const NFT_PRICE = 99; // USDT
 
 // 極差獎金門檻設定 (未來可改為從系統設定讀取)
 const TIERS = [

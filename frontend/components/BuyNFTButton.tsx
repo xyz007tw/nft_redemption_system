@@ -24,7 +24,7 @@ export default function BuyNFTButton() {
     functionName: 'priceInUSDT',
   });
 
-  const price = priceData ? (priceData as bigint) : parseUnits("990", 6);
+  const price = priceData ? (priceData as bigint) : parseUnits("99", 6);
   const displayPrice = formatUnits(price, 6);
 
   // 2. Read USDT Allowance
