@@ -5,6 +5,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
+import { useState } from 'react';
 
 export default function Home() {
   const { t } = useLanguage();
