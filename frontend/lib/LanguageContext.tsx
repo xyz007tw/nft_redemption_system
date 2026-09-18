@@ -15,11 +15,27 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('zh-TW');
 
-  // Load from local storage if available
+  // Load from local storage or detect from browser
   useEffect(() => {
     const saved = localStorage.getItem('lang') as Lang;
     if (saved && translations[saved]) {
       setTimeout(() => setLangState(saved), 0);
+    } else {
+      // 自動偵測瀏覽器語系 (比 IP 判定更精準且無延遲)
+      const browserLang = navigator.language || '';
+      let defaultLang: Lang = 'en-US';
+      
+      if (browserLang.toLowerCase().includes('zh-cn')) {
+        defaultLang = 'zh-CN';
+      } else if (browserLang.toLowerCase().includes('zh')) {
+        defaultLang = 'zh-TW';
+      } else if (browserLang.toLowerCase().includes('ja')) {
+        defaultLang = 'ja-JP';
+      } else if (browserLang.toLowerCase().includes('ko')) {
+        defaultLang = 'ko-KR';
+      }
+      
+      setTimeout(() => setLangState(defaultLang), 0);
     }
   }, []);
 
