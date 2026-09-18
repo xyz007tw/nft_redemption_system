@@ -196,7 +196,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h4 className="text-xl font-bold mb-2">已是節點投資人？</h4>
-            <p className="text-gray-400">前往管理面板取得您的專屬聯盟行銷推廣連結，享受最高達 15% 的智能合約即時分佣。</p>
+            <p className="text-gray-400">前往管理面板取得您的專屬聯盟行銷推廣連結，享受最高達 25% 的智能合約分佣。</p>
           </div>
           <Link href="/dashboard">
             <button className="px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-xl text-lg font-bold transition-all">
