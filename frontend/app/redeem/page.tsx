@@ -20,7 +20,7 @@ export default function RedeemPage() {
     address: WEIXIANG_NFT_ADDRESS as `0x${string}`,
     abi: WEIXIANG_NFT_ABI,
     functionName: 'balanceOf',
-    args: address ? [address] : undefined,
+    args: address ? [address, BigInt(1)] : undefined,
     query: {
       enabled: !!address,
     }

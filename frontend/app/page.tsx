@@ -10,12 +10,15 @@ export default function Home() {
   const { t } = useLanguage();
 
   const packages = [
-    { name: '體驗創始包', amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
-    { name: '輕量增長包', amount: 3, price: 198, unitPrice: 66.0, discount: '66 折', roi: '+50%' },
-    { name: '商隊矩陣包', amount: 30, price: 1788, unitPrice: 59.6, discount: '60 折', roi: '+66%' },
-    { name: '超級節點包', amount: 108, price: 5400, unitPrice: 50.0, discount: '50 折', roi: '+98%' },
-    { name: '創世財團包', amount: 360, price: 12000, unitPrice: 33.3, discount: '33 折 (極致底價)', roi: '+197%' },
+    { id: 1, name: '體驗創始包', amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
+    { id: 2, name: '輕量增長包', amount: 3, price: 198, unitPrice: 66.0, discount: '66 折', roi: '+50%' },
+    { id: 3, name: '商隊矩陣包', amount: 30, price: 1788, unitPrice: 59.6, discount: '60 折', roi: '+66%' },
+    { id: 4, name: '超級節點包', amount: 108, price: 5400, unitPrice: 50.0, discount: '50 折', roi: '+98%' },
+    { id: 5, name: '創世財團包', amount: 360, price: 12000, unitPrice: 33.3, discount: '33 折 (極致底價)', roi: '+197%' },
   ];
+
+  const [selectedPackageId, setSelectedPackageId] = useState(1);
+  const selectedPackage = packages.find(p => p.id === selectedPackageId) || packages[0];
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#0a0a0f] text-white overflow-x-hidden font-sans selection:bg-purple-500/30">
@@ -100,6 +103,23 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 萬商全球戰略大合作 */}
+      <section className="w-full max-w-7xl px-6 py-16">
+        <div className="bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-red-900/40 border border-pink-500/30 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
+          <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
+            🤝 歡迎萬商全球戰略大合作
+          </h2>
+          <p className="text-lg md:text-2xl text-pink-200 mb-8 max-w-4xl mx-auto leading-relaxed">
+            我們正在尋找全球各地的百業商企、行銷團隊與 DAO 組織。
+            將您的產品與微享 AI 流量憑證結合，打造極具競爭力的「買贈搭售」方案，共同瓜分 AI 自動化時代的流量紅利！
+          </p>
+          <button className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105">
+            立即洽詢全球合作方案
+          </button>
+        </div>
+      </section>
+
       {/* 眾籌認購區塊 */}
       <section id="crowdfund" className="w-full max-w-7xl px-6 py-24">
         <div className="text-center mb-16">
@@ -123,8 +143,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {packages.map((pkg, idx) => (
-                <tr key={idx} className="hover:bg-white/5 transition-colors">
+              {packages.map((pkg) => (
+                <tr key={pkg.id} className="hover:bg-white/5 transition-colors">
                   <td className="p-6 font-bold text-lg">{pkg.name}</td>
                   <td className="p-6">{pkg.amount} 枚</td>
                   <td className="p-6 font-mono text-xl">${pkg.price.toLocaleString()}</td>
@@ -142,14 +162,30 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[80px]" />
           <div className="relative z-10">
             <h3 className="text-3xl font-black mb-2 text-center">立即參與眾籌</h3>
-            <p className="text-center text-gray-400 mb-8">連接錢包，獲取您的微享 AI 生產力憑證</p>
+            <p className="text-center text-gray-400 mb-8">選擇方案並連接錢包，獲取您的微享 AI 生產力憑證</p>
             
-            <div className="bg-black/40 p-6 rounded-2xl border border-white/5 mb-6">
-              <BuyNFTButton />
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-400 mb-2">請選擇認購方案：</label>
+              <select 
+                value={selectedPackageId}
+                onChange={(e) => setSelectedPackageId(Number(e.target.value))}
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              >
+                {packages.map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.name} - {pkg.amount} 枚 (${pkg.price})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-black/40 p-6 rounded-2xl border border-white/5 mb-6 text-center">
+               <div className="text-4xl font-bold mb-6">${selectedPackage.price} <span className="text-xl text-gray-500">USDT</span></div>
+               <BuyNFTButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
             </div>
             
             <p className="text-xs text-center text-gray-500 mt-6">
-              * 目前智慧合約支援單枚鑄造。若需認購「輕量增長包」以上額度獲取批量折扣，請聯繫官方開通大宗批發專屬合約，或重複點擊購買。
+              * 您所選擇的方案將直接透過智能合約進行去中心化結算。
             </p>
           </div>
         </div>

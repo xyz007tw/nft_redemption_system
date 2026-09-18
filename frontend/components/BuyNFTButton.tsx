@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 import { 
   WEIXIANG_NFT_ADDRESS, 
   WEIXIANG_NFT_ABI, 
@@ -12,22 +12,18 @@ import {
 import { useLanguage } from '@/lib/LanguageContext';
 import { useRouter } from 'next/navigation';
 
-export default function BuyNFTButton() {
+interface BuyNFTButtonProps {
+  packageId: number;
+  priceInUSDT: number;
+}
+
+export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonProps) {
   const { address, isConnected } = useAccount();
-  const { t } = useLanguage();
   const router = useRouter();
 
-  // 1. Read NFT Price
-  const { data: priceData } = useReadContract({
-    address: WEIXIANG_NFT_ADDRESS as `0x${string}`,
-    abi: WEIXIANG_NFT_ABI,
-    functionName: 'priceInUSDT',
-  });
+  const price = parseUnits(priceInUSDT.toString(), 6);
 
-  const price = priceData ? (priceData as bigint) : parseUnits("99", 6);
-  const displayPrice = formatUnits(price, 6);
-
-  // 2. Read USDT Allowance
+  // Read USDT Allowance
   const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
     address: POLYGON_USDT_ADDRESS as `0x${string}`,
     abi: USDT_ABI,
@@ -41,7 +37,7 @@ export default function BuyNFTButton() {
   const allowance = allowanceData ? (allowanceData as bigint) : BigInt(0);
   const needsApproval = allowance < price;
 
-  // 3. Write Contracts (Approve & Buy)
+  // Write Contracts (Approve & Buy)
   const { data: hash, writeContract, isPending } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
@@ -55,7 +51,7 @@ export default function BuyNFTButton() {
       if (txType === 'approve') {
         refetchAllowance();
       } else if (txType === 'buy') {
-        alert("🎉 購買成功！即將為您導向兌換開通頁面...");
+        alert("🎉 眾籌成功！即將為您導向兌換與分佣頁面...");
         router.push('/redeem');
       }
       setTxType(null);
@@ -81,25 +77,23 @@ export default function BuyNFTButton() {
       writeContract({
         address: WEIXIANG_NFT_ADDRESS as `0x${string}`,
         abi: WEIXIANG_NFT_ABI,
-        functionName: 'buyNFT',
+        functionName: 'buyPackage',
+        args: [BigInt(packageId)]
       });
     }
   };
 
-  let buttonText = t.buyBtn;
+  let buttonText = "選擇此方案並結帳";
   if (isPending || isConfirming) {
-    buttonText = txType === 'approve' ? "授權中..." : "購買中(等待區塊鏈確認)...";
+    buttonText = txType === 'approve' ? "授權中(請在錢包確認)..." : "鑄造中(等待區塊鏈確認)...";
   } else if (isConnected && needsApproval) {
     buttonText = "1. 授權扣款 (Approve USDT)";
   } else if (isConnected && !needsApproval) {
-    buttonText = "2. 確認購買 (Buy NFT)";
+    buttonText = `2. 確認認購 ($${priceInUSDT})`;
   }
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="text-3xl md:text-4xl font-bold mb-8">
-        ${displayPrice} <span className="text-base md:text-lg text-gray-500">USDT</span>
-      </div>
       <button 
         onClick={handleAction}
         disabled={isPending || isConfirming}
@@ -108,7 +102,7 @@ export default function BuyNFTButton() {
         {buttonText}
       </button>
       {isConfirmed && txType === 'approve' && (
-        <p className="text-green-400 text-sm mt-2">授權成功！請點擊確認購買。</p>
+        <p className="text-green-400 text-sm mt-2">授權成功！請點擊確認認購。</p>
       )}
     </div>
   );
