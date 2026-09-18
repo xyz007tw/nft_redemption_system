@@ -34,7 +34,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="w-full max-w-7xl px-6 py-20 md:py-32 flex flex-col items-center text-center relative">
+      <section className="w-full max-w-7xl px-6 py-16 md:py-24 flex flex-col items-center text-center relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none -z-10" />
         
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 text-sm md:text-base font-medium text-purple-300">
@@ -69,7 +69,7 @@ export default function Home() {
       </section>
 
       {/* 核心價值主張 */}
-      <section id="whitepaper" className="w-full max-w-7xl px-6 py-20 border-t border-white/5">
+      <section id="whitepaper" className="w-full max-w-7xl px-6 py-12 md:py-16 border-t border-white/5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10">
             <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 border border-emerald-500/30">
