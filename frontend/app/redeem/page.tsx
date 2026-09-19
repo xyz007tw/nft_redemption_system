@@ -27,37 +27,42 @@ export default function RedeemPage() {
   });
 
   const { signMessageAsync } = useSignMessage();
+  const { data: hash, isPending: isConfirming } = useWriteContract();
+  const [email, setEmail] = useState('');
 
+  // 檢查用戶是否有 NFT
   const hasNFT = balance && (balance as bigint) > BigInt(0);
 
   const handleRedeem = async () => {
-    if (!address) return;
+    if (!address) return alert("請先連結錢包");
+    if (!email || !email.includes('@')) return alert("請輸入有效的電子郵件，我們將發送系統設定表單給您。");
+
     try {
       setIsVerifying(true);
       
       // 1. 簽名驗證身分 (Proof of ownership)
       const message = `我同意使用錢包 ${address} 開通 Web3 自動來客系統權限。\n時間戳: ${Date.now()}`;
-      await signMessageAsync({ message });
+      const signature = await signMessageAsync({ message });
 
       // 2. 呼叫後端 API，開通權限並計算發放極差獎金
       const refCode = localStorage.getItem('weixiang_referrer');
       const response = await fetch('/api/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: address, refCode })
+        body: JSON.stringify({ walletAddress: address, signature, message, email, refCode })
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'API 請求失敗');
+        throw new Error(data.error || 'API 請求失敗');
       }
 
-      alert("🎉 開通成功！您的帳號權限已解鎖，獎金已自動結算。");
+      alert("🎉 開通成功！我們已發送一封「系統設定指南」到您的信箱，請查收並回覆相關資料。");
       router.push('/dashboard');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("開通失敗，請確認您已拒絕簽名或稍後再試。");
+      alert("錯誤: " + (error.message || '開通失敗，請確認您已拒絕簽名或稍後再試。'));
     } finally {
       setIsVerifying(false);
     }
@@ -90,6 +95,19 @@ export default function RedeemPage() {
               <h2 className="text-2xl font-bold text-green-400">驗證成功！</h2>
               <p className="text-green-200 mt-2">您的錢包內持有 {balance?.toString()} 枚微享 NFT 憑證。</p>
             </div>
+
+            <div className="text-left">
+              <label className="block text-sm font-medium text-gray-400 mb-2">請輸入您的聯絡信箱 (必填)</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@gmail.com"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-green-500 focus:outline-none"
+              />
+              <p className="text-xs text-gray-500 mt-2">我們將發送系統設定需求表單至此信箱。</p>
+            </div>
+
             <button 
               onClick={handleRedeem}
               disabled={isVerifying}
