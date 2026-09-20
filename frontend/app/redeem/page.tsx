@@ -27,7 +27,6 @@ export default function RedeemPage() {
   });
 
   const { signMessageAsync } = useSignMessage();
-  const { data: hash, isPending: isConfirming } = useWriteContract();
   const [email, setEmail] = useState('');
 
   // 檢查用戶是否有 NFT

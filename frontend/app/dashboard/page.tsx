@@ -117,6 +117,9 @@ export default function Dashboard() {
               {t.dashCopyBtn}
             </button>
           </div>
+          <p className="text-pink-400 mt-6 text-sm font-medium">
+            ※ 推薦服務的三項回饋制度 - 含每個推薦團隊僅計算業績1萬美元/年
+          </p>
         </div>
       </div>
     </div>
