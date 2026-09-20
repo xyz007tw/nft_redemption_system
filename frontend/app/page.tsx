@@ -9,7 +9,11 @@ import PayUniButton from '@/components/PayUniButton';
 import { useState } from 'react';
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+
+  const isChinese = lang.includes('zh');
+  const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
+  const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
 
   const packages = [
     { id: 1, name: '體驗創始包', amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
@@ -69,6 +73,36 @@ export default function Home() {
           <a href="#whitepaper" className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-lg font-bold transition-all backdrop-blur-sm">
             閱讀白皮書摘要
           </a>
+        </div>
+      </section>
+
+      {/* 影音與圖解介紹區塊 (隨語系切換) */}
+      <section className="w-full max-w-7xl px-6 pb-16 flex flex-col md:flex-row items-center gap-12">
+        {/* YouTube Short Video */}
+        <div className="w-full md:w-1/3 flex justify-center">
+          <div className="w-[315px] h-[560px] rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/30">
+            <iframe 
+              width="315" 
+              height="560" 
+              src={introVideoUrl} 
+              title="WeiXiang AI Introduction" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              className="w-full h-full object-cover"
+            ></iframe>
+          </div>
+        </div>
+
+        {/* 資訊圖表 Infographic */}
+        <div className="w-full md:w-2/3 flex justify-center">
+          <div className="w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-white/5">
+            <img 
+              src={introImageUrl} 
+              alt="WeiXiang AI Infographic" 
+              className="w-full h-auto object-contain"
+            />
+          </div>
         </div>
       </section>
 
