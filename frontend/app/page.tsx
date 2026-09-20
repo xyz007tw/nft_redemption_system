@@ -5,6 +5,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
+import PayUniButton from '@/components/PayUniButton';
 import { useState } from 'react';
 
 export default function Home() {
@@ -183,6 +184,7 @@ export default function Home() {
             <div className="bg-black/40 p-6 rounded-2xl border border-white/5 mb-6 text-center">
                <div className="text-4xl font-bold mb-6">${selectedPackage.price} <span className="text-xl text-gray-500">USDT</span></div>
                <BuyNFTButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
+               <PayUniButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
             </div>
             
             <p className="text-xs text-center text-gray-500 mt-6">
