@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW">
-      <body className="bg-gray-900 text-white min-h-screen">
+      <body className="bg-[#0a0a0f] text-white min-h-screen overflow-x-hidden">
         <Suspense fallback={null}>
           <ReferralTracker />
         </Suspense>

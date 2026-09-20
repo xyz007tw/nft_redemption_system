@@ -23,20 +23,22 @@ export default function Home() {
   const selectedPackage = packages.find(p => p.id === selectedPackageId) || packages[0];
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-[#0a0a0f] text-white overflow-x-hidden font-sans selection:bg-purple-500/30">
+    <main className="flex min-h-screen flex-col items-center bg-[#0a0a0f] text-white font-sans selection:bg-purple-500/30">
       {/* 頂部導覽列 */}
-      <nav className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6 p-6 border-b border-white/5 backdrop-blur-md sticky top-0 z-50">
-        <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
-          WeiXiang AI
-        </h1>
-        <div className="flex items-center gap-4">
-          <LanguageSwitcher />
-          <ConnectButton />
+      <nav className="fixed top-0 left-0 w-full flex justify-center z-50 bg-[#0a0a0f]/80 backdrop-blur-lg border-b border-white/5">
+        <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6 p-4 md:p-6">
+          <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+            WeiXiang AI
+          </h1>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <ConnectButton />
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="w-full max-w-7xl px-6 py-16 md:py-24 flex flex-col items-center text-center relative">
+      <section className="w-full max-w-7xl px-6 py-16 md:py-24 mt-20 flex flex-col items-center text-center relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none -z-10" />
         
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 text-sm md:text-base font-medium text-purple-300">
