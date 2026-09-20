@@ -19,6 +19,7 @@ interface BuyNFTButtonProps {
 
 export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonProps) {
   const { address, isConnected } = useAccount();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const price = parseUnits(priceInUSDT.toString(), 6);
@@ -83,26 +84,29 @@ export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonPro
     }
   };
 
-  let buttonText = "選擇此方案並結帳";
+  let buttonText = t.buyBtn2;
   if (isPending || isConfirming) {
-    buttonText = txType === 'approve' ? "授權中(請在錢包確認)..." : "鑄造中(等待區塊鏈確認)...";
+    buttonText = txType === 'approve' ? t.buyApproving : t.buyMinting;
   } else if (isConnected && needsApproval) {
-    buttonText = "1. 授權扣款 (Approve USDT)";
+    buttonText = t.buyBtn1;
   } else if (isConnected && !needsApproval) {
-    buttonText = `2. 確認認購 ($${priceInUSDT})`;
+    buttonText = `${t.buyBtn2} ($${priceInUSDT})`;
   }
 
   return (
     <div className="flex flex-col items-center w-full">
       <button 
         onClick={handleAction}
-        disabled={isPending || isConfirming}
+        disabled={isPending || isConfirming || !isConnected}
         className="w-full py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]"
       >
         {buttonText}
       </button>
       {isConfirmed && txType === 'approve' && (
-        <p className="text-green-400 text-sm mt-2">授權成功！請點擊確認認購。</p>
+        <p className="text-green-400 text-sm mt-2">{t.buyApproveSuccess}</p>
+      )}
+      {!isConnected && (
+        <p className="text-red-400 text-xs mt-2">{t.buyConnect}</p>
       )}
     </div>
   );

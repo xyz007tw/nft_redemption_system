@@ -16,11 +16,11 @@ export default function Home() {
   const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
 
   const packages = [
-    { id: 1, name: t.pkg1Name, amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
-    { id: 2, name: t.pkg2Name, amount: 3, price: 198, unitPrice: 66.0, discount: '66 折', roi: '+50%' },
-    { id: 3, name: t.pkg3Name, amount: 30, price: 1788, unitPrice: 59.6, discount: '60 折', roi: '+66%' },
-    { id: 4, name: t.pkg4Name, amount: 108, price: 5400, unitPrice: 50.0, discount: '50 折', roi: '+98%' },
-    { id: 5, name: t.pkg5Name, amount: 360, price: 12000, unitPrice: 33.3, discount: '33 折(極致底價)', roi: '+197%' },
+    { id: 1, name: t.pkg1Name, amount: 1, price: 99, unitPrice: 99.0, discount: t.disc1, roi: '-' },
+    { id: 2, name: t.pkg2Name, amount: 3, price: 198, unitPrice: 66.0, discount: t.disc2, roi: '+50%' },
+    { id: 3, name: t.pkg3Name, amount: 30, price: 1788, unitPrice: 59.6, discount: t.disc3, roi: '+66%' },
+    { id: 4, name: t.pkg4Name, amount: 108, price: 5400, unitPrice: 50.0, discount: t.disc4, roi: '+98%' },
+    { id: 5, name: t.pkg5Name, amount: 360, price: 12000, unitPrice: 33.3, discount: t.disc5, roi: '+197%' },
   ];
 
   const [selectedPackageId, setSelectedPackageId] = useState(1);
@@ -196,11 +196,11 @@ export default function Home() {
         <div className="max-w-xl mx-auto bg-gradient-to-br from-gray-800 to-gray-900 p-8 md:p-12 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[80px]" />
           <div className="relative z-10">
-            <h3 className="text-3xl font-black mb-2 text-center">立即參與眾籌</h3>
-            <p className="text-center text-gray-400 mb-8">選擇方案並連接錢包，獲取您的微享 AI 生產力憑證</p>
+            <h3 className="text-3xl font-black mb-2 text-center">{t.checkoutTitle}</h3>
+            <p className="text-center text-gray-400 mb-8">{t.checkoutSub}</p>
             
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-400 mb-2">請選擇認購方案：</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">{t.checkoutSelectLabel}</label>
               <select 
                 value={selectedPackageId}
                 onChange={(e) => setSelectedPackageId(Number(e.target.value))}
@@ -208,7 +208,7 @@ export default function Home() {
               >
                 {packages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
-                    {pkg.name} - {pkg.amount} 枚 (${pkg.price})
+                    {pkg.name} - {pkg.amount} {t.unitCount} (${pkg.price})
                   </option>
                 ))}
               </select>
