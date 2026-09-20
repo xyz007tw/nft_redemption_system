@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface PayUniButtonProps {
   packageId: number;
@@ -10,6 +11,7 @@ interface PayUniButtonProps {
 
 export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonProps) {
   const { address } = useAccount();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -67,14 +69,14 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
         onClick={() => setShowEmailInput(true)}
         className="w-full mt-4 py-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
       >
-        <span>💳</span> 信用卡 / ATM 台幣專屬通道
+        <span></span> {t.payCard}
       </button>
     );
   }
 
   return (
     <div className="w-full mt-4 p-4 bg-gray-900 border border-gray-700 rounded-xl text-left">
-      <p className="text-sm text-gray-400 mb-2">請輸入您的聯絡信箱 (必填)</p>
+      <p className="text-sm text-gray-400 mb-2">{t.payEmailLabel}</p>
       <input
         type="email"
         value={email}
@@ -87,10 +89,10 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
         disabled={isProcessing || !address}
         className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 disabled:opacity-50 rounded-lg font-bold transition-all"
       >
-        {isProcessing ? "跳轉金流中..." : "確認並前往統一金流結帳"}
+        {isProcessing ? t.payJumping : t.payConfirm}
       </button>
       {!address && (
-        <p className="text-red-400 text-xs mt-2 text-center">請先在右上角連結錢包</p>
+        <p className="text-red-400 text-xs mt-2 text-center">{t.payConnectWallet}</p>
       )}
     </div>
   );

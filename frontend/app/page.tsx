@@ -239,22 +239,22 @@ export default function Home() {
             </div>
             
             <p className="text-xs text-center text-gray-500 mt-6">
-              * 您所選擇的方案將直接透過智能合約進行去中心化結算。
+              {t.footerNotice}
             </p>
           </div>
         </div>
       </section>
 
-      {/* 推廣連結 */}
+      {/* 推廣區塊 */}
       <section className="w-full bg-white/5 border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
-            <h4 className="text-xl font-bold mb-2">已是節點投資人？</h4>
-            <p className="text-gray-400">前往管理面板取得您的專屬聯盟行銷推廣連結，享受最高達 25% 的智能合約分佣。</p>
+            <h4 className="text-xl font-bold mb-2">{t.footerNodeTitle}</h4>
+            <p className="text-gray-400">{t.footerNodeDesc}</p>
           </div>
           <Link href="/dashboard">
             <button className="px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-xl text-lg font-bold transition-all">
-              進入投資人儀表板
+              {t.footerNodeBtn}
             </button>
           </Link>
         </div>
