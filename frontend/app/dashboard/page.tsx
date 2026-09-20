@@ -121,6 +121,28 @@ export default function Dashboard() {
             ※ 推薦服務的三項回饋制度 - 含每個推薦團隊僅計算業績1萬美元/年
           </p>
         </div>
+
+        {/* 萬商眾籌 NFT 合作規則 */}
+        <div id="crowdfund-rules" className="bg-gray-800 p-6 md:p-10 rounded-2xl border border-pink-900/50 shadow-[0_0_30px_rgba(236,72,153,0.15)] mt-12">
+          <h2 className="text-xl md:text-3xl font-bold mb-6 text-pink-500">萬商眾籌 NFT 合作規則與全球戰略</h2>
+          <div className="text-gray-300 space-y-4 text-base md:text-lg leading-relaxed bg-gray-900/50 p-6 rounded-xl border border-gray-700">
+            <p>
+              凡眾籌方案 <span className="text-white font-bold">$1788 / $5400 / $12000</span> 的金額下，可無需再繳建置眾籌系統費用。
+            </p>
+            <p>
+              但相關串接服務費依起初的眾籌金額當基礎，超過系統設計費需另行計算，且<strong className="text-pink-400">每月眾籌的系統服務費依銷售額 10% 來計費</strong>。
+            </p>
+          </div>
+          <div className="mt-8 flex justify-center">
+            <a 
+              href="mailto:xyz007tw@gmail.com" 
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105"
+            >
+              ✉️ 請洽總工程師 / CALL CTO : xyz007tw@gmail.com
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );

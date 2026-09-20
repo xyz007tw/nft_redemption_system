@@ -116,9 +116,9 @@ export default function Home() {
             我們正在尋找全球各地的百業商企、行銷團隊與 DAO 組織。
             將您的產品與微享 AI 流量憑證結合，打造極具競爭力的「買贈搭售」方案，共同瓜分 AI 自動化時代的流量紅利！
           </p>
-          <button className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105">
+          <Link href="/dashboard#crowdfund-rules" className="inline-block px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105">
             立即洽詢全球合作方案
-          </button>
+          </Link>
         </div>
       </section>
 
