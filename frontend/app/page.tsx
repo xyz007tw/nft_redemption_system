@@ -16,11 +16,11 @@ export default function Home() {
   const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
 
   const packages = [
-    { id: 1, name: '體驗創始包', amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
-    { id: 2, name: '輕量增長包', amount: 3, price: 198, unitPrice: 66.0, discount: '66 折', roi: '+50%' },
-    { id: 3, name: '商隊矩陣包', amount: 30, price: 1788, unitPrice: 59.6, discount: '60 折', roi: '+66%' },
-    { id: 4, name: '超級節點包', amount: 108, price: 5400, unitPrice: 50.0, discount: '50 折', roi: '+98%' },
-    { id: 5, name: '創世財團包', amount: 360, price: 12000, unitPrice: 33.3, discount: '33 折 (極致底價)', roi: '+197%' },
+    { id: 1, name: t.pkg1Name, amount: 1, price: 99, unitPrice: 99.0, discount: '原價', roi: '-' },
+    { id: 2, name: t.pkg2Name, amount: 3, price: 198, unitPrice: 66.0, discount: '66 折', roi: '+50%' },
+    { id: 3, name: t.pkg3Name, amount: 30, price: 1788, unitPrice: 59.6, discount: '60 折', roi: '+66%' },
+    { id: 4, name: t.pkg4Name, amount: 108, price: 5400, unitPrice: 50.0, discount: '50 折', roi: '+98%' },
+    { id: 5, name: t.pkg5Name, amount: 360, price: 12000, unitPrice: 33.3, discount: '33 折(極致底價)', roi: '+197%' },
   ];
 
   const [selectedPackageId, setSelectedPackageId] = useState(1);
@@ -54,24 +54,23 @@ export default function Home() {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
-          基於非稀釋性資產憑證之
+          {t.heroTitle1}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-            去中心化流量生產力網路
+            {t.heroTitle2}
           </span>
         </h1>
         
         <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl leading-relaxed">
-          打破全球企業「獲客成本通膨」與「注意力稀缺」危機。
-          結合 NFT 服務預售模式與 AI 自來客自動化系統，打造主動精準吸引的終極利器。
+          {t.heroSub}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <a href="#crowdfund" className="px-8 py-4 bg-white text-black hover:bg-gray-200 rounded-xl text-lg font-bold transition-all transform hover:scale-105">
-            參與節點眾籌
+            {t.btnCrowdfund}
           </a>
           <a href="#whitepaper" className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-lg font-bold transition-all backdrop-blur-sm">
-            閱讀白皮書摘要
+            {t.btnWhitepaper}
           </a>
         </div>
       </section>
@@ -113,9 +112,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 border border-emerald-500/30">
               <span className="text-2xl">⏳</span>
             </div>
-            <h3 className="text-2xl font-bold mb-4">180 天產能絕對錨定</h3>
-            <p className="text-gray-400 leading-relaxed">
-              每枚微享 NFT 嚴格對應 AI 系統 180 天核心功能使用權，將資金直接轉化為確定性的生產力工具，非純投機迷因。
+            <h3 className="text-2xl font-bold mb-4">{t.val1Title}</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              {t.val1Desc}
             </p>
           </div>
           
@@ -123,9 +122,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 border border-blue-500/30">
               <span className="text-2xl">⚖️</span>
             </div>
-            <h3 className="text-2xl font-bold mb-4">合規避險架構</h3>
-            <p className="text-gray-400 leading-relaxed">
-              憑證嚴格限定於「數位服務交換契約 (Digital Service Voucher)」，有效規避 Howey Test 證券化風險，符合歐美 SEC/MiCA 框架。
+            <h3 className="text-2xl font-bold mb-4">{t.val2Title}</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              {t.val2Desc}
             </p>
           </div>
 
@@ -133,9 +132,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-6 border border-pink-500/30">
               <span className="text-2xl">📈</span>
             </div>
-            <h3 className="text-2xl font-bold mb-4">批發轉售套利 (Arbitrage)</h3>
-            <p className="text-gray-400 leading-relaxed">
-              憑證可於 OpenSea、Magic Eden 等二級市場無限制自由交易。早期大戶以極低底價認購，創造高達 197% 的明確套利空間。
+            <h3 className="text-2xl font-bold mb-4">{t.val3Title}</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">
+              {t.val3Desc}
             </p>
           </div>
         </div>
@@ -146,14 +145,13 @@ export default function Home() {
         <div className="bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-red-900/40 border border-pink-500/30 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
           <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
-            🤝 歡迎萬商全球戰略大合作
+            {t.coopTitle}
           </h2>
           <p className="text-lg md:text-2xl text-pink-200 mb-8 max-w-4xl mx-auto leading-relaxed">
-            我們正在尋找全球各地的百業商企、行銷團隊與 DAO 組織。
-            將您的產品與微享 AI 流量憑證結合，打造極具競爭力的「買贈搭售」方案，共同瓜分 AI 自動化時代的流量紅利！
+            {t.coopDesc}
           </p>
           <Link href="/dashboard#crowdfund-rules" className="inline-block px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105">
-            立即洽詢全球合作方案
+            {t.coopBtn}
           </Link>
         </div>
       </section>
@@ -161,10 +159,9 @@ export default function Home() {
       {/* 眾籌認購區塊 */}
       <section id="crowdfund" className="w-full max-w-7xl px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">階梯式節點眾籌方案</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-6">{t.crowdTitle}</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            專注於「批發巨額價差」、「即買即省生產力」與「二級市場自由流通」。
-            提早佈局，掌握未來 AI 流量分發定價權。
+            {t.crowdDesc}
           </p>
         </div>
 
@@ -172,12 +169,12 @@ export default function Home() {
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/5">
-                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">方案級別</th>
-                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">憑證數量</th>
-                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">總售價 (USD)</th>
-                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">單枚成本</th>
-                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">折扣</th>
-                <th className="p-6 text-sm text-emerald-400 font-bold tracking-wider uppercase">預估 ROI</th>
+                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">{t.colLevel}</th>
+                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">{t.colAmount}</th>
+                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">{t.colPrice}</th>
+                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">{t.colUnitPrice}</th>
+                <th className="p-6 text-sm text-gray-400 font-semibold tracking-wider uppercase">{t.colDiscount}</th>
+                <th className="p-6 text-sm text-emerald-400 font-bold tracking-wider uppercase">ROI</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -217,10 +214,28 @@ export default function Home() {
               </select>
             </div>
 
-            <div className="bg-black/40 p-6 rounded-2xl border border-white/5 mb-6 text-center">
-               <div className="text-4xl font-bold mb-6">${selectedPackage.price} <span className="text-xl text-gray-500">USDT</span></div>
-               <BuyNFTButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
-               <PayUniButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
+            <div className="flex flex-col gap-4">
+              <BuyNFTButton 
+                packageId={selectedPackage.id} 
+                priceInUSDT={selectedPackage.price}
+              />
+              
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-gray-700"></div>
+                <span className="flex-shrink-0 mx-4 text-gray-500 text-sm font-medium">OR</span>
+                <div className="flex-grow border-t border-gray-700"></div>
+              </div>
+
+              <div className="w-full relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+                <PayUniButton 
+                  packageId={selectedPackage.id}
+                  priceInUSDT={selectedPackage.price}
+                />
+                <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12 animate-pulse">
+                  {t.payCard}
+                </div>
+              </div>
             </div>
             
             <p className="text-xs text-center text-gray-500 mt-6">
