@@ -6,10 +6,18 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const { t, lang } = useLanguage();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref');
+    if (refCode) {
+      localStorage.setItem('weixiang_referrer', refCode);
+    }
+  }, []);
 
   const isChinese = lang.includes('zh');
   const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';

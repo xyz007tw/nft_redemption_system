@@ -20,9 +20,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (address) {
-      // 1. 自動為該錢包地址產生專屬推廣連結 (取錢包前綴作為推廣碼)
+      // 1. 產生該用戶專屬推廣連結 (取錢包前綴作推廣碼)
       const code = address.substring(2, 8).toUpperCase();
-      setTimeout(() => setReferralLink(`https://weixiang.com/buy?ref=${code}`), 0);
+      setTimeout(() => setReferralLink(`${window.location.origin}/?ref=${code}`), 0);
 
       // 2. 即時連線至 Supabase 撈取業績與獎金資料
       const fetchStats = async () => {

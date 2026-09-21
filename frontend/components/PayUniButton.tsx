@@ -17,19 +17,26 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
   const [showEmailInput, setShowEmailInput] = useState(false);
 
   const handlePayUniCheckout = async () => {
-    if (!address) return alert("請先連結您的 Web3 錢包，作為資產綁定地址");
-    if (!email || !email.includes('@')) return alert("請輸入有效的聯絡信箱");
-
+    if (!address || !email) {
+      alert("請填寫 Email 並連接錢包");
+      return;
+    }
+    
+    setIsProcessing(true);
     try {
-      setIsProcessing(true);
       const refCode = localStorage.getItem('weixiang_referrer') || '';
-      
-      const res = await fetch('/api/payuni/checkout', {
+      const response = await fetch('/api/payuni/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packageId, priceInUSDT, walletAddress: address, email, refCode })
+        body: JSON.stringify({
+          packageId,
+          priceInUSDT,
+          buyerAddress: address,
+          email,
+          refCode
+        })
       });
-      const data = await res.json();
+      const data = await response.json();
       
       if (!data.success) throw new Error(data.error || '金流建立失敗');
 
