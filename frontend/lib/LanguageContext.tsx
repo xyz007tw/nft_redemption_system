@@ -33,6 +33,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         defaultLang = 'ja-JP';
       } else if (browserLang.toLowerCase().includes('ko')) {
         defaultLang = 'ko-KR';
+      } else if (browserLang.toLowerCase().includes('vi')) {
+        defaultLang = 'vi-VN';
       }
       
       setTimeout(() => setLangState(defaultLang), 0);
