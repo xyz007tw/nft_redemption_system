@@ -23,15 +23,32 @@ export default function Home() {
   const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
   const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
 
-  const packages = [
-    { id: 1, name: t.pkg1Name, amount: 1, price: 99, unitPrice: 99.0, discount: t.disc1, roi: '-' },
-    { id: 2, name: t.pkg2Name, amount: 3, price: 198, unitPrice: 66.0, discount: t.disc2, roi: '+50%' },
-    { id: 3, name: t.pkg3Name, amount: 30, price: 1788, unitPrice: 59.6, discount: t.disc3, roi: '+66%' },
-    { id: 4, name: t.pkg4Name, amount: 108, price: 5400, unitPrice: 50.0, discount: t.disc4, roi: '+98%' },
-    { id: 5, name: t.pkg5Name, amount: 360, price: 12000, unitPrice: 33.3, discount: t.disc5, roi: '+197%' },
+  const defaultPackages = [
+    { id: 1, name_zh: t.pkg1Name, amount: 1, price: 99, discount_text: t.disc1, roi: '-' },
+    { id: 2, name_zh: t.pkg2Name, amount: 3, price: 198, discount_text: t.disc2, roi: '+50%' },
+    { id: 3, name_zh: t.pkg3Name, amount: 30, price: 1788, discount_text: t.disc3, roi: '+66%' },
+    { id: 4, name_zh: t.pkg4Name, amount: 108, price: 5400, discount_text: t.disc4, roi: '+98%' },
+    { id: 5, name_zh: t.pkg5Name, amount: 360, price: 12000, discount_text: t.disc5, roi: '+197%' },
   ];
 
+  const [packages, setPackages] = useState<any[]>(defaultPackages);
   const [selectedPackageId, setSelectedPackageId] = useState(1);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch('/api/admin/packages');
+        const data = await res.json();
+        if (data.success && data.packages && data.packages.length > 0) {
+          setPackages(data.packages);
+        }
+      } catch (e) {
+        console.error("Failed to fetch dynamic packages", e);
+      }
+    };
+    fetchPackages();
+  }, []);
+
   const selectedPackage = packages.find(p => p.id === selectedPackageId) || packages[0];
 
   return (
@@ -185,19 +202,20 @@ export default function Home() {
                 <th className="p-6 text-sm text-emerald-400 font-bold tracking-wider uppercase">ROI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {packages.map((pkg) => (
-                <tr key={pkg.id} className="hover:bg-white/5 transition-colors">
-                  <td className="p-6 font-bold text-lg">{pkg.name}</td>
-                  <td className="p-6">{pkg.amount} 枚</td>
-                  <td className="p-6 font-mono text-xl">${pkg.price.toLocaleString()}</td>
-                  <td className="p-6 font-mono text-gray-400">${pkg.unitPrice.toFixed(1)}</td>
-                  <td className="p-6"><span className="px-3 py-1 rounded-full bg-white/10 text-sm">{pkg.discount}</span></td>
-                  <td className="p-6 font-black text-emerald-400">{pkg.roi}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <tbody className="divide-y divide-white/5">
+                {packages.map((pkg) => (
+                  <tr key={pkg.id} className="hover:bg-white/5 transition-colors">
+                    <td className="p-6 font-bold text-lg">{isChinese ? pkg.name_zh : (pkg.name_en || pkg.name_zh)}</td>
+                    <td className="p-6">{pkg.amount} {t.unitCount}</td>
+                    <td className="p-6 font-mono text-xl">${pkg.price.toLocaleString()}</td>
+                    <td className="p-6 font-mono text-gray-400">${(pkg.price / pkg.amount).toFixed(1)}</td>
+                    <td className="p-6 text-green-400 font-bold">{pkg.discount_text || pkg.discount}</td>
+                    <td className="p-6 text-purple-400 font-bold">{pkg.roi_text || pkg.roi}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* 互動購買區塊 */}
@@ -216,7 +234,7 @@ export default function Home() {
               >
                 {packages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
-                    {pkg.name} - {pkg.amount} {t.unitCount} (${pkg.price})
+                    {isChinese ? pkg.name_zh : (pkg.name_en || pkg.name_zh)} - {pkg.amount} {t.unitCount} (${pkg.price})
                   </option>
                 ))}
               </select>
