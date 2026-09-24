@@ -36,14 +36,26 @@ export async function POST(req: Request) {
     const packageId = decryptedInfo.CustomField3;
     const email = decryptedInfo.BuyerMail; // PayUni standard field
 
-    // 1. Process Database updates (Assign NFT / Mark as Paid)
-    // Update or insert user with a purchased flag
-    await supabase.from('users').upsert({
-      wallet_address: walletAddress,
-      // For Web2 payments, we flag them as having purchased the package in our DB
-      has_purchased: true,
+    // 1. Fetch package price in USDT
+    const { data: pkgData } = await supabase
+      .from('packages')
+      .select('price')
+      .eq('id', Number(packageId))
+      .single();
+    
+    const packagePriceUSDT = pkgData?.price || 0;
+
+    // 2. Process Database updates (Assign NFT / Mark as Paid) & Process Affiliate logic
+    // Import dynamically or at the top of file
+    const { processAffiliateCommissions } = await import('@/lib/affiliate');
+    
+    // Process commissions, this also upserts the user with has_purchased: true
+    await processAffiliateCommissions(walletAddress, refCode, packagePriceUSDT);
+
+    // Update the user's last purchased package specifically for fiat tracking
+    await supabase.from('users').update({
       last_purchased_package: packageId,
-    }, { onConflict: 'wallet_address' });
+    }).eq('wallet_address', walletAddress);
 
     // 2. Send emails
     if (email && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
