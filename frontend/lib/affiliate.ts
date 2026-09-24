@@ -50,7 +50,7 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
   if (userError) throw userError;
 
   const referrerAddress = user.referrer_address;
-  if (!referrerAddress) return;
+  if (!referrerAddress) return null;
 
   let currentReferrer = referrerAddress;
   let distributedRate = 0; 
@@ -90,4 +90,6 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
 
     currentReferrer = refUser.referrer_address;
   }
+
+  return referrerAddress;
 }

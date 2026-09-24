@@ -216,7 +216,6 @@ export default function Home() {
               </tbody>
             </table>
           </div>
-        </div>
 
         {/* 互動購買區塊 */}
         <div className="max-w-xl mx-auto bg-gradient-to-br from-gray-800 to-gray-900 p-8 md:p-12 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
