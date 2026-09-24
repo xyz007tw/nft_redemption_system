@@ -20,10 +20,6 @@ export default function AdminNFTPage() {
   const [newPrice, setNewPrice] = useState('');
   const [newDiscount, setNewDiscount] = useState('');
 
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
   const fetchPackages = async () => {
     try {
       const res = await fetch('/api/admin/packages');
@@ -37,6 +33,10 @@ export default function AdminNFTPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPackages();
+  }, []);
 
   const handleSaveFrontend = async (pkgId: number | string, isNew = false) => {
     try {
