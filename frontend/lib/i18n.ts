@@ -1,5 +1,13 @@
 export const translations = {
   'zh-TW': {
+    guideTitle: '三步啟動 AI 自動來客',
+    guideStep1Title: '1. 購買憑證',
+    guideStep1Desc: '選擇最適合您的微享算力方案，支援法幣信用卡一鍵支付與 USDT 購買。',
+    guideStep2Title: '2. 兌換綁定',
+    guideStep2Desc: '前往兌換區連結錢包進行安全簽署，正式啟用您的專屬 AI 憑證權限。',
+    guideStep3Title: '3. 執行交付',
+    guideStep3Desc: '系統自動為您開通專屬 AI 來客矩陣，並發送確認信件，無縫對接業務。',
+
     title: '微享 AI 來客系統',
     subtitle: 'Web3 基礎設施',
     description: '購買微享 NFT 憑證，立即解鎖您的專屬影音與 SEO 自動化艦隊。支援錢包支付與信用卡刷卡。',
@@ -75,6 +83,14 @@ export const translations = {
     footerNodeBtn: '進入投資人儀表板',
   },
   'zh-CN': {
+    guideTitle: '三步启动 AI 自动来客',
+    guideStep1Title: '1. 购买凭证',
+    guideStep1Desc: '选择最适合您的微享算力方案，支援法币信用卡一键支付与 USDT 购买。',
+    guideStep2Title: '2. 兑换绑定',
+    guideStep2Desc: '前往兑换区连结钱包进行安全签署，正式启用您的专属 AI 凭证权限。',
+    guideStep3Title: '3. 执行交付',
+    guideStep3Desc: '系统自动为您开通专属 AI 来客矩阵，并发送确认信件，无缝对接业务。',
+
     title: '微享 AI 来客系统',
     subtitle: 'Web3 基础设施',
     description: '购买微享 NFT 凭证，立即解锁您的专属影音与 SEO 自动化舰队。支持钱包支付与信用卡刷卡。',
@@ -149,6 +165,14 @@ export const translations = {
     footerNodeBtn: '进入投资人仪表板',
   },
   'en-US': {
+    guideTitle: 'Three Steps to Launch AI Traffic',
+    guideStep1Title: '1. Buy Voucher',
+    guideStep1Desc: 'Choose your ideal WeiXiang compute plan. Supports credit card and USDT.',
+    guideStep2Title: '2. Redeem & Bind',
+    guideStep2Desc: 'Link your wallet and securely sign to activate your exclusive AI privileges.',
+    guideStep3Title: '3. Execution & Delivery',
+    guideStep3Desc: 'The system automatically activates your AI traffic matrix and sends a confirmation email.',
+
     title: 'WeiXiang AI Traffic System',
     subtitle: 'Web3 Infrastructure',
     description: 'Purchase WeiXiang NFT vouchers to instantly unlock your exclusive video and SEO automation fleet. Supports Wallet & Credit Card payments.',
@@ -223,6 +247,14 @@ export const translations = {
     footerNodeBtn: 'Enter Investor Dashboard',
   },
   'ja-JP': {
+    guideTitle: 'AIトラフィックを起動する3つのステップ',
+    guideStep1Title: '1. バウチャー購入',
+    guideStep1Desc: '最適なプランを選択し、クレジットカードまたはUSDTで簡単にお支払いいただけます。',
+    guideStep2Title: '2. 引き換えとバインド',
+    guideStep2Desc: 'ウォレットをリンクし、安全に署名して専用のAI権限を有効にします。',
+    guideStep3Title: '3. 実行と納品',
+    guideStep3Desc: 'システムが自動的にAIトラフィックマトリックスを有効にし、確認メールを送信します。',
+
     title: 'WeiXiang AI トラフィックシステム',
     subtitle: 'Web3 インフラストラクチャ',
     description: 'NFTバウチャーを購入して、専用のビデオおよびSEO自動化フリートのロックを解除します。ウォレットとクレジットカードをサポート。',
@@ -297,6 +329,14 @@ export const translations = {
     footerNodeBtn: '投資家ダッシュボードに入る',
   },
   'ko-KR': {
+    guideTitle: 'AI 트래픽을 시작하는 3단계',
+    guideStep1Title: '1. 바우처 구매',
+    guideStep1Desc: '가장 적합한 플랜을 선택하고 신용카드나 USDT로 결제하세요.',
+    guideStep2Title: '2. 교환 및 바인딩',
+    guideStep2Desc: '지갑을 연결하고 안전하게 서명하여 전용 AI 권한을 활성화하세요.',
+    guideStep3Title: '3. 실행 및 제공',
+    guideStep3Desc: '시스템이 자동으로 AI 트래픽 매트릭스를 활성화하고 확인 이메일을 보냅니다.',
+
     title: 'WeiXiang AI 트래픽 시스템',
     subtitle: 'Web3 인프라',
     description: 'WeiXiang NFT 바우처를 구매하여 전용 비디오 및 SEO 자동화 시스템을 즉시 잠금 해제하십시오. 지갑 및 신용 카드 결제 지원.',
@@ -371,6 +411,14 @@ export const translations = {
     footerNodeBtn: '투자자 대시보드 입장',
   },
   'vi-VN': {
+    guideTitle: 'Ba Bước Khởi Động Lưu Lượng AI',
+    guideStep1Title: '1. Mua Voucher',
+    guideStep1Desc: 'Chọn gói điện toán WeiXiang của bạn. Hỗ trợ thẻ tín dụng và USDT.',
+    guideStep2Title: '2. Đổi và Liên kết',
+    guideStep2Desc: 'Liên kết ví của bạn và ký an toàn để kích hoạt các đặc quyền AI độc quyền.',
+    guideStep3Title: '3. Thực thi & Bàn giao',
+    guideStep3Desc: 'Hệ thống tự động kích hoạt ma trận lưu lượng AI và gửi email xác nhận.',
+
     title: 'Hệ thống Lưu lượng WeiXiang AI',
     subtitle: 'Hạ tầng Web3',
     description: 'Mua voucher NFT WeiXiang để mở khóa ngay lập tức đội ngũ tự động hóa video và SEO độc quyền của bạn. Hỗ trợ thanh toán qua Ví Web3 & Thẻ tín dụng.',

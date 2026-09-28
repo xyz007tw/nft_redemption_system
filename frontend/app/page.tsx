@@ -182,6 +182,37 @@ export default function Home() {
       </section>
 
       {/* 眾籌認購區塊 */}
+      
+      {/* 操作流程引導 (3-Step Guide) */}
+      <section className="w-full max-w-7xl px-6 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">{t.guideTitle}</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {/* 連接線 (只在桌面版顯示) */}
+          <div className="hidden md:block absolute top-[4.5rem] left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 -z-10"></div>
+          
+          {/* Step 1 */}
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-blue-500/30 transform rotate-3 hover:rotate-0 transition-transform">💳</div>
+            <h3 className="text-2xl font-bold mb-4">{t.guideStep1Title}</h3>
+            <p className="text-gray-400 leading-relaxed">{t.guideStep1Desc}</p>
+          </div>
+          {/* Step 2 */}
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-purple-500/30 transform -rotate-3 hover:rotate-0 transition-transform">🔗</div>
+            <h3 className="text-2xl font-bold mb-4">{t.guideStep2Title}</h3>
+            <p className="text-gray-400 leading-relaxed">{t.guideStep2Desc}</p>
+          </div>
+          {/* Step 3 */}
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-pink-500/30 transform rotate-3 hover:rotate-0 transition-transform">🚀</div>
+            <h3 className="text-2xl font-bold mb-4">{t.guideStep3Title}</h3>
+            <p className="text-gray-400 leading-relaxed">{t.guideStep3Desc}</p>
+          </div>
+        </div>
+      </section>
+
       <section id="crowdfund" className="w-full max-w-7xl px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black mb-6">{t.crowdTitle}</h2>
