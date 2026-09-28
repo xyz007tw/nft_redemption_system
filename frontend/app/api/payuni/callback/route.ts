@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     // 1. Fetch package price in USDT
     const { data: pkgData } = await supabase
       .from('packages')
-      .select('price')
+      .select('price, product_type, course_link')
       .eq('id', Number(packageId))
       .single();
     
@@ -67,15 +67,34 @@ export async function POST(req: Request) {
         },
       });
 
+            let emailSubject = "🎉 【WeiXiang AI】信用卡付款成功！請查看系統設定資訊";
+      let emailHtml = `
+          <h2>親愛的節點投資人，恭喜您成功購買 AI 生產力憑證！</h2>
+          <p>您的款項已確認完畢。系統已在區塊鏈上為您綁定了節點權限。</p>
+          <p>請前往我們的網站 <strong>兌換區 (Redeem)</strong> 綁定您的 Web3 錢包，即可正式開通 AI 自動來客矩陣。</p>
+          <p>感謝您的參與，讓我們一起掌握未來的定價權！</p>
+          <br>
+          <p>微享 AI 團隊 敬上</p>
+      `;
+
+      if (pkgData?.product_type === 'DIRECT_COURSE') {
+        emailSubject = "🎓 【WeiXiang AI】您的線上知識課程已開通！";
+        emailHtml = `
+          <h2>親愛的學員，恭喜您成功購買線上課程！</h2>
+          <p>您的付款已確認完畢。請點擊下方連結下載/觀看您的專屬課程教材：</p>
+          <br/>
+          <a href="${pkgData.course_link || '#'}" style="display:inline-block; padding: 12px 24px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即前往上課</a>
+          <br/><br/>
+          <p>（此連結為您的專屬課程教材，請妥善保存。）</p>
+          <p>微享 AI 團隊 敬上</p>
+        `;
+      }
+
       const mailToClient = {
         from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: "🎉 【WeiXiang AI】信用卡付款成功！請回覆系統設定資料",
-        html: `
-          <h2>親愛的節點投資人，恭喜您成功購買 AI 生產力憑證！</h2>
-          <p>您的 Web3 錢包：${walletAddress}</p>
-          <p>請您直接「回覆此信件」並提供您的專案網址與聯絡資訊，系統工程師將於 24 小時內為您建置專屬的產線資料夾！</p>
-        `,
+        subject: emailSubject,
+        html: emailHtml
       };
 
       const mailToAdmin = {

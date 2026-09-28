@@ -19,6 +19,8 @@ export default function AdminNFTPage() {
   const [newAmount, setNewAmount] = useState('1');
   const [newPrice, setNewPrice] = useState('');
   const [newDiscount, setNewDiscount] = useState('');
+  const [newProductType, setNewProductType] = useState('NFT_REDEEM');
+  const [newCourseLink, setNewCourseLink] = useState('');
 
   const fetchPackages = async () => {
     try {

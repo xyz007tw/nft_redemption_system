@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, name_zh, name_en, amount, price, discount_text, roi_text, is_active } = body;
+    const { id, name_zh, name_en, amount, price, discount_text, roi_text, is_active, product_type, course_link } = body;
 
     if (!id || !name_zh || !price) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
@@ -39,7 +39,9 @@ export async function POST(req: Request) {
         price: Number(price),
         discount_text: discount_text || '',
         roi_text: roi_text || '',
-        is_active: is_active ?? true
+        is_active: is_active ?? true,
+        product_type: product_type || 'NFT_REDEEM',
+        course_link: course_link || null
       }, { onConflict: 'id' })
       .select()
       .single();
