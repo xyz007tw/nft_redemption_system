@@ -2,6 +2,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Suspense } from 'react';
 import ReferralTracker from '@/components/ReferralTracker';
+import ChatWidget from '@/components/ChatWidget';
 
 export const metadata = {
   title: 'Weixiang AI-ATM | 智能行銷收單系統',
@@ -20,6 +21,7 @@ export default function RootLayout({
           <ReferralTracker />
         </Suspense>
         <Providers>{children}</Providers>
+        <ChatWidget />
       </body>
     </html>
   );
