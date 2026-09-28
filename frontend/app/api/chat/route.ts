@@ -18,10 +18,13 @@ const SYSTEM_KNOWLEDGE = `
 - 購買方式極度友善：支援 Web3 小狐狸錢包 (USDT) 支付，也支援 Web2 法幣信用卡一鍵支付 (PayUni 統一金流，僅限一次性付清)。
 - 權限開通：法幣刷卡可達成「混合門禁 (Hybrid Gating)」，秒速開通 AI 權限，免除自己付區塊鏈 Gas Fee 的煩惱。
 
-【極差獎金分潤制度 (Affiliate System)】
-- 客戶只要購買憑證，就能獲得專屬的推廣連結 (例如: ?ref=錢包地址)。
-- 當其他人透過此連結購買時，系統會在區塊鏈或資料庫永久綁定上下線關係。
-- 採用「極差獎金制度」：根據自身購買的方案級別，享有不同的抽成比例（最高可達 35%）。只要下線的級別低於你，你就能賺取中間的「級差」。
+【萬商眾籌獎金分潤制度 (Affiliate System)】
+- 客戶只要購買憑證，就能獲得專屬的推廣連結。當其他人透過此連結購買時，系統會永久綁定上下線關係。
+- 獎金結構非常豐厚，包含以下四大板塊：
+  1. 「推廣獎金」：25%。
+  2. 「極差獎金」：10% (只要您的級別高於下線，就能賺取中間差額)。
+  3. 「對等獎金」：10%。
+  4. 「團隊加碼獎金」：5% (領取條件：需達成10%極差獎金級別，且推廣了2個團隊業績，單一團隊業績最高採計 1 萬美元/年)。
 
 【技術支援與錢包綁定】
 - 用戶必須在會員中心 (Dashboard) 點擊「連結錢包 (Connect Wallet)」進行安全簽署 (SIWE)。
@@ -31,7 +34,7 @@ const SYSTEM_KNOWLEDGE = `
 - 專業、友善、具有科技感，並帶有強烈的推廣與銷售意識。
 - 當用戶詢問如何賺錢或哪個方案好時，請主動推銷高階方案（如 $1788 甚至 $12000 方案），說明高階方案能解鎖更完整的極差與對等獎金，回本更快。
 - 若遇到不清楚的細節，請委婉告知會請真人指揮官後續聯繫。
-- 請根據用戶使用的語言 (${'用戶目前的偏好語言'}) 來進行回答。
+- 請根據用戶使用的語言 (\${'用戶目前的偏好語言'}) 來進行回答。
 `;
 
 export async function POST(req: Request) {
@@ -41,11 +44,10 @@ export async function POST(req: Request) {
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { reply: '⚠️ 系統管理員尚未配置 Gemini API 金鑰，請稍後再試。' },
-        { status: 200 } // Return 200 so UI displays the message gracefully
+        { status: 200 }
       );
     }
 
-    // 將前端的歷史紀錄轉換為 Gemini SDK 格式
     const formattedHistory = history.map((msg: any) => ({
       role: msg.role === 'ai' ? 'model' : 'user',
       parts: [{ text: msg.content }],
@@ -58,7 +60,7 @@ export async function POST(req: Request) {
         { role: 'user', parts: [{ text: message }] }
       ],
       config: {
-        systemInstruction: SYSTEM_KNOWLEDGE.replace('${用戶目前的偏好語言}', language || 'zh-TW'),
+        systemInstruction: SYSTEM_KNOWLEDGE.replace('\${用戶目前的偏好語言}', language || 'zh-TW'),
         temperature: 0.7,
       }
     });
