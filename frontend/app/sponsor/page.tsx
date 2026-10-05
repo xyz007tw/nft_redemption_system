@@ -86,13 +86,13 @@ export default function SponsorPage() {
                 <button
                   key={pkg.id}
                   onClick={() => setSelectedPackage(pkg)}
-                  className={\`py-3 px-2 rounded-xl border text-center transition-all \${
+                  className={`py-3 px-2 rounded-xl border text-center transition-all \${
                     selectedPackage?.id === pkg.id 
                     ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
                     : 'border-white/10 bg-black/30 hover:border-white/30'
                   }\`}
                 >
-                  <div className="text-lg font-bold text-blue-400">$\${pkg.price}</div>
+                  <div className="text-lg font-bold text-blue-400">${pkg.price}</div>
                   <div className="text-xs text-gray-400 mt-1 truncate px-1">
                     {lang === 'zh-TW' ? pkg.name_zh : pkg.name_en}
                   </div>
