@@ -54,10 +54,10 @@ export default function SponsorPage() {
 
       {/* 標題區 */}
       <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-6 text-center">
-        加入去中心化 AI 革命
+        {t.sponsorPageTitle}
       </h1>
       <p className="text-gray-400 max-w-2xl text-center mb-12 text-lg">
-        成為微享建設者！贊助我們，您不只是給予支持，您將獲得專屬區塊鏈紀念憑證，並立刻取得 25% 全球幣圈推廣分潤權限！
+        {t.sponsorPageSub}
       </p>
 
       {/* 內容/影片播放區 (Placeholder) */}

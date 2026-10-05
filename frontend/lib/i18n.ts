@@ -1,5 +1,7 @@
 export const translations = {
   'zh-TW': {
+    sponsorPageTitle: '🔥 加入去中心化 AI 革命',
+    sponsorPageSub: '成為微享建設者！贊助我們，您不只是給予支持，您將獲得專屬區塊鏈紀念憑證，並立刻取得 25% 全球幣圈推廣分潤權限！',
     sponsorBannerTitle: '🎁 想要支持去中心化 AI 基礎設施？',
     sponsorBannerSub1: '成為知識贊助者，立刻解鎖',
     sponsorBannerSub1Highlight: '25% 全球幣圈流水',
@@ -88,6 +90,8 @@ export const translations = {
     footerNodeBtn: '進入投資人儀表板',
   },
   'zh-CN': {
+    sponsorPageTitle: '🔥 加入去中心化 AI 革命',
+    sponsorPageSub: '成为微享建设者！赞助我们，您不只是给予支持，您将获得专属区块链纪念凭证，并立刻取得 25% 全球币圈推广分润权限！',
     sponsorBannerTitle: '🎁 想要支持去中心化 AI 基础设施？',
     sponsorBannerSub1: '成为知识赞助者，立刻解锁',
     sponsorBannerSub1Highlight: '25% 全球币圈流水',
@@ -175,6 +179,8 @@ export const translations = {
     footerNodeBtn: '进入投资人仪表板',
   },
   'en-US': {
+    sponsorPageTitle: '🔥 Join the Decentralized AI Revolution',
+    sponsorPageSub: 'Become a WeiXiang Builder! By sponsoring us, you not only provide support, but you will also receive an exclusive blockchain commemorative NFT and immediately unlock 25% global crypto affiliate rights!',
     sponsorBannerTitle: '🎁 Support Decentralized AI Infrastructure?',
     sponsorBannerSub1: 'Become a knowledge sponsor and unlock',
     sponsorBannerSub1Highlight: '25% global crypto cash flow',
@@ -262,6 +268,8 @@ export const translations = {
     footerNodeBtn: 'Enter Investor Dashboard',
   },
   'ja-JP': {
+    sponsorPageTitle: '🔥 分散型AI革命に参加しよう',
+    sponsorPageSub: 'WeiXiangビルダーになろう！私たちをスポンサーすることで、サポートを提供するだけでなく、限定ブロックチェーン記念NFTを受け取り、グローバル暗号資産アフィリエイト権の25%を即座にアンロックできます！',
     sponsorBannerTitle: '🎁 分散型AIインフラを支援しませんか？',
     sponsorBannerSub1: '知識スポンサーになって、',
     sponsorBannerSub1Highlight: 'グローバル暗号資産の25%をアンロック',
@@ -349,6 +357,8 @@ export const translations = {
     footerNodeBtn: '投資家ダッシュボードに入る',
   },
   'ko-KR': {
+    sponsorPageTitle: '🔥 탈중앙화 AI 혁명에 참여하세요',
+    sponsorPageSub: 'WeiXiang 빌더가 되어보세요! 저희를 후원함으로써 지원을 제공할 뿐만 아니라 독점 블록체인 기념 NFT를 받고 즉시 25% 글로벌 암호화폐 제휴 권한을 잠금 해제할 수 있습니다!',
     sponsorBannerTitle: '🎁 탈중앙화 AI 인프라를 지원하시겠습니까?',
     sponsorBannerSub1: '지식 스폰서가 되어',
     sponsorBannerSub1Highlight: '글로벌 암호화폐 현금 흐름의 25%를 잠금 해제하세요',
@@ -436,6 +446,8 @@ export const translations = {
     footerNodeBtn: '투자자 대시보드 입장',
   },
   'vi-VN': {
+    sponsorPageTitle: '🔥 Tham gia Cuộc cách mạng AI Phi tập trung',
+    sponsorPageSub: 'Trở thành Người xây dựng WeiXiang! Bằng cách tài trợ cho chúng tôi, bạn không chỉ cung cấp hỗ trợ mà còn nhận được NFT kỷ niệm blockchain độc quyền và ngay lập tức mở khóa 25% quyền liên kết tiền điện tử toàn cầu!',
     sponsorBannerTitle: '🎁 Hỗ trợ Cơ sở hạ tầng AI phi tập trung?',
     sponsorBannerSub1: 'Trở thành nhà tài trợ kiến thức và mở khóa',
     sponsorBannerSub1Highlight: '25% dòng tiền crypto toàn cầu',
