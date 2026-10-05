@@ -11,6 +11,16 @@ export default function SponsorPage() {
   const { t, lang } = useLanguage();
   const isChinese = lang.includes('zh');
   const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
+  
+  const pitchTitle = isChinese ? '{pitchTitle}' : '🚀 About WeiXiang AI Infrastructure';
+  const pitchDesc = isChinese ? '{pitchDesc}' : 'Your sponsorship will be used to:';
+  const point1 = isChinese ? '{point1}' : 'Expand global AI compute nodes';
+  const point2 = isChinese ? '{point2}' : 'Optimize the Web3 affiliate engine';
+  const point3 = isChinese ? '{point3}' : 'Promote decentralized marketing tech';
+  const pitchFooter = isChinese ? '{pitchFooter}' : '(Watch our vision here. Every bit of support fuels the AI revolution)';
+  const selectSponsorTitle = isChinese ? '{selectSponsorTitle}' : '⚡ Choose Your Sponsorship Tier';
+  const selectSponsorDesc = isChinese ? '{selectSponsorDesc}' : 'Your sponsorship helps us maintain AI nodes. Sponsors receive an exclusive blockchain NFT.';
+
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
