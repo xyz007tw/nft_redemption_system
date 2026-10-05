@@ -9,6 +9,8 @@ import Link from 'next/link';
 
 export default function SponsorPage() {
   const { t, lang } = useLanguage();
+  const isChinese = lang.includes('zh');
+  const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
@@ -60,9 +62,17 @@ export default function SponsorPage() {
 
       {/* 內容/影片播放區 (Placeholder) */}
       <div className="w-full max-w-4xl bg-black/40 border border-white/10 rounded-2xl p-6 mb-16 shadow-2xl">
-        <div className="aspect-video bg-gray-800 rounded-xl flex items-center justify-center mb-6 overflow-hidden relative group">
-           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 z-0"></div>
-           <svg className="w-20 h-20 text-white/50 z-10 group-hover:scale-110 transition-transform cursor-pointer" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" fillRule="evenodd"></path></svg>
+        <div className="aspect-video bg-gray-800 rounded-xl flex items-center justify-center mb-6 overflow-hidden relative shadow-2xl border border-purple-500/30">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src={introVideoUrl} 
+            title="WeiXiang AI Introduction" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+            className="absolute inset-0"
+          ></iframe>
         </div>
         <h2 className="text-2xl font-bold mb-4">🚀 關於微享 AI 基礎設施計畫</h2>
         <div className="space-y-4 text-gray-300">
