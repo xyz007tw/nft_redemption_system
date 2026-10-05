@@ -301,6 +301,33 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* 贊助引流區塊 */}
+      <section className="w-full max-w-5xl mx-auto px-6 pb-12">
+        <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-purple-500/30 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group hover:border-purple-500/60 transition-all">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-purple-500/30 transition-all"></div>
+          
+          <div className="flex-1 z-10">
+            <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white">
+              🎁 想要支持去中心化 AI 基礎設施？
+            </h3>
+            <p className="text-purple-200 text-lg font-medium">
+              成為知識贊助者，立刻解鎖 <span className="text-yellow-400 font-bold bg-yellow-400/10 px-2 py-1 rounded">25% 全球幣圈流水</span>！
+            </p>
+            <p className="text-gray-400 mt-2 text-sm">
+              點此進入創作者贊助基地，獲取您的區塊鏈專屬紀念憑證。
+            </p>
+          </div>
+          <div className="z-10 w-full md:w-auto">
+            <Link href="/sponsor">
+              <button className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:-translate-y-1 text-lg whitespace-nowrap">
+                前往贊助基地 🚀
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* 推廣區塊 */}
       <section className="w-full bg-white/5 border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
