@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -20,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     async function checkAdmin() {
       if (!isConnected || !address) {
-        setIsAdmin(false);
+        setIsAdmin(null); // Keep it loading/waiting instead of hard denial
         return;
       }
 
@@ -50,6 +51,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [address, isConnected]);
 
   if (isAdmin === null) {
+    if (!isConnected) {
+      return (
+        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
+          <h1 className="text-2xl font-bold mb-6">請先連接錢包以驗證管理員身分</h1>
+          <ConnectButton />
+          <button onClick={() => router.push('/')} className="mt-8 px-6 py-2 border border-gray-600 rounded-lg hover:bg-gray-800 text-gray-400">
+            回首頁
+          </button>
+        </div>
+      );
+    }
     return <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">驗證權限中...</div>;
   }
 
@@ -57,7 +69,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
         <h1 className="text-3xl font-bold text-red-500 mb-4">存取被拒</h1>
-        <p className="text-gray-400 mb-8">您的錢包地址不在管理員白名單內。</p>
+        <p className="text-gray-400 mb-6">您的錢包地址不在管理員白名單內。</p>
+        <div className="mb-8"><ConnectButton /></div>
         <button onClick={() => router.push('/')} className="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700">
           回首頁
         </button>
