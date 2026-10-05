@@ -21,6 +21,7 @@ export default function SponsorPage() {
   const selectSponsorTitle = isChinese ? '⚡ 選擇您的贊助方案' : '⚡ Choose Your Sponsorship Tier';
   const selectSponsorDesc = isChinese ? '您的贊助將幫助我們維持 AI 節點的運作。贊助者將獲得一枚專屬區塊鏈紀念憑證。' : 'Your sponsorship helps us maintain AI nodes. Sponsors receive an exclusive blockchain NFT.';
 
+  const disclaimerText = isChinese ? '*使用法幣贊助將獲得感謝信件，使用 USDT 贊助將自動空投專屬憑證至您的錢包' : '*Fiat sponsorship yields a thank-you letter. USDT sponsorship automatically airdrops an exclusive NFT to your wallet.';
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
@@ -104,7 +105,7 @@ export default function SponsorPage() {
 
         <h3 className="text-2xl font-bold text-center mb-2">{selectSponsorTitle}</h3>
         <p className="text-gray-400 text-center mb-8 text-sm">
-          您的贊助將幫助我們維持 AI 節點的運作。贊助者將獲得一枚專屬區塊鏈紀念憑證。
+          {selectSponsorDesc}
         </p>
 
         {isLoading ? (
@@ -155,7 +156,7 @@ export default function SponsorPage() {
             )}
             
             <p className="text-center text-xs text-gray-500 mt-4">
-              *使用法幣贊助將獲得感謝信件，使用 USDT 贊助將自動空投專屬憑證至您的錢包
+              {disclaimerText}
             </p>
           </div>
         )}
