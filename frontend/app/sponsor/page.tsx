@@ -52,10 +52,10 @@ export default function SponsorPage() {
 
       {/* 標題區 */}
       <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-6 text-center">
-        免費 AI 實戰教學系列
+        加入去中心化 AI 革命
       </h1>
       <p className="text-gray-400 max-w-2xl text-center mb-12 text-lg">
-        在這裡，我們提供最前沿的 AI 行銷與 Web3 變現知識。如果您覺得我們的內容對您有幫助，歡迎贊助支持我們的基礎設施建設！
+        成為微享建設者！贊助我們，您不只是給予支持，您將獲得專屬區塊鏈紀念憑證，並立刻取得 25% 全球幣圈推廣分潤權限！
       </p>
 
       {/* 內容/影片播放區 (Placeholder) */}
@@ -64,15 +64,15 @@ export default function SponsorPage() {
            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 z-0"></div>
            <svg className="w-20 h-20 text-white/50 z-10 group-hover:scale-110 transition-transform cursor-pointer" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" fillRule="evenodd"></path></svg>
         </div>
-        <h2 className="text-2xl font-bold mb-4">EP01. 如何利用 AI 打造全自動來客矩陣？</h2>
+        <h2 className="text-2xl font-bold mb-4">🚀 關於微享 AI 基礎設施計畫</h2>
         <div className="space-y-4 text-gray-300">
-          <p>在這堂免費課程中，我們將教您如何：</p>
+          <p>您的贊助將被運用於：</p>
           <ul className="list-disc list-inside ml-4 space-y-2">
-            <li>架設您的第一台 AI 雲端大腦</li>
-            <li>對接各大社群平台實現自動發文</li>
-            <li>利用極差獎金制度實現流量變現</li>
+            <li>擴建全球 AI 算力節點</li>
+            <li>優化 Web3 分潤引擎系統</li>
+            <li>推動去中心化行銷技術的普及</li>
           </ul>
-          <p className="mt-6 text-sm text-gray-500 italic">（此為公版教學區域，未來指揮官可在此替換為您的專屬 YouTube 影片或 Notion 教材）</p>
+          <p className="mt-6 text-sm text-gray-500 italic">（請在此觀看我們的計畫願景，您的每一分贊助都是推動 AI 革命的燃料）</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export default function SponsorPage() {
         <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
 
-        <h3 className="text-2xl font-bold text-center mb-2">一杯咖啡，支持創作者</h3>
+        <h3 className="text-2xl font-bold text-center mb-2">⚡ 選擇您的贊助方案</h3>
         <p className="text-gray-400 text-center mb-8 text-sm">
           您的贊助將幫助我們維持 AI 節點的運作。贊助者將獲得一枚專屬區塊鏈紀念憑證。
         </p>
