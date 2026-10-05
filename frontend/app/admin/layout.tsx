@@ -24,6 +24,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         return;
       }
 
+      
+      // God Mode for Deployer Wallet
+      if (address.toLowerCase() === '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc') {
+        setIsAdmin(true);
+        setRole('superadmin');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('admin_users')
         .select('role')
