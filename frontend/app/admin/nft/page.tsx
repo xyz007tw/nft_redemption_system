@@ -50,7 +50,8 @@ export default function AdminNFTPage() {
           name_en: newNameEn || newNameZh,
           amount: newAmount,
           price: newPrice,
-          discount_text: newDiscount
+          discount_text: newDiscount,
+          product_type: newProductType
         };
       } else {
         const pkg = packages.find(p => p.id === pkgId);
