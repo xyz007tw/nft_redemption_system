@@ -1,5 +1,5 @@
 export const translations = {
-  'zh-TW': {
+  'zh-TW': {\n    sponsorBannerTitle: '🎁 想要支持去中心化 AI 基礎設施？',\n    sponsorBannerSub1: '成為知識贊助者，立刻解鎖',\n    sponsorBannerSub1Highlight: '25% 全球幣圈流水',\n    sponsorBannerSub2: '點此進入創作者贊助基地，獲取您的區塊鏈專屬紀念憑證。',\n    sponsorBannerBtn: '前往贊助基地 🚀',
     guideTitle: '三步啟動 AI 自動來客',
     guideStep1Title: '1. 購買憑證',
     guideStep1Desc: '選擇最適合您的微享算力方案，支援法幣信用卡一鍵支付與 USDT 購買。',
@@ -82,7 +82,7 @@ export const translations = {
     footerNodeDesc: '前往管理面板取得您的專屬聯盟行銷推廣連結，享受最高達 25% 的智能合約分佣。',
     footerNodeBtn: '進入投資人儀表板',
   },
-  'zh-CN': {
+  'zh-CN': {\n    sponsorBannerTitle: '🎁 想要支持去中心化 AI 基础设施？',\n    sponsorBannerSub1: '成为知识赞助者，立刻解锁',\n    sponsorBannerSub1Highlight: '25% 全球币圈流水',\n    sponsorBannerSub2: '点此进入创作者赞助基地，获取您的区块链专属纪念凭证。',\n    sponsorBannerBtn: '前往赞助基地 🚀',
     guideTitle: '三步启动 AI 自动来客',
     guideStep1Title: '1. 购买凭证',
     guideStep1Desc: '选择最适合您的微享算力方案，支援法币信用卡一键支付与 USDT 购买。',

@@ -309,19 +309,19 @@ export default function Home() {
           
           <div className="flex-1 z-10">
             <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white">
-              🎁 想要支持去中心化 AI 基礎設施？
+              {t.sponsorBannerTitle}
             </h3>
             <p className="text-purple-200 text-lg font-medium">
-              成為知識贊助者，立刻解鎖 <span className="text-yellow-400 font-bold bg-yellow-400/10 px-2 py-1 rounded">25% 全球幣圈流水</span>！
+              {t.sponsorBannerSub1} <span className="text-yellow-400 font-bold bg-yellow-400/10 px-2 py-1 rounded">{t.sponsorBannerSub1Highlight}</span>！
             </p>
             <p className="text-gray-400 mt-2 text-sm">
-              點此進入創作者贊助基地，獲取您的區塊鏈專屬紀念憑證。
+              {t.sponsorBannerSub2}
             </p>
           </div>
           <div className="z-10 w-full md:w-auto">
             <Link href="/sponsor">
               <button className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:-translate-y-1 text-lg whitespace-nowrap">
-                前往贊助基地 🚀
+                {t.sponsorBannerBtn}
               </button>
             </Link>
           </div>
