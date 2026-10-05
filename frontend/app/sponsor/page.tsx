@@ -12,14 +12,14 @@ export default function SponsorPage() {
   const isChinese = lang.includes('zh');
   const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
   
-  const pitchTitle = isChinese ? '{pitchTitle}' : '🚀 About WeiXiang AI Infrastructure';
-  const pitchDesc = isChinese ? '{pitchDesc}' : 'Your sponsorship will be used to:';
-  const point1 = isChinese ? '{point1}' : 'Expand global AI compute nodes';
-  const point2 = isChinese ? '{point2}' : 'Optimize the Web3 affiliate engine';
-  const point3 = isChinese ? '{point3}' : 'Promote decentralized marketing tech';
-  const pitchFooter = isChinese ? '{pitchFooter}' : '(Watch our vision here. Every bit of support fuels the AI revolution)';
-  const selectSponsorTitle = isChinese ? '{selectSponsorTitle}' : '⚡ Choose Your Sponsorship Tier';
-  const selectSponsorDesc = isChinese ? '{selectSponsorDesc}' : 'Your sponsorship helps us maintain AI nodes. Sponsors receive an exclusive blockchain NFT.';
+  const pitchTitle = isChinese ? '🚀 關於微享 AI 基礎設施計畫' : '🚀 About WeiXiang AI Infrastructure';
+  const pitchDesc = isChinese ? '您的贊助將被運用於：' : 'Your sponsorship will be used to:';
+  const point1 = isChinese ? '擴建全球 AI 算力節點' : 'Expand global AI compute nodes';
+  const point2 = isChinese ? '優化 Web3 分潤引擎系統' : 'Optimize the Web3 affiliate engine';
+  const point3 = isChinese ? '推動去中心化行銷技術的普及' : 'Promote decentralized marketing tech';
+  const pitchFooter = isChinese ? '（請在此觀看我們的計畫願景，您的每一分贊助都是推動 AI 革命的燃料）' : '(Watch our vision here. Every bit of support fuels the AI revolution)';
+  const selectSponsorTitle = isChinese ? '⚡ 選擇您的贊助方案' : '⚡ Choose Your Sponsorship Tier';
+  const selectSponsorDesc = isChinese ? '您的贊助將幫助我們維持 AI 節點的運作。贊助者將獲得一枚專屬區塊鏈紀念憑證。' : 'Your sponsorship helps us maintain AI nodes. Sponsors receive an exclusive blockchain NFT.';
 
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,15 +84,15 @@ export default function SponsorPage() {
             className="absolute inset-0"
           ></iframe>
         </div>
-        <h2 className="text-2xl font-bold mb-4">🚀 關於微享 AI 基礎設施計畫</h2>
+        <h2 className="text-2xl font-bold mb-4">{pitchTitle}</h2>
         <div className="space-y-4 text-gray-300">
-          <p>您的贊助將被運用於：</p>
+          <p>{pitchDesc}</p>
           <ul className="list-disc list-inside ml-4 space-y-2">
-            <li>擴建全球 AI 算力節點</li>
-            <li>優化 Web3 分潤引擎系統</li>
-            <li>推動去中心化行銷技術的普及</li>
+            <li>{point1}</li>
+            <li>{point2}</li>
+            <li>{point3}</li>
           </ul>
-          <p className="mt-6 text-sm text-gray-500 italic">（請在此觀看我們的計畫願景，您的每一分贊助都是推動 AI 革命的燃料）</p>
+          <p className="mt-6 text-sm text-gray-500 italic">{pitchFooter}</p>
         </div>
       </div>
 
@@ -102,7 +102,7 @@ export default function SponsorPage() {
         <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
 
-        <h3 className="text-2xl font-bold text-center mb-2">⚡ 選擇您的贊助方案</h3>
+        <h3 className="text-2xl font-bold text-center mb-2">{selectSponsorTitle}</h3>
         <p className="text-gray-400 text-center mb-8 text-sm">
           您的贊助將幫助我們維持 AI 節點的運作。贊助者將獲得一枚專屬區塊鏈紀念憑證。
         </p>
