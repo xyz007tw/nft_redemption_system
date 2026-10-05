@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Link from 'next/link';
 
 export default function SponsorPage() {
   const { t, lang } = useLanguage();
@@ -36,7 +38,18 @@ export default function SponsorPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center py-20 px-4">
+    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center pt-28 pb-20 px-4 relative">
+
+      {/* 頂部導覽列 */}
+      <div className="w-full max-w-7xl flex justify-between items-center p-6 absolute top-0 left-0 right-0 mx-auto">
+        <Link href="/" className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 cursor-pointer hover:scale-105 transition-transform">
+          WeiXiang AI
+        </Link>
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+        </div>
+      </div>
+
       {/* 標題區 */}
       <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-6 text-center">
         免費 AI 實戰教學系列
