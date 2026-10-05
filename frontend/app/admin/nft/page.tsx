@@ -110,6 +110,11 @@ export default function AdminNFTPage() {
           <input type="number" placeholder="發行數量 (枚)" value={newAmount} onChange={e => setNewAmount(e.target.value)} className="bg-black border border-gray-700 rounded px-3 py-2 text-white" />
           <input type="number" placeholder="售價 (USDT)" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="bg-black border border-gray-700 rounded px-3 py-2 text-white" />
           <input type="text" placeholder="折扣文字 (可留空)" value={newDiscount} onChange={e => setNewDiscount(e.target.value)} className="bg-black border border-gray-700 rounded px-3 py-2 text-white" />
+          <select value={newProductType} onChange={e => setNewProductType(e.target.value)} className="bg-black border border-gray-700 rounded px-3 py-2 text-white">
+            <option value="NFT_REDEEM">一般節點眾籌 (預設)</option>
+            <option value="SPONSOR">創作者贊助 (純斗內)</option>
+            <option value="DIRECT_COURSE">直購課程</option>
+          </select>
         </div>
         <button onClick={() => handleSaveFrontend(0, true)} className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-bold w-full md:w-auto">
           新增至前台資料庫
