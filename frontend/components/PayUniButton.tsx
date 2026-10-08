@@ -17,8 +17,8 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
   const [showEmailInput, setShowEmailInput] = useState(false);
 
   const handlePayUniCheckout = async () => {
-    if (!address || !email) {
-      alert("請填寫 Email 並連接錢包");
+    if (!email || !email.includes('@')) {
+      alert("請填寫有效的聯絡電子信箱 (Email)");
       return;
     }
     
@@ -31,8 +31,8 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
         body: JSON.stringify({
           packageId,
           priceInUSDT,
-          buyerAddress: address,
-          email,
+          buyerAddress: address || '',
+          email: email.trim().toLowerCase(),
           refCode
         })
       });
@@ -76,7 +76,7 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
         onClick={() => setShowEmailInput(true)}
         className="w-full mt-4 py-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
       >
-        <span></span> {t.payCard}
+        <span>💳</span> {t.payCard}
       </button>
     );
   }
@@ -93,14 +93,16 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
       />
       <button 
         onClick={handlePayUniCheckout}
-        disabled={isProcessing || !address}
-        className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 disabled:opacity-50 rounded-lg font-bold transition-all"
+        disabled={isProcessing || !email}
+        className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 disabled:opacity-50 rounded-lg font-bold transition-all cursor-pointer"
       >
         {isProcessing ? t.payJumping : t.payConfirm}
       </button>
-      {!address && (
-        <p className="text-red-400 text-xs mt-2 text-center">{t.payConnectWallet}</p>
-      )}
+      <p className="text-gray-400 text-xs mt-3 text-center">
+        {address 
+          ? `✓ 已綁定錢包: ${address.substring(0, 6)}...${address.substring(38)}` 
+          : '✓ 免連接錢包！系統將自動以 Email 建立專屬會員權限'}
+      </p>
     </div>
   );
 }

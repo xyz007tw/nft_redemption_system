@@ -31,10 +31,16 @@ export async function POST(req: Request) {
     }
 
     // Extract custom Web3 data we sent
-    const walletAddress = decryptedInfo.CustomField1;
+    let walletAddress = decryptedInfo.CustomField1;
     const refCode = decryptedInfo.CustomField2;
     const packageId = decryptedInfo.CustomField3;
     const email = decryptedInfo.BuyerMail; // PayUni standard field
+
+    if (!walletAddress || !walletAddress.startsWith('0x')) {
+      const crypto = await import('crypto');
+      const hash = crypto.createHash('sha256').update((email || `buyer_${Date.now()}`).toLowerCase().trim()).digest('hex');
+      walletAddress = '0x' + hash.substring(0, 40);
+    }
 
     // 1. Fetch package price in USDT
     const { data: pkgData } = await supabase
@@ -55,6 +61,7 @@ export async function POST(req: Request) {
     // Update the user's last purchased package specifically for fiat tracking
     await supabase.from('users').update({
       last_purchased_package: packageId,
+      email: email || null
     }).eq('wallet_address', walletAddress);
 
     // 2. Send emails
@@ -67,13 +74,21 @@ export async function POST(req: Request) {
         },
       });
 
-            let emailSubject = "🎉 【WeiXiang AI】信用卡付款成功！請查看系統設定資訊";
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+      let emailSubject = "🎉 【WeiXiang AI】信用卡付款成功！請查看系統開通與後台登入資訊";
       let emailHtml = `
-          <h2>親愛的節點投資人，恭喜您成功購買 AI 生產力憑證！</h2>
-          <p>您的款項已確認完畢。系統已在區塊鏈上為您綁定了節點權限。</p>
-          <p>請前往我們的網站 <strong>兌換區 (Redeem)</strong> 綁定您的 Web3 錢包，即可正式開通 AI 自動來客矩陣。</p>
-          <p>感謝您的參與，讓我們一起掌握未來的定價權！</p>
+          <h2>親愛的投資人/贊助者，恭喜您成功購買 AI 生產力憑證！</h2>
+          <p>您的款項已確認完畢。系統已為您開通專屬會員權限與 AI 服務配額。</p>
+          <br/>
+          <div style="background:#f4f4f5; padding: 16px; border-radius: 8px;">
+            <h3>📊 【如何進入會員數據後台？】</h3>
+            <p>請前往 <a href="${siteUrl}/dashboard" style="color:#2563eb; font-weight:bold;">會員中心 (Dashboard)</a>，輸入您的信箱 <strong>${email}</strong> 即可免密碼快速登入，領取專屬推廣碼並查看 25% 業務分潤！</p>
+            <br/>
+            <h3>🎟️ 【如何啟用 AI 來客矩陣？】</h3>
+            <p>請前往 <a href="${siteUrl}/redeem" style="color:#2563eb; font-weight:bold;">VIP 兌換專區 (Redeem)</a> 開通您的專屬 AI 影音與 SEO 文章產線（每枚享 180 天服務）。</p>
+          </div>
           <br>
+          <p>感謝您的參與，讓我們一起掌握未來的定價權！</p>
           <p>微享 AI 團隊 敬上</p>
       `;
 

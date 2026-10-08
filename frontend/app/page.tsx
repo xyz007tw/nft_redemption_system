@@ -196,19 +196,28 @@ export default function Home() {
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-blue-500/30 transform rotate-3 hover:rotate-0 transition-transform">💳</div>
             <h3 className="text-2xl font-bold mb-4">{t.guideStep1Title}</h3>
-            <p className="text-gray-400 leading-relaxed">{t.guideStep1Desc}</p>
+            <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep1Desc}</p>
+            <a href="#crowdfund" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-cyan-400 hover:text-cyan-300 hover:underline">
+              👉 挑選方案・前往購買
+            </a>
           </div>
           {/* Step 2 */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-purple-500/30 transform -rotate-3 hover:rotate-0 transition-transform">🔗</div>
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-purple-500/30 transform -rotate-3 hover:rotate-0 transition-transform">🎟️</div>
             <h3 className="text-2xl font-bold mb-4">{t.guideStep2Title}</h3>
-            <p className="text-gray-400 leading-relaxed">{t.guideStep2Desc}</p>
+            <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep2Desc}</p>
+            <Link href="/redeem" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-indigo-400 hover:text-indigo-300 hover:underline">
+              👉 前往兌換專區 (Redeem)
+            </Link>
           </div>
           {/* Step 3 */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center shadow-xl">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-pink-500/30 transform rotate-3 hover:rotate-0 transition-transform">🚀</div>
+            <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 shadow-lg shadow-pink-500/30 transform rotate-3 hover:rotate-0 transition-transform">📊</div>
             <h3 className="text-2xl font-bold mb-4">{t.guideStep3Title}</h3>
-            <p className="text-gray-400 leading-relaxed">{t.guideStep3Desc}</p>
+            <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep3Desc}</p>
+            <Link href="/dashboard" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-pink-400 hover:text-pink-300 hover:underline">
+              👉 進入會員數據後台
+            </Link>
           </div>
         </div>
       </section>

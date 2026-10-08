@@ -3,7 +3,8 @@ import { PAYUNI_MERCHANT_ID, encryptTradeInfo, generateTradeSha } from '@/lib/pa
 
 export async function POST(req: Request) {
   try {
-    const { packageId, priceInUSDT, walletAddress, email, refCode } = await req.json();
+    const { packageId, priceInUSDT, buyerAddress, walletAddress, email, refCode } = await req.json();
+    const finalWallet = buyerAddress || walletAddress || '';
 
     if (!PAYUNI_MERCHANT_ID) {
       return NextResponse.json({ error: 'PayUni is not configured' }, { status: 500 });
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       NotifyURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft-redemption-system.onrender.com'}/api/payuni/callback`,
       UsrMail: email,
       // Pass our custom Web3 data in a custom field so we can process it in the callback
-      CustomField1: walletAddress,
+      CustomField1: finalWallet,
       CustomField2: refCode || '',
       CustomField3: packageId.toString(),
     };
