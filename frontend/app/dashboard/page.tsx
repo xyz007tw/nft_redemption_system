@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
@@ -386,3 +386,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
