@@ -311,6 +311,38 @@ export default function Home() {
       </section>
 
 
+            {/* 贊助圖文與影音區 */}
+      <section className="w-full max-w-5xl mx-auto px-6 pb-12">
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl flex flex-col items-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-emerald-400 text-center tracking-wide">
+            {isChinese ? '💎 共創 AI 流量革命：贊助微享 AI-ATM 研發' : '💎 CO-CREATE THE AI TRAFFIC REVOLUTION'}
+          </h2>
+          
+          <div className="w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 mb-10">
+            <img 
+              src={isChinese ? '/sponsor-zh.jpg' : '/sponsor-en.jpg'} 
+              alt="Sponsorship Infographic" 
+              className="w-full h-auto object-cover hover:scale-[1.02] transition-transform duration-700"
+            />
+          </div>
+
+          <div className="flex justify-center w-full">
+            <div className="w-[315px] h-[560px] bg-gray-800 rounded-2xl overflow-hidden relative shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-purple-500/30 hover:shadow-[0_0_60px_rgba(168,85,247,0.5)] transition-shadow duration-500">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src={isChinese ? 'https://www.youtube.com/embed/nm2lVetbkaw' : 'https://www.youtube.com/embed/yMWApJ4uvcU'} 
+                title="WeiXiang AI Sponsorship" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                className="absolute inset-0"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 贊助引流區塊 */}
       <section className="w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-purple-500/30 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group hover:border-purple-500/60 transition-all">
