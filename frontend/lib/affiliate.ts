@@ -19,7 +19,7 @@ function getCommissionRate(totalSales: number) {
   return 0;
 }
 
-export async function processAffiliateCommissions(walletAddress: string, refCode: string | null, packagePriceUSDT: number) {
+export async function processAffiliateCommissions(walletAddress: string, refCode: string | null, packagePriceUSDT: number, productType?: string) {
   let matchedReferrer = null;
   if (refCode) {
     const { data: potentialReferrer } = await supabase
@@ -49,12 +49,18 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
 
   if (userError) throw userError;
 
+  // 1. 如果是斗內贊助 (SPONSOR)，不啟動任何推廣分潤，但仍完成綁定
+  if (productType === 'SPONSOR') {
+    return user.referrer_address;
+  }
+
   const referrerAddress = user.referrer_address;
   if (!referrerAddress) return null;
 
   let currentReferrer = referrerAddress;
   let distributedRate = 0; 
 
+  // 2. 無限代級差獎金 (最頂 10%) & 對等獎金 (100% 匹配被推薦人的級差獎金)
   while (currentReferrer && distributedRate < TIERS[0].rate) {
     const { data: refUser } = await supabase
       .from('users')
@@ -71,12 +77,23 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
       const commissionAmount = packagePriceUSDT * diffRate;
       const commissionType = distributedRate === 0 ? 'DIRECT' : 'DIFFERENTIAL';
 
+      // 發放級差 / 直推獎金
       await supabase.from('commissions').insert({
         wallet_address: currentReferrer,
         from_buyer: walletAddress,
         amount: commissionAmount,
         commission_type: commissionType
       });
+
+      // 發放對等獎金 (被推薦人領多少，推薦人就領多少)
+      if (refUser.referrer_address) {
+        await supabase.from('commissions').insert({
+          wallet_address: refUser.referrer_address,
+          from_buyer: walletAddress,
+          amount: commissionAmount,
+          commission_type: 'MATCHING'
+        });
+      }
 
       if (commissionType === 'DIRECT') {
         await supabase
@@ -89,6 +106,26 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
     }
 
     currentReferrer = refUser.referrer_address;
+  }
+
+  // 3. 全球領袖獎 (5%) - 均分給所有達成 10% 級差條件 (業績 >= 15000) 的領袖
+  const { data: globalLeaders } = await supabase
+    .from('users')
+    .select('wallet_address')
+    .gte('total_sales', 15000);
+
+  if (globalLeaders && globalLeaders.length > 0) {
+    const globalPoolAmount = packagePriceUSDT * 0.05; // 5%
+    const splitAmount = globalPoolAmount / globalLeaders.length;
+    
+    for (const leader of globalLeaders) {
+      await supabase.from('commissions').insert({
+        wallet_address: leader.wallet_address,
+        from_buyer: walletAddress,
+        amount: splitAmount,
+        commission_type: 'GLOBAL_POOL'
+      });
+    }
   }
 
   return referrerAddress;

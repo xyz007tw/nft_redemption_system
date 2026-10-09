@@ -56,7 +56,8 @@ export async function POST(req: Request) {
     const { processAffiliateCommissions } = await import('@/lib/affiliate');
     
     // Process commissions, this also upserts the user with has_purchased: true
-    await processAffiliateCommissions(walletAddress, refCode, packagePriceUSDT);
+    await processAffiliateCommissions(walletAddress, refCode, packagePriceUSDT, pkgData?.product_type);
+
 
     // Update the user's last purchased package specifically for fiat tracking
     await supabase.from('users').update({
