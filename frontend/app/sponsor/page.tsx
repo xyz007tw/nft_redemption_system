@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default function SponsorPage() {
   const { t, lang } = useLanguage();
   const isChinese = lang.includes('zh');
-  const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
+  const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/nm2lVetbkaw' : 'https://www.youtube.com/embed/yMWApJ4uvcU';
   
   const pitchTitle = isChinese ? '🚀 關於微享 AI 基礎設施計畫' : '🚀 About WeiXiang AI Infrastructure';
   const pitchDesc = isChinese ? '您的贊助將被運用於：' : 'Your sponsorship will be used to:';
