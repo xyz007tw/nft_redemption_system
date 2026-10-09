@@ -100,32 +100,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 影音與圖解介紹區塊 (隨語系切換) */}
-      <section className="w-full max-w-7xl px-6 pb-16 flex flex-col md:flex-row items-center gap-12">
-        {/* YouTube Short Video */}
-        <div className="w-full md:w-1/3 flex justify-center">
-          <div className="w-[315px] h-[560px] rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/30">
+            {/* 影音與圖解介紹區 (雙語系) - 優化版排版 */}
+      <section className="w-full max-w-5xl px-6 pb-16 flex flex-col items-center gap-10">
+        {/* 資訊圖表 Infographic (置上，滿版) */}
+        <div className="w-full rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10 group">
+          <img 
+            src={introImageUrl} 
+            alt="WeiXiang AI Infographic" 
+            className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-700"
+          />
+        </div>
+
+        {/* YouTube Short Video (置中) */}
+        <div className="w-full flex justify-center">
+          <div className="w-[315px] h-[560px] rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/40 hover:border-purple-400 transition-colors duration-300">
             <iframe 
-              width="315" 
-              height="560" 
+              width="100%" 
+              height="100%" 
               src={introVideoUrl} 
               title="WeiXiang AI Introduction" 
               frameBorder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
-              className="w-full h-full object-cover"
+              className="absolute inset-0"
             ></iframe>
-          </div>
-        </div>
-
-        {/* 資訊圖表 Infographic */}
-        <div className="w-full md:w-2/3 flex justify-center">
-          <div className="w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-white/5">
-            <img 
-              src={introImageUrl} 
-              alt="WeiXiang AI Infographic" 
-              className="w-full h-auto object-contain"
-            />
           </div>
         </div>
       </section>
