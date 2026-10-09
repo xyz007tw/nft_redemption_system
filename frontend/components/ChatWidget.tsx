@@ -62,17 +62,34 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform z-50"
-      >
-        {isOpen ? (
-          <span className="text-2xl font-bold">×</span>
-        ) : (
-          <span className="text-2xl">💬</span>
+      {/* Floating Button and Tooltip Container */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
+        {/* Animated Tooltip Bubble */}
+        {!isOpen && (
+          <div className="relative animate-bounce">
+            <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.5)] font-bold text-sm whitespace-nowrap border border-white/20">
+              {lang === 'en-US' ? 'Chat with us ✨' :
+               lang === 'ja-JP' ? 'チャットする ✨' :
+               lang === 'ko-KR' ? '채팅하기 ✨' :
+               lang === 'vi-VN' ? 'Trò chuyện ✨' :
+               '歡迎聊聊 ✨'}
+            </div>
+            {/* Arrow pointing right */}
+            <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-l-rose-500"></div>
+          </div>
         )}
-      </button>
+
+        <button
+          onClick={toggleChat}
+          className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform"
+        >
+          {isOpen ? (
+            <span className="text-2xl font-bold">×</span>
+          ) : (
+            <span className="text-2xl">💬</span>
+          )}
+        </button>
+      </div>
 
       {/* Chat Window */}
       {isOpen && (
