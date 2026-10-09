@@ -343,7 +343,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 贊助引流區塊 */}
+      {/* 贊助圖文與影音區 */}
       <section className="w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-purple-500/30 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group hover:border-purple-500/60 transition-all">
           <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-purple-500/30 transition-all"></div>
