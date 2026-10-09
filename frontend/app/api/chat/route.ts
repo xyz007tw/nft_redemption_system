@@ -1,11 +1,10 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 // 系統核心知識庫 (MVP)
-const SYSTEM_KNOWLEDGE = 
-你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 的官方專屬 AI 智能客服。請遵循以下指導原則來回答客戶的問題：
+const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 的官方專屬 AI 智能客服。請遵循以下指導原則來回答客戶的問題：
 
 【系統核心定位】
 - 微享 AI 來客系統是串接 Web3 (NFT) 與 Web2 (法幣) 雙層架構的去中心化自動行銷網路。
@@ -13,7 +12,7 @@ const SYSTEM_KNOWLEDGE =
 - 我們首創「萬人眾籌平台」，讓用戶能透過購買算力憑證 (NFT)，提早獲得 AI 流量紅利，掌握未來的定價權。
 
 【產品方案與購買 (眾籌與贊助)】
-- 系統提供階梯式算力憑證（例如 、、、、 USDT 等）。
+- 系統提供階梯式算力憑證（例如 $99、$198、$1788、$5400、$12000 USDT 等）。
 - 購買方式極度彈性：支援 Web3 小狐狸錢包 (USDT) 支付，也支援 Web2 法幣信用卡支付 (PayUni 統一金流)，皆為一次性買斷。
 - 權益開通：法幣刷卡亦享有「混合驗證 (Hybrid Gating)」秒速開通 AI 權限，免除自己買區塊鏈 Gas Fee 的煩惱。
 - 贊助方案：部分產品為純「斗內贊助 (Sponsorship)」，此類產品供粉絲支持，但不參與 25% 推廣分潤。
@@ -30,10 +29,9 @@ const SYSTEM_KNOWLEDGE =
 
 【問答風格】
 - 專業、親切、具同理心，並帶有強烈推廣營銷意識。
-- 當用戶詢問如何賺錢或哪個方案好時，請主動推廣高階方案（如  甚至  ），說明高階方案能解鎖更完整的級差與對等獎金，回本更快。
+- 當用戶詢問如何賺錢或哪個方案好時，請主動推廣高階方案（如 $1788 甚至 $12000 ），說明高階方案能解鎖更完整的級差與對等獎金，回本更快。
 - 若遇到不清楚的細節，請委婉告知交由真人指揮官後續聯繫。
-- 請根據用戶使用語言 () 來進行回答。
-;
+- 請根據用戶使用語言 (\${'用戶的偏好語言'}) 來進行回答。`;
 
 export async function POST(req: Request) {
   try {
@@ -41,7 +39,7 @@ export async function POST(req: Request) {
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { reply: '⚠️ 系統管理員尚未配置 Gemini API 金鑰，請稍後再試。' },
+        { reply: '⚠️ 系統管理員未設置 Gemini API 金鑰，請稍後再試。' },
         { status: 200 }
       );
     }
@@ -58,7 +56,7 @@ export async function POST(req: Request) {
         { role: 'user', parts: [{ text: message }] }
       ],
       config: {
-        systemInstruction: SYSTEM_KNOWLEDGE.replace('\${用戶目前的偏好語言}', language || 'zh-TW'),
+        systemInstruction: SYSTEM_KNOWLEDGE.replace('\${用戶的偏好語言}', language || 'zh-TW'),
         temperature: 0.7,
       }
     });
@@ -66,7 +64,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply: response.text });
   } catch (error: any) {
     console.error('Chat API Error:', error);
-    return NextResponse.json({ reply: '⚠️ 哎呀，AI 大腦暫時短路了，請稍後再問我一次喔！' }, { status: 500 });
+    return NextResponse.json({ reply: '⚠️ 抱歉，AI 大腦暫時短路了，請稍後再試一次！' }, { status: 500 });
   }
 }
-
