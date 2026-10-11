@@ -15,16 +15,31 @@ export default function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const welcomeMessage = lang === 'zh-TW' ? '您好！我是微享 AI 專屬客服，請問有什麼我可以協助您的？（支援多國語言）' :
                          lang === 'zh-CN' ? '您好！我是微享 AI 专属客服，请问有什么我可以协助您的？（支援多国语言）' :
                          lang === 'en-US' ? 'Hello! I am the WeiXiang AI Assistant. How can I help you today?' :
                          lang === 'ja-JP' ? 'こんにちは！WeiXiang AIアシスタントです。何かお手伝いできることはありますか？' :
                          lang === 'ko-KR' ? '안녕하세요! WeiXiang AI 어시스턴트입니다. 무엇을 도와드릴까요?' :
                          'Xin chào! Tôi là Trợ lý AI WeiXiang. Tôi có thể giúp gì cho bạn?';
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    const handleOpenChat = (e: any) => {
+      setIsOpen(true);
+      if (messages.length === 0) {
+        setMessages([{ role: 'ai', content: welcomeMessage }]);
+      }
+      const query = e?.detail?.query;
+      if (query) {
+        setInput(query);
+      }
+    };
+    window.addEventListener('open-ai-chat', handleOpenChat);
+    return () => window.removeEventListener('open-ai-chat', handleOpenChat);
+  }, [messages, welcomeMessage]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
