@@ -53,27 +53,27 @@ export async function POST(req: Request) {
     }
 
     // 2. Fetch course info from packages table
-    let courseName = 'AI 自動來客系統・頂配實戰家教教材 (WeiXiang AI Master Course)';
+    const { unpackPackageRow } = await import('@/lib/packageMeta');
+    let courseName = 'AI 自動來客系統・AI頂配實戰教材 (WeiXiang AI Master Materials)';
     let courseLink = process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem';
 
     if (packageId) {
-      const { data: pkg } = await supabase
+      const { data: rawPkg } = await supabase
         .from('packages')
-        .select('name_zh, name_en, course_link')
+        .select('*')
         .eq('id', Number(packageId))
         .single();
+      const pkg = unpackPackageRow(rawPkg);
       if (pkg) {
         courseName = pkg.name_zh || courseName;
         if (pkg.course_link) courseLink = pkg.course_link;
       }
     } else {
-      const { data: coursePkg } = await supabase
+      const { data: allPkgs } = await supabase
         .from('packages')
-        .select('name_zh, name_en, course_link')
-        .eq('product_type', 'DIRECT_COURSE')
-        .order('id', { ascending: true })
-        .limit(1)
-        .single();
+        .select('*')
+        .order('id', { ascending: true });
+      const coursePkg = (allPkgs || []).map(unpackPackageRow).find((p: any) => p.product_type === 'DIRECT_COURSE');
       if (coursePkg) {
         courseName = coursePkg.name_zh || courseName;
         if (coursePkg.course_link) courseLink = coursePkg.course_link;

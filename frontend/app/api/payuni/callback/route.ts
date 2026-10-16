@@ -42,12 +42,14 @@ export async function POST(req: Request) {
       walletAddress = '0x' + hash.substring(0, 40);
     }
 
-    // 1. Fetch package price in USDT
-    const { data: pkgData } = await supabase
+    // 1. Fetch package price in USDT & unpack metadata
+    const { unpackPackageRow } = await import('@/lib/packageMeta');
+    const { data: rawPkgData } = await supabase
       .from('packages')
-      .select('price, product_type, course_link')
+      .select('*')
       .eq('id', Number(packageId))
       .single();
+    const pkgData = unpackPackageRow(rawPkgData);
     
     const packagePriceUSDT = pkgData?.price || 0;
 

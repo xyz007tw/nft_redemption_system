@@ -127,6 +127,10 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
     }
   };
 
+  const customPromoHtml = isChinese
+    ? (selectedCourse.promo_html_zh || selectedCourse.promo_html_en || '')
+    : (selectedCourse.promo_html_en || selectedCourse.promo_html_zh || '');
+
   return (
     <section id="tutor-courses" className="w-full max-w-7xl px-6 py-16 scroll-mt-20">
       <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900/90 to-cyan-950/60 border border-emerald-500/40 rounded-3xl p-8 md:p-14 relative overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)]">
@@ -150,7 +154,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
           </p>
         </div>
 
-        {/* 2. AI頂配教材三大核心大綱導覽卡片 */}
+        {/* 2. AI頂配教材宣傳文案 HTML 或預設三大核心大綱導覽卡片 */}
         <div className="mb-12 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
             <h3 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
@@ -162,39 +166,46 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {curriculumModules.map((mod, idx) => (
-              <div
-                key={idx}
-                className={`bg-white/5 border border-white/10 ${mod.border} rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] flex flex-col justify-between backdrop-blur-md`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/10">
-                      {mod.badge}
-                    </span>
-                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${mod.color} flex items-center justify-center text-2xl shadow-lg`}>
-                      {mod.icon}
+          {customPromoHtml.trim() ? (
+            <div
+              className="w-full rounded-2xl overflow-hidden"
+              dangerouslySetInnerHTML={{ __html: customPromoHtml }}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {curriculumModules.map((mod, idx) => (
+                <div
+                  key={idx}
+                  className={`bg-white/5 border border-white/10 ${mod.border} rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] flex flex-col justify-between backdrop-blur-md`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/10">
+                        {mod.badge}
+                      </span>
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${mod.color} flex items-center justify-center text-2xl shadow-lg`}>
+                        {mod.icon}
+                      </div>
                     </div>
+                    <h4 className="text-xl font-bold text-white mb-3 leading-snug">
+                      {mod.title}
+                    </h4>
+                    <p className="text-gray-300 text-sm leading-relaxed mb-5">
+                      {mod.desc}
+                    </p>
                   </div>
-                  <h4 className="text-xl font-bold text-white mb-3 leading-snug">
-                    {mod.title}
-                  </h4>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-5">
-                    {mod.desc}
-                  </p>
-                </div>
 
-                <div className="pt-4 border-t border-white/10 space-y-1.5">
-                  {mod.points.map((pt, pIdx) => (
-                    <div key={pIdx} className="text-xs font-semibold text-emerald-300/90">
-                      {pt}
-                    </div>
-                  ))}
+                  <div className="pt-4 border-t border-white/10 space-y-1.5">
+                    {mod.points.map((pt, pIdx) => (
+                      <div key={pIdx} className="text-xs font-semibold text-emerald-300/90">
+                        {pt}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 3. 多套教材快速切換卡片列 */}
