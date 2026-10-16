@@ -24,6 +24,93 @@ export default function Home() {
   const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
   const tutorialVideoUrl = isChinese ? 'https://www.youtube.com/embed/flO2mSCrSI8' : 'https://www.youtube.com/embed/4BfEWd2F014';
 
+  const connectLabel =
+    lang === 'zh-TW' ? '連接錢包' :
+    lang === 'zh-CN' ? '连接钱包' :
+    lang === 'ja-JP' ? 'ウォレットを接続' :
+    lang === 'ko-KR' ? '지갑 연결' :
+    lang === 'vi-VN' ? 'Kết nối ví' :
+    'Connect Wallet';
+
+  const heroBadgeText =
+    lang === 'zh-TW' ? '{heroBadgeText}' :
+    lang === 'zh-CN' ? 'DePIN × Enterprise AI Agent 基础设施' :
+    lang === 'ja-JP' ? 'DePIN × Enterprise AI Agent インフラストラクチャ' :
+    lang === 'ko-KR' ? 'DePIN × Enterprise AI Agent 인프라' :
+    lang === 'vi-VN' ? 'Hạ tầng DePIN × Enterprise AI Agent' :
+    'DePIN × Enterprise AI Agent Infrastructure';
+
+  const step1LinkText =
+    lang === 'zh-TW' ? '{step1LinkText}' :
+    lang === 'zh-CN' ? '👉 挑选方案・前往购买' :
+    lang === 'ja-JP' ? '👉 プランを選択・購入へ' :
+    lang === 'ko-KR' ? '👉 플랜 선택 · 구매하기' :
+    lang === 'vi-VN' ? '👉 Chọn Gói · Mua Ngay' :
+    '👉 Choose Plan · Buy Now';
+
+  const step2LinkText =
+    lang === 'zh-TW' ? '{step2LinkText}' :
+    lang === 'zh-CN' ? '👉 前往兑换专区 (Redeem)' :
+    lang === 'ja-JP' ? '👉 引き換えセンターへ (Redeem)' :
+    lang === 'ko-KR' ? '👉 리딤 센터로 이동 (Redeem)' :
+    lang === 'vi-VN' ? '👉 Đến Trung tâm Đổi quà (Redeem)' :
+    '👉 Go to Redeem Hub (Redeem)';
+
+  const step3LinkText =
+    lang === 'zh-TW' ? '{step3LinkText}' :
+    lang === 'zh-CN' ? '👉 进入会员数据后台' :
+    lang === 'ja-JP' ? '👉 会員ダッシュボードへ' :
+    lang === 'ko-KR' ? '👉 회원 대시보드 입장' :
+    lang === 'vi-VN' ? '👉 Vào Bảng điều khiển Thành viên' :
+    '👉 Enter Member Dashboard';
+
+  const tutorialBadgeText =
+    lang === 'zh-TW' ? 'AI 自來客系統・實戰操作說明影音' :
+    lang === 'zh-CN' ? 'AI 自来客系统・实战操作说明影音' :
+    lang === 'ja-JP' ? 'WeiXiang AIシステム・実践操作ガイド動画' :
+    lang === 'ko-KR' ? 'WeiXiang AI 시스템 · 실전 조작 가이드 영상' :
+    lang === 'vi-VN' ? 'Hệ thống WeiXiang AI · Video Hướng dẫn Thực chiến' :
+    'WeiXiang AI-ATM · Practical Operation Guide Video';
+
+  const sponsorHeadingText =
+    lang === 'zh-TW' ? '💎 共創 AI 流量革命：贊助微享 AI-ATM 研發' :
+    lang === 'zh-CN' ? '💎 共创 AI 流量革命：赞助微享 AI-ATM 研发' :
+    lang === 'ja-JP' ? '💎 AIトラフィック革命を共創：WeiXiang AI研究開発を支援' :
+    lang === 'ko-KR' ? '💎 AI 트래픽 혁명 공동 창조: WeiXiang AI 연구개발 후원' :
+    lang === 'vi-VN' ? '💎 Đồng kiến tạo Cách mạng Lưu lượng AI: Tài trợ R&D WeiXiang AI' :
+    '💎 CO-CREATE THE AI TRAFFIC REVOLUTION';
+
+  const getPkgName = (pkg: any) => {
+    const i18nNames: Record<number, string> = {
+      1: t.pkg1Name,
+      2: t.pkg2Name,
+      3: t.pkg3Name,
+      4: t.pkg4Name,
+      5: t.pkg5Name,
+    };
+    if (i18nNames[pkg.id]) {
+      if (lang === 'zh-TW' && pkg.name_zh) return pkg.name_zh;
+      if (lang === 'en-US' && pkg.name_en) return pkg.name_en;
+      return i18nNames[pkg.id];
+    }
+    return isChinese ? pkg.name_zh : (pkg.name_en || pkg.name_zh);
+  };
+
+  const getPkgDiscount = (pkg: any) => {
+    const i18nDiscounts: Record<number, string> = {
+      1: t.disc1,
+      2: t.disc2,
+      3: t.disc3,
+      4: t.disc4,
+      5: t.disc5,
+    };
+    if (i18nDiscounts[pkg.id]) {
+      if (lang === 'zh-TW' && pkg.discount_text) return pkg.discount_text;
+      return i18nDiscounts[pkg.id];
+    }
+    return pkg.discount_text || pkg.discount;
+  };
+
   const defaultPackages = [
     { id: 1, name_zh: t.pkg1Name, amount: 1, price: 99, discount_text: t.disc1, roi: '-' },
     { id: 2, name_zh: t.pkg2Name, amount: 3, price: 198, discount_text: t.disc2, roi: '+50%' },
@@ -62,7 +149,7 @@ export default function Home() {
           </h1>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <ConnectButton />
+            <ConnectButton label={connectLabel} />
           </div>
         </div>
       </nav>
@@ -309,7 +396,7 @@ export default function Home() {
         <div className="mt-14 w-full max-w-4xl mx-auto">
           <div className="text-center mb-6">
             <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-base md:text-lg font-bold shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-              🎬 {isChinese ? 'AI 自來客系統・實戰操作說明影音' : 'WeiXiang AI-ATM · Practical Operation Guide Video'}
+              🎬 {tutorialBadgeText}
             </span>
           </div>
           <div className="w-full aspect-video rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(6,182,212,0.25)] border border-cyan-500/30 hover:border-cyan-400 transition-colors duration-300 bg-black/40">
@@ -350,11 +437,11 @@ export default function Home() {
               <tbody className="divide-y divide-white/5">
                 {packages.map((pkg) => (
                   <tr key={pkg.id} className="hover:bg-white/5 transition-colors">
-                    <td className="p-6 font-bold text-lg">{isChinese ? pkg.name_zh : (pkg.name_en || pkg.name_zh)}</td>
+                    <td className="p-6 font-bold text-lg">{getPkgName(pkg)}</td>
                     <td className="p-6">{pkg.amount} {t.unitCount}</td>
                     <td className="p-6 font-mono text-xl">${pkg.price.toLocaleString()}</td>
                     <td className="p-6 font-mono text-gray-400">${(pkg.price / pkg.amount).toFixed(1)}</td>
-                    <td className="p-6 text-green-400 font-bold">{pkg.discount_text || pkg.discount}</td>
+                    <td className="p-6 text-green-400 font-bold">{getPkgDiscount(pkg)}</td>
                     <td className="p-6 text-purple-400 font-bold">{pkg.roi_text || pkg.roi}</td>
                   </tr>
                 ))}
@@ -378,7 +465,7 @@ export default function Home() {
               >
                 {packages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
-                    {isChinese ? pkg.name_zh : (pkg.name_en || pkg.name_zh)} - {pkg.amount} {t.unitCount} (${pkg.price})
+                    {getPkgName(pkg)} - {pkg.amount} {t.unitCount} (${pkg.price})
                   </option>
                 ))}
               </select>
@@ -420,7 +507,7 @@ export default function Home() {
       <section className="w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl flex flex-col items-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-emerald-400 text-center tracking-wide">
-            {isChinese ? '💎 共創 AI 流量革命：贊助微享 AI-ATM 研發' : '💎 CO-CREATE THE AI TRAFFIC REVOLUTION'}
+            {sponsorHeadingText}
           </h2>
           
           <div className="w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 mb-10">

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { polygon } from 'wagmi/chains';
-import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, getDefaultConfig, Locale } from '@rainbow-me/rainbowkit';
 import { 
   metaMaskWallet, 
   walletConnectWallet, 
@@ -13,7 +13,7 @@ import {
   rainbowWallet
 } from '@rainbow-me/rainbowkit/wallets';
 import '@rainbow-me/rainbowkit/styles.css';
-import { LanguageProvider } from '@/lib/LanguageContext';
+import { LanguageProvider, useLanguage } from '@/lib/LanguageContext';
 
 const config = getDefaultConfig({
   appName: 'Weixiang AI-ATM',
@@ -24,15 +24,24 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
+function RainbowKitWithLocale({ children }: { children: React.ReactNode }) {
+  const { lang } = useLanguage();
+  return (
+    <RainbowKitProvider locale={lang as Locale}>
+      {children}
+    </RainbowKitProvider>
+  );
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          <LanguageProvider>
+        <LanguageProvider>
+          <RainbowKitWithLocale>
             {children}
-          </LanguageProvider>
-        </RainbowKitProvider>
+          </RainbowKitWithLocale>
+        </LanguageProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

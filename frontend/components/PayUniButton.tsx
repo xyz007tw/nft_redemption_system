@@ -11,7 +11,8 @@ interface PayUniButtonProps {
 
 export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonProps) {
   const { address } = useAccount();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isChinese = lang.includes('zh');
   const [email, setEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -100,8 +101,8 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
       </button>
       <p className="text-gray-400 text-xs mt-3 text-center">
         {address 
-          ? `✓ 已綁定錢包: ${address.substring(0, 6)}...${address.substring(38)}` 
-          : '✓ 免連接錢包！系統將自動以 Email 建立專屬會員權限'}
+          ? (isChinese ? `✓ 已綁定錢包: ${address.substring(0, 6)}...${address.substring(38)}` : `✓ Wallet Linked: ${address.substring(0, 6)}...${address.substring(38)}`)
+          : (isChinese ? '✓ 免連接錢包！系統將自動以 Email 建立專屬會員權限' : '✓ No wallet needed! System automatically binds membership via Email')}
       </p>
     </div>
   );
