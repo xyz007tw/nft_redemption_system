@@ -96,17 +96,40 @@ export async function POST(req: Request) {
       `;
 
       if (pkgData?.product_type === 'DIRECT_COURSE') {
-        emailSubject = "🎓 【WeiXiang AI】您的線上知識課程已開通！";
+        emailSubject = "🎓 【WeiXiang AI】您的 AI頂配教材 已開通！";
         emailHtml = `
-          <h2>親愛的學員，恭喜您成功購買線上課程！</h2>
-          <p>您的付款已確認完畢。請點擊下方連結下載/觀看您的專屬課程教材：</p>
+          <h2>親愛的學員，恭喜您成功購買「${pkgData.name_zh || 'AI頂配教材'}」！</h2>
+          <p>您的付款已確認完畢。請點擊下方連結下載/觀看您的專屬 AI頂配教材：</p>
           <br/>
-          <a href="${pkgData.course_link || '#'}" style="display:inline-block; padding: 12px 24px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即前往上課</a>
+          <a href="${pkgData.course_link || '#'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即下載 / 觀看 AI頂配教材</a>
           <br/><br/>
-          <p>（此連結為您的專屬課程教材，請妥善保存。）</p>
+          <p>（此連結為您的專屬教材，您亦可隨時回到首頁「AI頂配教材導覽專區」輸入購買信箱一鍵轉發電郵。）</p>
+          <p>微享 AI 團隊 敬上</p>
+        `;
+      } else if (pkgData?.product_type === 'SPONSOR') {
+        emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
+        emailHtml = `
+          <h2>親愛的贊助者，衷心感謝您對微享 AI 團隊的支持與贊助！</h2>
+          <p>您的贊助款項（${pkgData.name_zh || '斗內贊助方案'}）已確認收訖。</p>
+          <p>因為有您的支持，我們將持續研發更強大的 AI 自動化工具回饋社群！</p>
+          <br/>
           <p>微享 AI 團隊 敬上</p>
         `;
       }
+
+      const orderCategoryLabel =
+        pkgData?.product_type === 'DIRECT_COURSE'
+          ? '🎓 AI頂配教材 (納入 25% 推廣分潤)'
+          : pkgData?.product_type === 'SPONSOR'
+          ? '💖 斗內贊助 (純贊助・不計入分潤)'
+          : '🚀 眾籌憑證方案 (納入 25% 推廣分潤)';
+
+      const orderSubjectPrefix =
+        pkgData?.product_type === 'DIRECT_COURSE'
+          ? '🎓 【新訂單・AI頂配教材】'
+          : pkgData?.product_type === 'SPONSOR'
+          ? '💖 【新訂單・斗內贊助】'
+          : '🚀 【新訂單・眾籌憑證】';
 
       const mailToClient = {
         from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
@@ -115,16 +138,46 @@ export async function POST(req: Request) {
         html: emailHtml
       };
 
+      const adminToList = Array.from(
+        new Set(['xyz007tw@gmail.com', process.env.ADMIN_EMAIL, process.env.EMAIL_USER].filter(Boolean))
+      ).join(', ');
+
       const mailToAdmin = {
         from: `"WeiXiang 系統通知" <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-        subject: "💰 【新客到】有客戶透過統一金流刷卡成功！",
+        to: adminToList,
+        cc: 'qqww0614@gmail.com',
+        subject: `${orderSubjectPrefix}${pkgData?.name_zh || `方案 #${packageId}`} (刷卡成功 NT$${decryptedInfo.TradeAmt})`,
         html: `
-          <h2>總指揮官，您有新的信用卡訂單！</h2>
-          <p>客戶錢包：${walletAddress}</p>
-          <p>客戶信箱：${email}</p>
-          <p>推薦人：${refCode || '無'}</p>
-          <p>金額 (TWD)：${decryptedInfo.TradeAmt}</p>
+          <div style="font-family: sans-serif; max-width: 640px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px;">
+            <h2 style="color: #111827; margin-top: 0;">${orderSubjectPrefix}總指揮官，您有新的統一金流訂單！</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280; width: 140px;">訂單類型</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold; color: #111827;">${orderCategoryLabel}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">購買方案名稱</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold; color: #2563eb;">${pkgData?.name_zh || `Package #${packageId}`}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">實付金額 (TWD)</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold; color: #059669;">NT$ ${decryptedInfo.TradeAmt} (約 $${packagePriceUSDT} USDT)</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">客戶聯絡信箱</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${email || '未填寫'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">綁定錢包地址</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-family: monospace;">${walletAddress}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">推薦人代碼 (ref)</td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${refCode || '無 (自然流量)'}</td>
+              </tr>
+            </table>
+            <p style="color: #6b7280; font-size: 12px; margin-bottom: 0;">此通知已自動寄送至 xyz007tw@gmail.com 並副本 (CC) 至 qqww0614@gmail.com。</p>
+          </div>
         `,
       };
 
