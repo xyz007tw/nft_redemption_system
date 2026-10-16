@@ -22,6 +22,7 @@ export default function Home() {
   const isChinese = lang.includes('zh');
   const introVideoUrl = isChinese ? 'https://www.youtube.com/embed/ZGyXZiW9hH0' : 'https://www.youtube.com/embed/jolRAnobFds';
   const introImageUrl = isChinese ? '/images/intro-zh.jpg' : '/images/intro-en.jpg';
+  const tutorialVideoUrl = isChinese ? 'https://www.youtube.com/embed/flO2mSCrSI8' : 'https://www.youtube.com/embed/4BfEWd2F014';
 
   const defaultPackages = [
     { id: 1, name_zh: t.pkg1Name, amount: 1, price: 99, discount_text: t.disc1, roi: '-' },
@@ -301,6 +302,27 @@ export default function Home() {
             <Link href="/dashboard" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-pink-400 hover:text-pink-300 hover:underline">
               👉 進入會員數據後台
             </Link>
+          </div>
+        </div>
+
+        {/* AI自來客系統 實戰操作說明影音 (雙語系) */}
+        <div className="mt-14 w-full max-w-4xl mx-auto">
+          <div className="text-center mb-6">
+            <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-base md:text-lg font-bold shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+              🎬 {isChinese ? 'AI 自來客系統・實戰操作說明影音' : 'WeiXiang AI-ATM · Practical Operation Guide Video'}
+            </span>
+          </div>
+          <div className="w-full aspect-video rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(6,182,212,0.25)] border border-cyan-500/30 hover:border-cyan-400 transition-colors duration-300 bg-black/40">
+            <iframe
+              width="100%"
+              height="100%"
+              src={tutorialVideoUrl}
+              title="WeiXiang AI Practical Operation Guide"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
           </div>
         </div>
       </section>
