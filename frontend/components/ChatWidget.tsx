@@ -77,33 +77,55 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button and Tooltip Container */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
-        {/* Animated Tooltip Bubble */}
+      {/* Floating Buttons Stack (AI頂配教材 + AI客服) */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {/* AI 頂配教材 Floating Pill (位於 AI 客服正上方) */}
         {!isOpen && (
-          <div className="relative animate-bounce">
-            <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.5)] font-bold text-sm whitespace-nowrap border border-white/20">
-              {lang === 'en-US' ? 'Chat with us ✨' :
-               lang === 'ja-JP' ? 'チャットする ✨' :
-               lang === 'ko-KR' ? '채팅하기 ✨' :
-               lang === 'vi-VN' ? 'Trò chuyện ✨' :
-               '歡迎聊聊 ✨'}
-            </div>
-            {/* Arrow pointing right */}
-            <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-l-rose-500"></div>
-          </div>
+          <a
+            href="/#tutor-courses"
+            className="group flex items-center gap-2 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 hover:from-amber-400 hover:to-cyan-400 text-black font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(16,185,129,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
+          >
+            <span className="text-base">🎓</span>
+            <span>
+              {lang === 'zh-TW' ? 'AI頂配教材' :
+               lang === 'zh-CN' ? 'AI顶配教材' :
+               lang === 'ja-JP' ? 'AIマスター教材' :
+               lang === 'ko-KR' ? 'AI 마스터 교재' :
+               lang === 'vi-VN' ? 'Giáo trình AI' :
+               'AI Master Courses'}
+            </span>
+          </a>
         )}
 
-        <button
-          onClick={toggleChat}
-          className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform"
-        >
-          {isOpen ? (
-            <span className="text-2xl font-bold">×</span>
-          ) : (
-            <span className="text-2xl">💬</span>
+        {/* AI 客服按鈕與氣泡 */}
+        <div className="flex items-center gap-4">
+          {/* Animated Tooltip Bubble */}
+          {!isOpen && (
+            <div className="relative animate-bounce">
+              <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.5)] font-bold text-sm whitespace-nowrap border border-white/20">
+                {lang === 'en-US' ? 'Chat with us ✨' :
+                 lang === 'ja-JP' ? 'チャットする ✨' :
+                 lang === 'ko-KR' ? '채팅하기 ✨' :
+                 lang === 'vi-VN' ? 'Trò chuyện ✨' :
+                 lang === 'zh-CN' ? '欢迎聊聊 ✨' :
+                 '歡迎聊聊 ✨'}
+              </div>
+              {/* Arrow pointing right */}
+              <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-l-rose-500"></div>
+            </div>
           )}
-        </button>
+
+          <button
+            onClick={toggleChat}
+            className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform"
+          >
+            {isOpen ? (
+              <span className="text-2xl font-bold">×</span>
+            ) : (
+              <span className="text-2xl">💬</span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Chat Window */}

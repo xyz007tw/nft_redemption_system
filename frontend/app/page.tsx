@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
+import TutorCourseSection from '@/components/TutorCourseSection';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -32,8 +33,16 @@ export default function Home() {
     lang === 'vi-VN' ? 'Kết nối ví' :
     'Connect Wallet';
 
+  const navCourseText =
+    lang === 'zh-TW' ? '🎓 AI頂配教材' :
+    lang === 'zh-CN' ? '🎓 AI顶配教材' :
+    lang === 'ja-JP' ? '🎓 AIマスター教材' :
+    lang === 'ko-KR' ? '🎓 AI 마스터 교재' :
+    lang === 'vi-VN' ? '🎓 Giáo trình AI' :
+    '🎓 AI Master Courses';
+
   const heroBadgeText =
-    lang === 'zh-TW' ? '{heroBadgeText}' :
+    lang === 'zh-TW' ? 'DePIN × Enterprise AI Agent 基礎設施' :
     lang === 'zh-CN' ? 'DePIN × Enterprise AI Agent 基础设施' :
     lang === 'ja-JP' ? 'DePIN × Enterprise AI Agent インフラストラクチャ' :
     lang === 'ko-KR' ? 'DePIN × Enterprise AI Agent 인프라' :
@@ -41,7 +50,7 @@ export default function Home() {
     'DePIN × Enterprise AI Agent Infrastructure';
 
   const step1LinkText =
-    lang === 'zh-TW' ? '{step1LinkText}' :
+    lang === 'zh-TW' ? '👉 挑選方案・前往購買' :
     lang === 'zh-CN' ? '👉 挑选方案・前往购买' :
     lang === 'ja-JP' ? '👉 プランを選択・購入へ' :
     lang === 'ko-KR' ? '👉 플랜 선택 · 구매하기' :
@@ -49,7 +58,7 @@ export default function Home() {
     '👉 Choose Plan · Buy Now';
 
   const step2LinkText =
-    lang === 'zh-TW' ? '{step2LinkText}' :
+    lang === 'zh-TW' ? '👉 前往兌換專區 (Redeem)' :
     lang === 'zh-CN' ? '👉 前往兑换专区 (Redeem)' :
     lang === 'ja-JP' ? '👉 引き換えセンターへ (Redeem)' :
     lang === 'ko-KR' ? '👉 리딤 센터로 이동 (Redeem)' :
@@ -57,7 +66,7 @@ export default function Home() {
     '👉 Go to Redeem Hub (Redeem)';
 
   const step3LinkText =
-    lang === 'zh-TW' ? '{step3LinkText}' :
+    lang === 'zh-TW' ? '👉 進入會員數據後台' :
     lang === 'zh-CN' ? '👉 进入会员数据后台' :
     lang === 'ja-JP' ? '👉 会員ダッシュボードへ' :
     lang === 'ko-KR' ? '👉 회원 대시보드 입장' :
@@ -137,7 +146,10 @@ export default function Home() {
     fetchPackages();
   }, []);
 
-  const selectedPackage = packages.find(p => p.id === selectedPackageId) || packages[0];
+  const crowdfundPackages = packages.filter(p => !p.product_type || p.product_type === 'NFT_REDEEM');
+  const coursePackages = packages.filter(p => p.product_type === 'DIRECT_COURSE');
+  const displayCrowdfundPackages = crowdfundPackages.length > 0 ? crowdfundPackages : packages;
+  const selectedPackage = displayCrowdfundPackages.find(p => p.id === selectedPackageId) || displayCrowdfundPackages[0];
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#0a0a0f] text-white font-sans selection:bg-purple-500/30">
@@ -147,7 +159,13 @@ export default function Home() {
           <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
             WeiXiang AI
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            <a
+              href="#tutor-courses"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 border border-emerald-400/50 text-emerald-300 font-bold text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105 whitespace-nowrap"
+            >
+              {navCourseText}
+            </a>
             <LanguageSwitcher />
             <ConnectButton label={connectLabel} />
           </div>
@@ -163,7 +181,7 @@ export default function Home() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
           </span>
-          DePIN × Enterprise AI Agent 基礎設施
+          {heroBadgeText}
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
@@ -369,7 +387,7 @@ export default function Home() {
             <h3 className="text-2xl font-bold mb-4">{t.guideStep1Title}</h3>
             <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep1Desc}</p>
             <a href="#crowdfund" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-cyan-400 hover:text-cyan-300 hover:underline">
-              👉 挑選方案・前往購買
+              {step1LinkText}
             </a>
           </div>
           {/* Step 2 */}
@@ -378,7 +396,7 @@ export default function Home() {
             <h3 className="text-2xl font-bold mb-4">{t.guideStep2Title}</h3>
             <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep2Desc}</p>
             <Link href="/redeem" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-indigo-400 hover:text-indigo-300 hover:underline">
-              👉 前往兌換專區 (Redeem)
+              {step2LinkText}
             </Link>
           </div>
           {/* Step 3 */}
@@ -387,7 +405,7 @@ export default function Home() {
             <h3 className="text-2xl font-bold mb-4">{t.guideStep3Title}</h3>
             <p className="text-gray-400 leading-relaxed mb-4">{t.guideStep3Desc}</p>
             <Link href="/dashboard" className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-pink-400 hover:text-pink-300 hover:underline">
-              👉 進入會員數據後台
+              {step3LinkText}
             </Link>
           </div>
         </div>
@@ -414,6 +432,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AI 頂配家教課程・付費下載與電郵轉發專區 */}
+      <TutorCourseSection courses={coursePackages} />
+
       <section id="crowdfund" className="w-full max-w-7xl px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black mb-6">{t.crowdTitle}</h2>
@@ -435,7 +456,7 @@ export default function Home() {
               </tr>
             </thead>
               <tbody className="divide-y divide-white/5">
-                {packages.map((pkg) => (
+                {displayCrowdfundPackages.map((pkg) => (
                   <tr key={pkg.id} className="hover:bg-white/5 transition-colors">
                     <td className="p-6 font-bold text-lg">{getPkgName(pkg)}</td>
                     <td className="p-6">{pkg.amount} {t.unitCount}</td>
@@ -463,7 +484,7 @@ export default function Home() {
                 onChange={(e) => setSelectedPackageId(Number(e.target.value))}
                 className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
               >
-                {packages.map((pkg) => (
+                {displayCrowdfundPackages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
                     {getPkgName(pkg)} - {pkg.amount} {t.unitCount} (${pkg.price})
                   </option>
