@@ -17,11 +17,11 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
 
   const fallbackCourse = {
     id: 6,
-    name_zh: 'AI 自動來客系統・頂配實戰家教全套教材',
-    name_en: 'WeiXiang AI-ATM · Master Practical Tutor Course & Materials',
+    name_zh: 'AI 自動來客系統・AI頂配實戰全套教材',
+    name_en: 'WeiXiang AI-ATM · AI Master Practical Materials',
     amount: 1,
     price: 99,
-    discount_text: isChinese ? '🔥 享 25% 推廣分潤' : '🔥 25% Affiliate Eligible',
+    discount_text: isChinese ? '🔥 限時特惠・享 25% 推廣分潤' : '🔥 Special Offer · 25% Affiliate Eligible',
     product_type: 'DIRECT_COURSE',
     course_link: ''
   };
@@ -29,6 +29,49 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const displayCourses = courses && courses.length > 0 ? courses : [fallbackCourse];
   const [selectedCourseId, setSelectedCourseId] = useState<number>(displayCourses[0].id);
   const selectedCourse = displayCourses.find(c => c.id === selectedCourseId) || displayCourses[0];
+
+  // AI頂配教材大綱導覽卡片 (AI Master Materials Showcase)
+  const curriculumModules = [
+    {
+      badge: isChinese ? 'AI頂配教材 01' : 'Master Material 01',
+      icon: '🎬',
+      title: isChinese ? 'AI 短影音與爆款圖卡全自動產線' : 'Automated AI Short Video & Viral Infographic Pipeline',
+      desc: isChinese
+        ? '手把手拆解如何運用 AI 腳本生成、多語系配音與高轉化資訊圖表，一鍵打造日產百支跨國短影音的流量印鈔機。'
+        : 'Step-by-step guide to building an automated AI video, voiceover, and viral infographic production matrix.',
+      points: isChinese
+        ? ['✓ 零剪輯基礎也能 24H 自動產片', '✓ 跨平台自動排程發佈實戰', '✓ 專屬 QR Code 導流私域秘笈']
+        : ['✓ Zero editing skills required', '✓ Multi-platform auto-publishing', '✓ High-converting QR funnel setup'],
+      color: 'from-emerald-500 to-teal-600',
+      border: 'hover:border-emerald-400/60'
+    },
+    {
+      badge: isChinese ? 'AI頂配教材 02' : 'Master Material 02',
+      icon: '🌐',
+      title: isChinese ? '全球多語系 SEO 矩陣與精準截流' : 'Global Multilingual SEO Matrix & Traffic Capture',
+      desc: isChinese
+        ? '掌握 AI 雙大腦自動化長文造血技術，自動翻譯並佈署中、英、日、韓、越等多國語系網站，精準收割全球搜尋引擎自然流量。'
+        : 'Master dual-brain AI long-form SEO generation across 6+ languages to dominate global search engine traffic.',
+      points: isChinese
+        ? ['✓ 熱門趨勢話題自動抓取與去重', '✓ WordPress 全自動發文串接', '✓ 打造被動搜尋流量護城河']
+        : ['✓ Automated trend harvesting', '✓ Seamless WordPress integration', '✓ Evergreen organic search moat'],
+      color: 'from-cyan-500 to-blue-600',
+      border: 'hover:border-cyan-400/60'
+    },
+    {
+      badge: isChinese ? 'AI頂配教材 03' : 'Master Material 03',
+      icon: '💎',
+      title: isChinese ? 'Web2 刷卡 + Web3 錢包自動收單與 25% 裂變' : 'Web2 + Web3 Auto-Checkout & 25% Viral Affiliate System',
+      desc: isChinese
+        ? '完整收錄如何將您的知識產品、電子書或服務結合自動發貨系統與 25% 聯盟分潤機制，讓全球學員成為您的自動推廣大軍！'
+        : 'Complete blueprint on combining digital products with automated fulfillment and a 25% viral affiliate engine.',
+      points: isChinese
+        ? ['✓ 信用卡與 USDT 雙軌收款實戰', '✓ 24H AI 智能客服自動成交配置', '✓ 10%級差 + 10%對等 + 5%分紅解析']
+        : ['✓ Credit Card & USDT dual checkout', '✓ 24/7 AI sales agent configuration', '✓ 25% affiliate viral loop blueprint'],
+      color: 'from-amber-500 to-orange-600',
+      border: 'hover:border-amber-400/60'
+    }
+  ];
 
   // Email forwarding & download state
   const [buyerEmail, setBuyerEmail] = useState('');
@@ -65,13 +108,13 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
         setStatusMsg({
           type: 'success',
           text: isChinese
-            ? `✅ 驗證成功！教材連結已轉發至 ${targetEmail}，您也可以直接點擊下方按鈕下載！`
-            : `✅ Verified! Course link forwarded to ${targetEmail}, and unlocked below!`
+            ? `✅ 驗證成功！AI頂配教材連結已轉發至 ${targetEmail}，您也可以直接點擊下方按鈕下載！`
+            : `✅ Verified! AI Master Material link forwarded to ${targetEmail}, and unlocked below!`
         });
       } else {
         setStatusMsg({
           type: 'error',
-          text: data.error || (isChinese ? '查無購課紀錄或轉發失敗' : 'Verification failed or no purchase record found.')
+          text: data.error || (isChinese ? '查無購買紀錄或轉發失敗' : 'Verification failed or no purchase record found.')
         });
       }
     } catch (e: any) {
@@ -85,107 +128,147 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   };
 
   return (
-    <section id="tutor-courses" className="w-full max-w-7xl px-6 py-20 scroll-mt-20">
-      <div className="bg-gradient-to-br from-emerald-950/50 via-slate-900/80 to-cyan-950/50 border border-emerald-500/30 rounded-3xl p-8 md:p-14 relative overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.15)]">
-        {/* 背景光暈 */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
+    <section id="tutor-courses" className="w-full max-w-7xl px-6 py-16 scroll-mt-20">
+      <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900/90 to-cyan-950/60 border border-emerald-500/40 rounded-3xl p-8 md:p-14 relative overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)]">
+        {/* 背景裝飾光暈 */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* 頂部標題區 */}
+        {/* 1. 頂部標題導覽區 */}
         <div className="text-center mb-12 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-bold mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-sm font-bold mb-5 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
             <span>🎓</span>
-            {isChinese ? 'AI 頂配實戰家教課程・付費下載與電郵轉發專區' : 'AI Master Tutor Courses · Instant Download & Email Forwarding'}
+            {isChinese ? 'AI頂配教材導覽專區・付費秒級下載 ＋ 一鍵轉發電郵' : 'AI Master Materials Guide · Instant Download & Email Forwarding'}
           </div>
-          <h2 className="text-3xl md:text-5xl font-black mb-5 tracking-tight text-white drop-shadow-lg">
-            {isChinese ? '🔥 AI 頂配家教課程・手把手實戰教材' : '🔥 AI Master Tutor Courses & Practical Materials'}
+          <h2 className="text-3xl md:text-5xl font-black mb-5 tracking-tight text-white drop-shadow-lg leading-tight">
+            {isChinese ? '🔥 AI頂配教材導覽專區・手把手實戰秘笈' : '🔥 AI Master Materials Guide & Practical Blueprint'}
           </h2>
-          <p className="text-lg md:text-xl text-emerald-100/80 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-emerald-100/85 max-w-4xl mx-auto leading-relaxed">
             {isChinese
-              ? '專為渴望掌握 AI 自動化獲客的學員打造！購買後系統秒級解鎖教材下載，並自動寄送至您的信箱，更支援「一鍵轉發電郵」分享給團隊夥伴，且全額納入 25% 聯盟推廣分潤！'
-              : 'Master AI automated client acquisition! Unlock instant course downloads upon checkout with automatic email delivery, 1-click email forwarding to your team, and full 25% affiliate commission rewards!'}
+              ? '從零打造您的 24H 自動化獲客系統！購買後不僅立即解鎖「AI頂配教材」高清下載、自動寄送至您的信箱，還可隨時「一鍵轉發電郵」給團隊或朋友，並全額納入 25% 聯盟推廣分潤！'
+              : 'Build your 24/7 automated client acquisition system from scratch! Unlock instant AI Master Materials download, automatic inbox delivery, 1-click email forwarding to your team, and full 25% affiliate commissions!'}
           </p>
         </div>
 
-        {/* 三大課程權益徽章 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 relative z-10">
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl shrink-0">
-              📥
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white mb-1">
-                {isChinese ? '付費秒級下載教材' : 'Instant Course Download'}
-              </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                {isChinese
-                  ? '支援台灣信用卡 / ATM 與 USDT 雙軌付款，完成結帳立即取得完整實戰家教教材與教學連結。'
-                  : 'Pay via Credit Card/ATM or USDT to immediately access the complete practical training materials.'}
-              </p>
-            </div>
+        {/* 2. AI頂配教材三大核心大綱導覽卡片 */}
+        <div className="mb-12 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+            <h3 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
+              <span>📚</span>
+              {isChinese ? 'AI頂配教材・核心實戰模組導覽' : 'AI Master Materials · Core Practical Modules'}
+            </h3>
+            <span className="text-xs md:text-sm font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-3 py-1 rounded-full">
+              {isChinese ? '✨ 付費即享完整 AI 頂配教材與實戰 SOP' : '✨ Includes Complete AI Master Materials & SOPs'}
+            </span>
           </div>
 
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-2xl shrink-0">
-              📧
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white mb-1">
-                {isChinese ? '自動寄信 ＋ 一鍵轉發電郵' : 'Auto Email & 1-Click Forward'}
-              </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                {isChinese
-                  ? '系統自動將教材發送至購課信箱，並提供學員專屬「轉發電郵」功能，隨時轉寄給團隊或備用信箱。'
-                  : 'Automatically delivered to your inbox with built-in email forwarding to share with your backup email or team.'}
-              </p>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {curriculumModules.map((mod, idx) => (
+              <div
+                key={idx}
+                className={`bg-white/5 border border-white/10 ${mod.border} rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] flex flex-col justify-between backdrop-blur-md`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/10">
+                      {mod.badge}
+                    </span>
+                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${mod.color} flex items-center justify-center text-2xl shadow-lg`}>
+                      {mod.icon}
+                    </div>
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-3 leading-snug">
+                    {mod.title}
+                  </h4>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-5">
+                    {mod.desc}
+                  </p>
+                </div>
 
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
-              💰
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white mb-1">
-                {isChinese ? '納入 25% 聯盟推廣分潤' : '25% Affiliate Commission'}
-              </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                {isChinese
-                  ? '推廣家教課程同樣享有最高 10% 級差 + 10% 對等 + 5% 全球領袖分紅，邊學邊賺取被動收益！'
-                  : 'Course sales count toward the 25% affiliate plan (10% Differential + 10% Matching + 5% Global Pool)!'}
-              </p>
-            </div>
+                <div className="pt-4 border-t border-white/10 space-y-1.5">
+                  {mod.points.map((pt, pIdx) => (
+                    <div key={pIdx} className="text-xs font-semibold text-emerald-300/90">
+                      {pt}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* 左右雙欄：左側選課結帳 / 右側學員下載與轉發電郵 */}
+        {/* 3. 多套教材快速切換卡片列 */}
+        <div className="mb-10 relative z-10">
+          <h3 className="text-lg font-bold text-emerald-300 mb-4 flex items-center gap-2">
+            <span>🎯</span>
+            {isChinese ? '點選您要選購或領取的「AI頂配教材」方案：' : 'Select Your AI Master Materials Package:'}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {displayCourses.map((course) => {
+              const isSelected = course.id === selectedCourse.id;
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => setSelectedCourseId(course.id)}
+                  className={`cursor-pointer rounded-2xl p-5 border transition-all duration-300 flex items-center justify-between gap-4 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-emerald-900/60 to-cyan-900/60 border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.35)] scale-[1.01]'
+                      : 'bg-black/40 border-white/10 hover:border-emerald-500/40 hover:bg-white/5'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`w-3 h-3 rounded-full ${isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-600'}`} />
+                      <span className="text-xs font-bold text-emerald-300">
+                        {course.discount_text || (isChinese ? '享 25% 推廣分潤' : '25% Affiliate Eligible')}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-white text-base md:text-lg">
+                      {isChinese ? course.name_zh : (course.name_en || course.name_zh)}
+                    </h4>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-2xl font-black font-mono text-emerald-400">
+                      ${course.price}
+                    </div>
+                    <div className="text-[11px] text-gray-400">USDT</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. 左右雙欄：左側雙軌秒級結帳 / 右側學員下載與一鍵轉發電郵 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
-          {/* 左側：課程選購區 */}
+          {/* 左側：教材選購結帳區 */}
           <div className="bg-gray-900/90 border border-emerald-500/30 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  {isChinese ? 'STEP 1 · 選購家教課程' : 'STEP 1 · Select & Checkout'}
+                  {isChinese ? 'STEP 1 · 立即結帳開通 AI頂配教材' : 'STEP 1 · Instant Materials Checkout'}
                 </span>
                 <span className="text-emerald-400 font-mono font-black text-2xl">
                   ${selectedCourse.price} USDT
                 </span>
               </div>
 
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {isChinese ? '請選擇家教課程教材方案：' : 'Choose AI Tutor Course Package:'}
-              </label>
-              <select
-                value={selectedCourseId}
-                onChange={(e) => setSelectedCourseId(Number(e.target.value))}
-                className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3.5 text-white font-bold mb-6 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              >
-                {displayCourses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {isChinese ? course.name_zh : (course.name_en || course.name_zh)} — ${course.price} USDT
-                  </option>
-                ))}
-              </select>
+              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 mb-6">
+                <div className="text-xs text-gray-400 mb-1">
+                  {isChinese ? '當前選定 AI頂配教材：' : 'Selected AI Master Materials:'}
+                </div>
+                <div className="text-lg font-bold text-white mb-2">
+                  {isChinese ? selectedCourse.name_zh : (selectedCourse.name_en || selectedCourse.name_zh)}
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    {isChinese ? '✓ 付款後自動寄送教材信件' : '✓ Auto Email Delivery'}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                    {isChinese ? '✓ 計入 25% 推廣業績分潤' : '✓ 25% Affiliate Commission'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -210,47 +293,47 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  {isChinese ? 'STEP 2 · 教材下載 & 轉發電郵' : 'STEP 2 · Download & Forward Email'}
+                  {isChinese ? 'STEP 2 · AI頂配教材下載 & 轉發電郵' : 'STEP 2 · Download & Forward Email'}
                 </span>
                 <span className="text-xs text-gray-400">
                   {address
                     ? (isChinese ? `已連結錢包: ${address.substring(0, 6)}...` : `Wallet: ${address.substring(0, 6)}...`)
-                    : (isChinese ? '支援購課信箱驗證' : 'Email Verification')}
+                    : (isChinese ? '支援購買信箱驗證' : 'Email Verification')}
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-white mb-2">
-                {isChinese ? '📤 付費學員專屬：線上領取與轉發電郵' : '📤 Student Portal: Download & Forward via Email'}
+                {isChinese ? '📤 付費學員專屬：AI頂配教材下載與轉發電郵' : '📤 Student Portal: Download & Forward via Email'}
               </h3>
               <p className="text-sm text-gray-400 mb-6 leading-relaxed">
                 {isChinese
-                  ? '已完成購課之學員，請輸入您的「購課驗證信箱」（若已連接購課錢包可免填）以及「欲接收/轉發的目標信箱」，即可立即解鎖下載並將教材轉寄至指定信箱！'
-                  : 'Purchased students: Enter your purchase email (optional if wallet connected) and the target recipient email to immediately unlock the download link and forward the course via email!'}
+                  ? '已完成購買之學員，請輸入您的「購買驗證信箱」（若已連接購買錢包可免填）以及「欲接收/轉發的目標信箱」，即可立即解鎖下載並將 AI頂配教材 轉寄至指定信箱！'
+                  : 'Purchased students: Enter your purchase email (optional if wallet connected) and the target recipient email to immediately unlock the download link and forward the AI Master Materials via email!'}
               </p>
 
               <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-xs text-gray-400 mb-1">
-                    {isChinese ? '1. 購課驗證信箱 (若使用信用卡購買請填寫)：' : '1. Your Purchase Email (for verification):'}
+                    {isChinese ? '1. 購買驗證信箱 (若使用信用卡購買請填寫)：' : '1. Your Purchase Email (for verification):'}
                   </label>
                   <input
                     type="email"
                     value={buyerEmail}
                     onChange={(e) => setBuyerEmail(e.target.value)}
-                    placeholder={isChinese ? '輸入您購課時填寫的 Email' : 'Your purchase email address'}
+                    placeholder={isChinese ? '輸入您購買時填寫的 Email' : 'Your purchase email address'}
                     className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs text-cyan-300 font-semibold mb-1">
-                    {isChinese ? '2. 欲接收 / 轉發教材的目標電子信箱 (必填)：' : '2. Target Email to Receive / Forward Course (Required):'}
+                    {isChinese ? '2. 欲接收 / 轉發教材的目標電子信箱 (必填)：' : '2. Target Email to Receive / Forward Materials (Required):'}
                   </label>
                   <input
                     type="email"
                     value={targetEmail}
                     onChange={(e) => setTargetEmail(e.target.value)}
-                    placeholder={isChinese ? '輸入欲接收教材的親友或個人 Email' : 'Recipient email to receive course link'}
+                    placeholder={isChinese ? '輸入欲接收教材的親友或個人 Email' : 'Recipient email to receive download link'}
                     className="w-full bg-black border border-cyan-500/50 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
@@ -266,7 +349,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
                 <span>📧</span>
                 {isForwarding
                   ? (isChinese ? '驗證與發送信件中...' : 'Verifying & Sending Email...')
-                  : (isChinese ? '一鍵轉發教材至信箱 & 解鎖下載' : 'Forward Course to Email & Unlock Download')}
+                  : (isChinese ? '一鍵轉發 AI頂配教材 至信箱 & 解鎖下載' : 'Forward AI Master Materials & Unlock Download')}
               </button>
 
               {statusMsg && (
@@ -287,7 +370,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
                   className="mt-4 w-full py-3.5 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-black font-black rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
                 >
                   <span>📥</span>
-                  {isChinese ? '立即點擊下載 / 觀看家教課程教材' : 'Click Here to Download / Access Course Now'}
+                  {isChinese ? '立即點擊下載 / 觀看 AI頂配教材' : 'Click Here to Download / Access AI Master Materials'}
                 </a>
               )}
             </div>
