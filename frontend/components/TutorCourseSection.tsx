@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from './BuyNFTButton';
 import PayUniButton from './PayUniButton';
+import { BIGMONEY_PROMO_HTML_ZH, BIGMONEY_PROMO_HTML_EN } from '@/lib/bigmoneyPromoHtml';
 
 interface TutorCourseSectionProps {
   courses: any[];
@@ -14,16 +15,19 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const { lang } = useLanguage();
   const { address } = useAccount();
   const isChinese = lang.includes('zh');
+  const promoContainerRef = useRef<HTMLDivElement | null>(null);
 
   const fallbackCourse = {
     id: 6,
-    name_zh: 'AI 自動來客系統・AI頂配實戰全套教材',
-    name_en: 'WeiXiang AI-ATM · AI Master Practical Materials',
-    amount: 1,
-    price: 99,
-    discount_text: isChinese ? '🔥 限時特惠・享 25% 推廣分潤' : '🔥 Special Offer · 25% Affiliate Eligible',
+    name_zh: 'BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
+    name_en: 'BIGMONEY.AI · AI Master Practical Materials (Incl. 2 NFTs)',
+    amount: 2,
+    price: 198,
+    discount_text: isChinese ? '🔥 贈微享NFT 2枚 (360天系統)＋享 25% 推廣分潤' : '🔥 Bonus 2 NFTs (360d) · 25% Affiliate Eligible',
     product_type: 'DIRECT_COURSE',
-    course_link: ''
+    course_link: '',
+    promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
+    promo_html_en: BIGMONEY_PROMO_HTML_EN
   };
 
   const displayCourses = courses && courses.length > 0 ? courses : [fallbackCourse];
@@ -128,8 +132,24 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   };
 
   const customPromoHtml = isChinese
-    ? (selectedCourse.promo_html_zh || selectedCourse.promo_html_en || '')
-    : (selectedCourse.promo_html_en || selectedCourse.promo_html_zh || '');
+    ? (selectedCourse.promo_html_zh || selectedCourse.promo_html_en || BIGMONEY_PROMO_HTML_ZH)
+    : (selectedCourse.promo_html_en || selectedCourse.promo_html_zh || BIGMONEY_PROMO_HTML_EN);
+
+  // Hydrate and execute any <script> tags inside customPromoHtml (e.g. 5-project carousel & language toggle)
+  useEffect(() => {
+    const container = promoContainerRef.current;
+    if (!container) return;
+
+    const scripts = Array.from(container.querySelectorAll('script'));
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.text = oldScript.textContent || '';
+      oldScript.parentNode?.replaceChild(newScript, oldScript);
+    });
+  }, [customPromoHtml, selectedCourseId, isChinese]);
 
   return (
     <section id="tutor-courses" className="w-full max-w-7xl px-6 py-16 scroll-mt-20">
@@ -168,6 +188,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
 
           {customPromoHtml.trim() ? (
             <div
+              ref={promoContainerRef}
               className="w-full rounded-2xl overflow-hidden"
               dangerouslySetInnerHTML={{ __html: customPromoHtml }}
             />
@@ -209,7 +230,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
         </div>
 
         {/* 3. 多套教材快速切換卡片列 */}
-        <div className="mb-10 relative z-10">
+        <div id="course-checkout-box" className="mb-10 relative z-10 scroll-mt-24">
           <h3 className="text-lg font-bold text-emerald-300 mb-4 flex items-center gap-2">
             <span>🎯</span>
             {isChinese ? '點選您要選購或領取的「AI頂配教材」方案：' : 'Select Your AI Master Materials Package:'}

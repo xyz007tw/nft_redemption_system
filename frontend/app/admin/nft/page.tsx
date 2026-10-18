@@ -5,57 +5,10 @@ import { useWriteContract, useAccount } from 'wagmi';
 import { WEIXIANG_NFT_ABI, WEIXIANG_NFT_ADDRESS } from '@/lib/contractAbi';
 import { parseUnits } from 'viem';
 
-const DEFAULT_PROMO_TEMPLATE_ZH = `<div class="space-y-6 text-left">
-  <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-cyan-900/40 border border-emerald-400/40">
-    <h3 class="text-2xl font-black text-emerald-300 mb-2">🚀 為什麼您必須掌握這套「AI頂配教材」？</h3>
-    <p class="text-gray-200 leading-relaxed">
-      告別傳統高昂廣告費與人工剪輯！本套教材完整公開微享 AI 自動來客系統的核心實戰配置，手把手帶您從零建立 24 小時全自動運轉的獲客與變現機器。
-    </p>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-emerald-400 font-bold mb-1">📌 實戰重點 01</div>
-      <div class="text-white font-bold text-lg mb-2">AI 爆款影音與圖文自動產線</div>
-      <p class="text-gray-400 text-sm">掌握 AI 腳本、多語系配音與高轉化圖卡，單人即可抵一個 10 人行銷團隊。</p>
-    </div>
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-cyan-400 font-bold mb-1">📌 實戰重點 02</div>
-      <div class="text-white font-bold text-lg mb-2">跨國多語系 SEO 流量矩陣</div>
-      <p class="text-gray-400 text-sm">自動生成中、英、日、韓、越長文並排程發佈，精準攔截全球搜尋引擎自然流量。</p>
-    </div>
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-amber-400 font-bold mb-1">📌 實戰重點 03</div>
-      <div class="text-white font-bold text-lg mb-2">自動收單發貨 ＋ 25% 裂變分潤</div>
-      <p class="text-gray-400 text-sm">串接信用卡與 USDT 收款，付費秒級發貨並啟動 25% 聯盟分潤倍增業績！</p>
-    </div>
-  </div>
-</div>`;
-
-const DEFAULT_PROMO_TEMPLATE_EN = `<div class="space-y-6 text-left">
-  <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-cyan-900/40 border border-emerald-400/40">
-    <h3 class="text-2xl font-black text-emerald-300 mb-2">🚀 Why Master This AI Practical Blueprint?</h3>
-    <p class="text-gray-200 leading-relaxed">
-      Stop burning budget on expensive ads and manual editing! This complete AI Master Material reveals the exact SOPs to build a 24/7 automated client-acquisition and monetization engine.
-    </p>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-emerald-400 font-bold mb-1">📌 Pillar 01</div>
-      <div class="text-white font-bold text-lg mb-2">Automated AI Video & Infographic Matrix</div>
-      <p class="text-gray-400 text-sm">Generate scripts, multilingual voiceovers, and viral infographics automatically.</p>
-    </div>
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-cyan-400 font-bold mb-1">📌 Pillar 02</div>
-      <div class="text-white font-bold text-lg mb-2">Global Multilingual SEO Engine</div>
-      <p class="text-gray-400 text-sm">Deploy localized long-form articles across 6+ languages to capture organic search traffic.</p>
-    </div>
-    <div class="p-5 rounded-xl bg-black/50 border border-white/10">
-      <div class="text-amber-400 font-bold mb-1">📌 Pillar 03</div>
-      <div class="text-white font-bold text-lg mb-2">Auto-Fulfillment & 25% Viral Affiliate</div>
-      <p class="text-gray-400 text-sm">Accept Credit Cards & USDT with instant delivery and a 25% viral referral loop.</p>
-    </div>
-  </div>
-</div>`;
+import {
+  BIGMONEY_PROMO_HTML_ZH as DEFAULT_PROMO_TEMPLATE_ZH,
+  BIGMONEY_PROMO_HTML_EN as DEFAULT_PROMO_TEMPLATE_EN
+} from '@/lib/bigmoneyPromoHtml';
 
 function toYoutubeEmbed(rawUrl: string): string {
   const url = rawUrl.trim();
