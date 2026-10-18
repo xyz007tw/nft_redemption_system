@@ -371,9 +371,6 @@ export default function Home() {
       </section>
 
       {/* 眾籌認購區塊 */}
-      
-      {/* AI頂配教材導覽專區 */}
-      <TutorCourseSection courses={coursePackages} />
 
       {/* 操作流程引導 (3-Step Guide) */}
       <section className="w-full max-w-7xl px-6 py-16">
@@ -581,6 +578,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* AI頂配教材導覽專區 (擺放於「想要支持去中心化 AI 基礎設施？」正下方) */}
+      <TutorCourseSection courses={coursePackages} />
 
       {/* 推廣區塊 */}
       <section className="w-full bg-white/5 border-t border-white/10 py-12">
