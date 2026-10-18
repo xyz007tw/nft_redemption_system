@@ -9,6 +9,10 @@ import {
   BIGMONEY_PROMO_HTML_ZH as DEFAULT_PROMO_TEMPLATE_ZH,
   BIGMONEY_PROMO_HTML_EN as DEFAULT_PROMO_TEMPLATE_EN
 } from '@/lib/bigmoneyPromoHtml';
+import {
+  SAAS_AVME_PROMO_HTML_ZH,
+  SAAS_AVME_PROMO_HTML_EN
+} from '@/lib/saasAvmePromoHtml';
 
 function toYoutubeEmbed(rawUrl: string): string {
   const url = rawUrl.trim();
@@ -244,7 +248,14 @@ export default function AdminNFTPage() {
                     onClick={() => insertSnippetToEditor(activeHtmlLang === 'zh' ? DEFAULT_PROMO_TEMPLATE_ZH : DEFAULT_PROMO_TEMPLATE_EN, true)}
                     className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 rounded-lg text-xs font-bold cursor-pointer"
                   >
-                    ✨ 插入爆款銷售模板
+                    ✨ 插入教材1模板 ($198 BIGMONEY)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertSnippetToEditor(activeHtmlLang === 'zh' ? SAAS_AVME_PROMO_HTML_ZH : SAAS_AVME_PROMO_HTML_EN, true)}
+                    className="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 rounded-lg text-xs font-bold cursor-pointer"
+                  >
+                    ⚡ 插入教材2模板 ($99 SaaS-AVME 3.0)
                   </button>
                   <button
                     type="button"
@@ -459,7 +470,14 @@ export default function AdminNFTPage() {
                   onClick={() => insertSnippetToEditor(activeHtmlLang === 'zh' ? DEFAULT_PROMO_TEMPLATE_ZH : DEFAULT_PROMO_TEMPLATE_EN, false)}
                   className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 rounded-xl text-xs font-bold cursor-pointer"
                 >
-                  ✨ 插入爆款銷售模板
+                  ✨ 插入教材1模板 ($198 BIGMONEY)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSnippetToEditor(activeHtmlLang === 'zh' ? SAAS_AVME_PROMO_HTML_ZH : SAAS_AVME_PROMO_HTML_EN, false)}
+                  className="px-3 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 rounded-xl text-xs font-bold cursor-pointer"
+                >
+                  ⚡ 插入教材2模板 ($99 SaaS-AVME 3.0)
                 </button>
                 <button
                   type="button"

@@ -6,6 +6,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from './BuyNFTButton';
 import PayUniButton from './PayUniButton';
 import { BIGMONEY_PROMO_HTML_ZH, BIGMONEY_PROMO_HTML_EN } from '@/lib/bigmoneyPromoHtml';
+import { SAAS_AVME_PROMO_HTML_ZH, SAAS_AVME_PROMO_HTML_EN } from '@/lib/saasAvmePromoHtml';
 
 interface TutorCourseSectionProps {
   courses: any[];
@@ -17,22 +18,37 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const isChinese = lang.includes('zh');
   const promoContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const fallbackCourse = {
-    id: 6,
-    name_zh: 'BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
-    name_en: 'BIGMONEY.AI · AI Master Practical Materials (Incl. 2 NFTs)',
-    amount: 2,
-    price: 198,
-    discount_text: isChinese ? '🔥 贈微享NFT 2枚 (360天系統)＋享 25% 推廣分潤' : '🔥 Bonus 2 NFTs (360d) · 25% Affiliate Eligible',
-    product_type: 'DIRECT_COURSE',
-    course_link: '',
-    promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
-    promo_html_en: BIGMONEY_PROMO_HTML_EN
-  };
+  const fallbackCourses = [
+    {
+      id: 6,
+      name_zh: '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
+      name_en: 'Course 01 | BIGMONEY.AI · AI Master Practical Materials (Incl. 2 NFTs)',
+      amount: 2,
+      price: 198,
+      discount_text: isChinese ? '🔥 贈微享NFT 2枚 (360天系統)＋享 25% 推廣分潤' : '🔥 Bonus 2 NFTs (360d) · 25% Affiliate Eligible',
+      product_type: 'DIRECT_COURSE',
+      course_link: '',
+      promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
+      promo_html_en: BIGMONEY_PROMO_HTML_EN
+    },
+    {
+      id: 7,
+      name_zh: '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊',
+      name_en: 'Course 02 | SaaS-AVME 3.0 Dual-Engine AI Short Video Master Manual',
+      amount: 1,
+      price: 99,
+      discount_text: isChinese ? '⚡ 開口即成片・雙引擎無頭渲染＋享 25% 推廣分潤' : '⚡ Speak It into Video · 25% Affiliate Eligible',
+      product_type: 'DIRECT_COURSE',
+      course_link: '',
+      promo_html_zh: SAAS_AVME_PROMO_HTML_ZH,
+      promo_html_en: SAAS_AVME_PROMO_HTML_EN
+    }
+  ];
 
-  const displayCourses = courses && courses.length > 0 ? courses : [fallbackCourse];
+  const displayCourses = courses && courses.length > 0 ? courses : fallbackCourses;
   const [selectedCourseId, setSelectedCourseId] = useState<number>(displayCourses[0].id);
   const selectedCourse = displayCourses.find(c => c.id === selectedCourseId) || displayCourses[0];
+  const selectedCourseIndex = displayCourses.findIndex(c => c.id === selectedCourse.id);
 
   // AI頂配教材大綱導覽卡片 (AI Master Materials Showcase)
   const curriculumModules = [
@@ -131,9 +147,19 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
     }
   };
 
+  // Determine default fallback HTML based on course name/price/index if not explicitly saved in DB
+  const isAvmeCourse =
+    selectedCourseIndex === 1 ||
+    Number(selectedCourse.price) === 99 ||
+    String(selectedCourse.name_zh || '').toLowerCase().includes('avme') ||
+    String(selectedCourse.name_en || '').toLowerCase().includes('avme');
+
+  const defaultHtmlZh = isAvmeCourse ? SAAS_AVME_PROMO_HTML_ZH : BIGMONEY_PROMO_HTML_ZH;
+  const defaultHtmlEn = isAvmeCourse ? SAAS_AVME_PROMO_HTML_EN : BIGMONEY_PROMO_HTML_EN;
+
   const customPromoHtml = isChinese
-    ? (selectedCourse.promo_html_zh || selectedCourse.promo_html_en || BIGMONEY_PROMO_HTML_ZH)
-    : (selectedCourse.promo_html_en || selectedCourse.promo_html_zh || BIGMONEY_PROMO_HTML_EN);
+    ? (selectedCourse.promo_html_zh || selectedCourse.promo_html_en || defaultHtmlZh)
+    : (selectedCourse.promo_html_en || selectedCourse.promo_html_zh || defaultHtmlEn);
 
   // Hydrate and execute any <script> tags inside customPromoHtml (e.g. 5-project carousel & language toggle)
   useEffect(() => {
@@ -159,7 +185,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
 
         {/* 1. 頂部標題導覽區 */}
-        <div className="text-center mb-12 relative z-10">
+        <div className="text-center mb-10 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-sm font-bold mb-5 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
             <span>🎓</span>
             {isChinese ? 'AI頂配教材導覽專區・付費秒級下載 ＋ 一鍵轉發電郵' : 'AI Master Materials Guide · Instant Download & Email Forwarding'}
@@ -174,18 +200,63 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
           </p>
         </div>
 
-        {/* 2. AI頂配教材宣傳文案 HTML 或預設三大核心大綱導覽卡片 */}
-        <div className="mb-12 relative z-10">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
-            <h3 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
+        {/* 1.5 頂部教材快速切換頁籤 (點擊即切換下方完整宣傳頁與結帳金額) */}
+        <div className="mb-8 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+            <h3 className="text-lg md:text-xl font-black text-white flex items-center gap-2">
               <span>📚</span>
-              {isChinese ? 'AI頂配教材・核心實戰模組導覽' : 'AI Master Materials · Core Practical Modules'}
+              {isChinese ? '請點選欲閱覽與選購的「AI頂配教材」專題：' : 'Select an AI Master Material to Preview & Order:'}
             </h3>
             <span className="text-xs md:text-sm font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-3 py-1 rounded-full">
-              {isChinese ? '✨ 付費即享完整 AI 頂配教材與實戰 SOP' : '✨ Includes Complete AI Master Materials & SOPs'}
+              {isChinese ? '✨ 點擊卡片即可切換專屬介紹頁與結帳方案' : '✨ Click a tab to switch sales page & checkout'}
             </span>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {displayCourses.map((course, idx) => {
+              const isSelected = course.id === selectedCourse.id;
+              return (
+                <button
+                  key={course.id}
+                  type="button"
+                  onClick={() => setSelectedCourseId(course.id)}
+                  className={`text-left cursor-pointer rounded-2xl p-5 border transition-all duration-300 flex items-center justify-between gap-4 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-emerald-900/80 via-teal-900/70 to-cyan-900/80 border-amber-400 shadow-[0_0_30px_rgba(250,204,21,0.3)] scale-[1.01]'
+                      : 'bg-black/50 border-white/15 hover:border-emerald-400/50 hover:bg-white/5'
+                  }`}
+                >
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
+                        isSelected ? 'bg-amber-400 text-black' : 'bg-white/10 text-gray-300'
+                      }`}>
+                        {isChinese ? `🎓 頂配教材 0${idx + 1}` : `🎓 Course 0${idx + 1}`}
+                      </span>
+                      <span className="text-xs font-bold text-emerald-300">
+                        {course.discount_text || (isChinese ? '享 25% 推廣分潤' : '25% Affiliate Eligible')}
+                      </span>
+                    </div>
+                    <div className="font-black text-white text-base md:text-lg leading-snug">
+                      {isChinese ? course.name_zh : (course.name_en || course.name_zh)}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-2xl md:text-3xl font-black font-mono text-amber-400">
+                      ${course.price}
+                    </div>
+                    <div className="text-[11px] text-gray-300 font-bold">
+                      {isSelected ? (isChinese ? '👁️ 當前預覽中' : '👁️ Viewing') : (isChinese ? '點擊切換 →' : 'View →')}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. AI頂配教材宣傳文案 HTML 或預設三大核心大綱導覽卡片 */}
+        <div className="mb-12 relative z-10">
           {customPromoHtml.trim() ? (
             <div
               ref={promoContainerRef}
