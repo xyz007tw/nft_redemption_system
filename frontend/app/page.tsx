@@ -7,6 +7,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
 import TutorCourseSection from '@/components/TutorCourseSection';
+import VideoShoppableSection from '@/components/VideoShoppableSection';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -40,6 +41,22 @@ export default function Home() {
     lang === 'ko-KR' ? '🎓 AI 마스터 교재' :
     lang === 'vi-VN' ? '🎓 Giáo trình AI' :
     '🎓 AI Master Courses';
+
+  const navSponsorText =
+    lang === 'zh-TW' ? '💎 斗內解鎖25%流水' :
+    lang === 'zh-CN' ? '💎 斗内解锁25%流水' :
+    lang === 'ja-JP' ? '💎 支援して25%報酬解放' :
+    lang === 'ko-KR' ? '💎 후원하고 25% 수익 해제' :
+    lang === 'vi-VN' ? '💎 Tài trợ Mở khóa 25%' :
+    '💎 Sponsor & Unlock 25%';
+
+  const navShoppableText =
+    lang === 'zh-TW' ? '🛒 AI影片導購客製' :
+    lang === 'zh-CN' ? '🛒 AI影片导购客制' :
+    lang === 'ja-JP' ? '🛒 AI動画コマース開発' :
+    lang === 'ko-KR' ? '🛒 AI 영상 커머스 구축' :
+    lang === 'vi-VN' ? '🛒 Hệ thống Video Mua sắm AI' :
+    '🛒 AI Video Shoppable';
 
   const heroBadgeText =
     lang === 'zh-TW' ? 'DePIN × Enterprise AI Agent 基礎設施' :
@@ -166,6 +183,18 @@ export default function Home() {
             >
               {navCourseText}
             </a>
+            <a
+              href="#video-shoppable-service"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 whitespace-nowrap"
+            >
+              {navShoppableText}
+            </a>
+            <Link
+              href="/sponsor"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 whitespace-nowrap"
+            >
+              {navSponsorText}
+            </Link>
             <LanguageSwitcher />
             <ConnectButton label={connectLabel} />
           </div>
@@ -581,6 +610,9 @@ export default function Home() {
 
       {/* AI頂配教材導覽專區 (擺放於「想要支持去中心化 AI 基礎設施？」正下方) */}
       <TutorCourseSection courses={coursePackages} />
+
+      {/* 新開發 AI「影片導購系統」客製化建置服務專區 */}
+      <VideoShoppableSection />
 
       {/* 推廣區塊 */}
       <section className="w-full bg-white/5 border-t border-white/10 py-12">
