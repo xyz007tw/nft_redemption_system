@@ -44,7 +44,32 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLang = (l: Lang) => {
     setLangState(l);
     localStorage.setItem('lang', l);
+    if (typeof window !== 'undefined') {
+      (window as any).__WEIXIANG_LANG__ = l;
+      document.documentElement.lang = l;
+      window.dispatchEvent(new CustomEvent('weixiang-lang-change', { detail: { lang: l } }));
+    }
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__WEIXIANG_LANG__ = lang;
+      document.documentElement.lang = lang;
+      window.dispatchEvent(new CustomEvent('weixiang-lang-change', { detail: { lang } }));
+    }
+  }, [lang]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleExternalLangSelect = (e: any) => {
+      const targetLang = e?.detail?.lang as Lang;
+      if (targetLang && translations[targetLang]) {
+        setLang(targetLang);
+      }
+    };
+    window.addEventListener('weixiang-select-lang', handleExternalLangSelect);
+    return () => window.removeEventListener('weixiang-select-lang', handleExternalLangSelect);
+  }, []);
 
   const t = translations[lang] || translations['zh-TW'];
 

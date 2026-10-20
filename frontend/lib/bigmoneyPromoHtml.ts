@@ -235,14 +235,22 @@ export const BIGMONEY_PROMO_HTML_ZH = `<!-- === BIGMONEY.AI 旗艦教材宣傳�
         }
     </style>
 
-    <!-- 頂部導航與雙語切換列 -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 14px; margin-bottom: 28px;">
+    <!-- 頂部導航與 6 國語系切換列 -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; padding-bottom: 14px; margin-bottom: 28px;">
         <div style="font-weight: 800; font-size: 18px; letter-spacing: 0.05em; color: #f8fafc;">
-            BIGMONEY<span style="color: #34d399;">.AI</span> · <span style="font-size: 13px; color: #38bdf8;">AI頂配實戰教材</span>
+            BIGMONEY<span style="color: #34d399;">.AI</span> · <span style="font-size: 13px; color: #38bdf8;" data-bm="brand_sub">AI頂配實戰教材</span>
         </div>
-        <button id="bmLangBtn" type="button" style="background: #1e293b; color: #34d399; border: 1px solid #334155; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;">
-            🌐 English / 中文切換
-        </button>
+        <div style="display: flex; align-items: center; gap: 6px; background: #1e293b; border: 1px solid #334155; padding: 5px 12px; border-radius: 20px;">
+            <span style="font-size: 12px;">🌐</span>
+            <select id="bmLangSelect" aria-label="Language" style="background: transparent; color: #34d399; border: none; font-size: 12px; font-weight: 700; cursor: pointer; outline: none;">
+                <option value="zh-TW" style="background: #0f172a; color: #f8fafc;">繁體中文</option>
+                <option value="zh-CN" style="background: #0f172a; color: #f8fafc;">简体中文</option>
+                <option value="en-US" style="background: #0f172a; color: #f8fafc;">English</option>
+                <option value="ja-JP" style="background: #0f172a; color: #f8fafc;">日本語</option>
+                <option value="ko-KR" style="background: #0f172a; color: #f8fafc;">한국어</option>
+                <option value="vi-VN" style="background: #0f172a; color: #f8fafc;">Tiếng Việt</option>
+            </select>
+        </div>
     </div>
 
     <!-- Hero 標題區 -->
@@ -686,29 +694,90 @@ export const BIGMONEY_PROMO_HTML_ZH = `<!-- === BIGMONEY.AI 旗艦教材宣傳�
         }
     };
 
+    const localeHeaderOverrides = {
+        'zh-TW': { brand_sub: "AI頂配實戰教材" },
+        'zh-CN': {
+            brand_sub: "AI顶配实战教材",
+            hero_badge: "🛡️ 20 年系统架构总工程师 亲手打造",
+            hero_title_1: "你的一个好点子，",
+            hero_title_2: "到底值多少钱？",
+            hero_desc: "告别手动苦力！结合「AI 影分身流 ＋ 全自动收款发货 ＋ 区块链抗通胀协议」，让灵感转化为 24 小时为你打工的被动收益飞轮。",
+            hero_direct_hint: "请于下方「STEP 1 结账面板」选择【信用卡/ATM 刷卡】或【Web3 USDT】即刻解锁完整教材",
+            trust_1: "即刻下载 3 份实战落地手册 ＋ 一键转发电邮",
+            trust_2: "赠微享 NFT 2 枚 (享 360 天系统赋能)",
+            trust_3: "纳入 25% 联盟推广分润 (10%级差+10%对等+5%全球分红)",
+            video_title: "60 秒看懂：AI 双引擎如何全自动运作"
+        },
+        'en-US': { brand_sub: "AI Master Practical Materials" },
+        'ja-JP': {
+            brand_sub: "AIマスター実践教材",
+            hero_badge: "🛡️ 20年システムアーキテクト総責任者が開発",
+            hero_title_1: "あなたの優れたアイデアは、",
+            hero_title_2: "一体いくらの価値がありますか？",
+            hero_desc: "手作業から解放！「AI動画分身ストリーム ＋ 全自動決済・納品 ＋ Web3複利プロトコル」で24時間自動収益システムを構築。",
+            hero_direct_hint: "下の「STEP 1 決済パネル」から【クレジットカード】または【Web3 USDT】で今すぐ教材を解放",
+            trust_1: "3冊の実践マニュアル即時ダウンロード ＋ ワンクリックメール転送",
+            trust_2: "微享NFT 2枚贈呈 (360日システム利用権)",
+            trust_3: "25% アフィリエイト報酬対象 (10%差額+10%マッチング+5%世界分配)",
+            video_title: "60秒でわかる：AIデュアルエンジンの全自動稼働"
+        },
+        'ko-KR': {
+            brand_sub: "AI 마스터 실전 교재",
+            hero_badge: "🛡️ 20년 경력 수석 시스템 아키텍트 직접 설계",
+            hero_title_1: "당신의 훌륭한 아이디어 하나,",
+            hero_title_2: "과연 얼마의 가치가 있을까요?",
+            hero_desc: "수작업은 이제 그만! 「AI 영상 분신 스트림 + 전자동 결제·발송 + 블록체인 복리 프로토콜」로 24시간 자동 수익 파이프라인을 구축하세요.",
+            hero_direct_hint: "아래 「STEP 1 결제 패널」에서 【신용카드】 또는 【Web3 USDT】를 선택해 즉시 교재를 잠금 해제하세요",
+            trust_1: "실전 매뉴얼 3종 즉시 다운로드 + 원클릭 이메일 전달",
+            trust_2: "WeiXiang NFT 2개 증정 (360일 시스템 권한)",
+            trust_3: "25% 제휴 마케팅 커미션 포함 (10% 차등+10% 매칭+5% 글로벌 풀)",
+            video_title: "60초 핵심 요약: AI 듀얼 엔진 전자동 작동 원리"
+        },
+        'vi-VN': {
+            brand_sub: "Giáo trình Thực chiến AI",
+            hero_badge: "🛡️ Được xây dựng bởi Kiến trúc sư trưởng 20 năm kinh nghiệm",
+            hero_title_1: "Một ý tưởng tuyệt vời của bạn,",
+            hero_title_2: "thực sự đáng giá bao nhiêu?",
+            hero_desc: "Tạm biệt làm việc thủ công! Kết hợp 'Luồng Video AI Phân thân + Thanh toán & Giao hàng Tự động + Giao thức Web3', biến ý tưởng thành cỗ máy thu nhập thụ động 24/7.",
+            hero_direct_hint: "Chọn 【Thẻ Tín dụng/ATM】 hoặc 【Web3 USDT】 tại Bảng Thanh toán STEP 1 bên dưới để mở khóa ngay",
+            trust_1: "Tải ngay 3 Sổ tay Thực chiến + Chuyển tiếp Email 1-Click",
+            trust_2: "Tặng 2 NFT WeiXiang (360 ngày sử dụng hệ thống)",
+            trust_3: "Hưởng 25% Hoa hồng Liên kết (10% Chênh lệch + 10% Đối ứng + 5% Toàn cầu)",
+            video_title: "60 Giây Hiểu Ngay: Cách Hệ thống AI Kép Tự động Vận hành"
+        }
+    };
+
     const root = document.getElementById('bigmoney-wrapper');
     if (!root) return;
 
-    const docLang = (document.documentElement.lang || '').toLowerCase();
-    let cur = docLang.includes('en') ? 'en' : 'zh';
+    function getGlobalLocale() {
+        return window.__WEIXIANG_LANG__ || localStorage.getItem('lang') || document.documentElement.lang || 'zh-TW';
+    }
 
-    function apply(lang) {
-        cur = lang;
-        const data = dict[lang];
-        if (!data) return;
+    let curLocale = getGlobalLocale();
+
+    function apply(localeCode) {
+        curLocale = localeCode || 'zh-TW';
+        const isZhLocale = String(curLocale).toLowerCase().includes('zh');
+        const baseKey = isZhLocale ? 'zh' : 'en';
+        const baseData = dict[baseKey] || dict.zh;
+        const overrides = localeHeaderOverrides[curLocale] || {};
+        const merged = Object.assign({}, baseData, overrides);
 
         root.querySelectorAll('[data-bm]').forEach(function(el) {
             const k = el.getAttribute('data-bm');
-            if (k && data[k]) el.textContent = data[k];
+            if (k && merged[k]) el.textContent = merged[k];
         });
 
-        const btn = document.getElementById('bmLangBtn');
-        if (btn) btn.textContent = data.btn_toggle;
+        const selectEl = document.getElementById('bmLangSelect');
+        if (selectEl && selectEl.value !== curLocale) {
+            selectEl.value = curLocale;
+        }
 
         const iframe = document.getElementById('bmShortsFrame');
-        if (iframe && shortsVideos[lang]) {
-            if (iframe.getAttribute('src') !== shortsVideos[lang]) {
-                iframe.setAttribute('src', shortsVideos[lang]);
+        if (iframe && shortsVideos[baseKey]) {
+            if (iframe.getAttribute('src') !== shortsVideos[baseKey]) {
+                iframe.setAttribute('src', shortsVideos[baseKey]);
             }
         }
     }
@@ -766,20 +835,24 @@ export const BIGMONEY_PROMO_HTML_ZH = `<!-- === BIGMONEY.AI 旗艦教材宣傳�
     }
 
     setTimeout(function() {
-        apply(cur);
+        apply(getGlobalLocale());
         setupCarousel();
-        const toggleBtn = document.getElementById('bmLangBtn');
-        if (toggleBtn) {
-            toggleBtn.onclick = function() {
-                apply(cur === 'zh' ? 'en' : 'zh');
+        const selectEl = document.getElementById('bmLangSelect');
+        if (selectEl) {
+            selectEl.onchange = function(e) {
+                const chosen = e.target.value;
+                apply(chosen);
+                window.dispatchEvent(new CustomEvent('weixiang-select-lang', { detail: { lang: chosen } }));
             };
         }
-    }, 80);
+        window.addEventListener('weixiang-lang-change', function(e) {
+            if (e && e.detail && e.detail.lang) {
+                apply(e.detail.lang);
+            }
+        });
+    }, 60);
 })();
 </script>
 <!-- === BIGMONEY.AI 旗艦教材宣傳文案結束 === -->`;
 
-export const BIGMONEY_PROMO_HTML_EN = BIGMONEY_PROMO_HTML_ZH.replace(
-  "let cur = docLang.includes('en') ? 'en' : 'zh';",
-  "let cur = 'en';"
-);
+export const BIGMONEY_PROMO_HTML_EN = BIGMONEY_PROMO_HTML_ZH;

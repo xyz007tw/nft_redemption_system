@@ -1,19 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useLanguage } from '@/lib/LanguageContext';
+import { useState } from 'react';
+import { useLanguage, Lang } from '@/lib/LanguageContext';
 
 export default function VideoShoppableSection() {
-  const { lang } = useLanguage();
-  const isGlobalChinese = lang.includes('zh');
-  const [localLang, setLocalLang] = useState<'zh' | 'en'>(isGlobalChinese ? 'zh' : 'en');
+  const { lang, setLang } = useLanguage();
+  const isZh = lang.includes('zh');
   const [copyToast, setCopyToast] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLocalLang(isGlobalChinese ? 'zh' : 'en');
-  }, [isGlobalChinese]);
-
-  const isZh = localLang === 'zh';
+  const langOptions: { code: Lang; name: string }[] = [
+    { code: 'zh-TW', name: '繁體中文' },
+    { code: 'zh-CN', name: '简体中文' },
+    { code: 'en-US', name: 'English' },
+    { code: 'ja-JP', name: '日本語' },
+    { code: 'ko-KR', name: '한국어' },
+    { code: 'vi-VN', name: 'Tiếng Việt' }
+  ];
 
   const handleCopyId = (idText: string, platformName: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
@@ -40,15 +42,28 @@ export default function VideoShoppableSection() {
               href="#shoppable-contact-hub"
               className="px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-sky-600 text-white text-xs font-extrabold shadow-md hover:opacity-95 transition-all"
             >
-              {isZh ? '💬 立即接洽規劃' : '💬 Contact CTO'}
+              {lang === 'zh-TW' ? '💬 立即接洽規劃' :
+               lang === 'zh-CN' ? '💬 立即接洽规划' :
+               lang === 'ja-JP' ? '💬 導入相談・お問い合わせ' :
+               lang === 'ko-KR' ? '💬 맞춤형 구축 상담' :
+               lang === 'vi-VN' ? '💬 Liên hệ Tư vấn' :
+               '💬 Contact CTO'}
             </a>
-            <button
-              type="button"
-              onClick={() => setLocalLang(isZh ? 'en' : 'zh')}
-              className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-[#0284c7] text-white border border-white/25 text-xs font-bold cursor-pointer transition-all"
-            >
-              🌐 {isZh ? '切換英文 / EN' : '切換中文 / 繁中'}
-            </button>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/25">
+              <span className="text-xs">🌐</span>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as Lang)}
+                aria-label="Select Language"
+                className="bg-transparent text-white text-xs font-bold cursor-pointer focus:outline-none"
+              >
+                {langOptions.map((opt) => (
+                  <option key={opt.code} value={opt.code} className="bg-slate-900 text-white">
+                    {opt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -58,15 +73,34 @@ export default function VideoShoppableSection() {
           style={{ background: 'radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 85%)' }}
         >
           <div className="inline-block bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-1.5 rounded-full text-xs font-extrabold shadow-lg mb-4">
-            {isZh
-              ? '企業/品牌客製化建置服務 · 專人架構對接'
-              : 'Custom Enterprise Implementation · Direct CTO Consultation'}
+            {lang === 'zh-TW' ? '企業/品牌客製化建置服務 · 專人架構對接' :
+             lang === 'zh-CN' ? '企业/品牌客制化建置服务 · 专人架构对接' :
+             lang === 'ja-JP' ? '企業・ブランド向けカスタム開発サービス · 専任アーキテクト対応' :
+             lang === 'ko-KR' ? '기업/브랜드 맞춤형 구축 서비스 · 수석 아키텍트 직접 설계' :
+             lang === 'vi-VN' ? 'Dịch vụ Xây dựng Hệ thống Tùy chỉnh · Kỹ sư trưởng Trực tiếp Tư vấn' :
+             'Custom Enterprise Implementation · Direct CTO Consultation'}
           </div>
 
           <h2 className="text-2xl md:text-4xl font-black text-white mb-4 leading-tight">
-            {isZh ? (
+            {lang === 'zh-TW' ? (
               <>
                 新開發 AI「<span className="text-[#38bdf8]">影片導購系統</span>」客製化建置
+              </>
+            ) : lang === 'zh-CN' ? (
+              <>
+                新开发 AI「<span className="text-[#38bdf8]">影片导购系统</span>」客制化建置
+              </>
+            ) : lang === 'ja-JP' ? (
+              <>
+                新開発 AI「<span className="text-[#38bdf8]">動画コマース導線システム</span>」カスタム構築
+              </>
+            ) : lang === 'ko-KR' ? (
+              <>
+                신규 개발 AI 「<span className="text-[#38bdf8]">비디오 쇼핑 전환 시스템</span>」 맞춤형 구축
+              </>
+            ) : lang === 'vi-VN' ? (
+              <>
+                Xây dựng Hệ thống AI 「<span className="text-[#38bdf8]">Video Mua sắm Tự động</span>」
               </>
             ) : (
               <>
@@ -76,8 +110,16 @@ export default function VideoShoppableSection() {
           </h2>
 
           <p className="text-sm md:text-base text-slate-300 max-w-3xl mx-auto mb-6 leading-relaxed">
-            {isZh
+            {lang === 'zh-TW'
               ? '觀看影片直接讓訪客點選，無縫直達您的官網、商城消費或聯盟推薦網址！由 20 年系統架構總工程師團隊為您量身整合官方 YouTube Data API v3，打造全自動化的超強流量變現閉環。'
+              : lang === 'zh-CN'
+              ? '观看影片直接让访客点选，无缝直达您的官网、商城消费或联盟推荐网址！由 20 年系统架构总工程师团队为您量身整合官方 YouTube Data API v3，打造全自动化的超强流量变现闭环。'
+              : lang === 'ja-JP'
+              ? '動画視聴中に商品を直接クリックさせ、公式サイト・ECショップ・アフィリエイトリンクへシームレスに誘導！20年の経験を持つシステムアーキテクトチームが公式 YouTube Data API v3 を統合し、24時間全自動の収益化ループを構築します。'
+              : lang === 'ko-KR'
+              ? '영상을 시청하는 방문자가 화면에서 바로 클릭하여 공식 웹사이트, 쇼핑몰 또는 제휴 링크로 즉시 이동하도록 연결합니다! 20년 경력의 수석 시스템 아키텍트 팀이 공식 YouTube Data API v3를 맞춤형으로 통합하여 24시간 전자동 수익화 루프를 구축해 드립니다.'
+              : lang === 'vi-VN'
+              ? 'Cho phép người xem nhấp trực tiếp vào sản phẩm ngay trong video để đến thẳng website, cửa hàng hoặc link tiếp thị liên kết của bạn! Đội ngũ Kiến trúc sư 20 năm kinh nghiệm tích hợp YouTube Data API v3 chính thức, xây dựng vòng lặp chuyển đổi tự động 24/7.'
               : 'Turn viewers into customers with direct in-video clicks to your store, website, or affiliate links. Custom-engineered with official YouTube Data API v3 for complete 24/7 marketing automation.'}
           </p>
 

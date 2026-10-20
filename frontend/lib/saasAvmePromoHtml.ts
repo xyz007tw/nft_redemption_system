@@ -220,16 +220,21 @@ export const SAAS_AVME_PROMO_HTML_ZH = `<!-- === 第 2 套教材：SaaS-AVME 3.0
         }
     </style>
 
-    <!-- 頂部品牌條與語言切換膠囊 -->
+    <!-- 頂部品牌條與 6 國語系切換選單 -->
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
         <div style="font-weight: 900; font-size: 20px; letter-spacing: -0.02em; color: #ffffff;">
             SaaS-AVME 3.0 <span style="color: #facc15; font-style: italic; font-family: monospace; font-size: 13px; margin-left: 6px;">DUAL-ENGINE STACK</span>
         </div>
-        <div class="avme-lang-bar">
+        <div class="avme-lang-bar" style="padding: 4px 12px;">
             <span style="color: #facc15; font-size: 12px;">🌐</span>
-            <button type="button" id="avme-lang-zh" class="avme-lang-btn active">繁中</button>
-            <span style="color: #64748b; font-size: 12px;">|</span>
-            <button type="button" id="avme-lang-en" class="avme-lang-btn">EN</button>
+            <select id="avmeLangSelect" aria-label="Language" style="background: transparent; color: #facc15; border: none; font-size: 12px; font-weight: 800; cursor: pointer; outline: none;">
+                <option value="zh-TW" style="background: #0f172a; color: #f8fafc;">繁體中文</option>
+                <option value="zh-CN" style="background: #0f172a; color: #f8fafc;">简体中文</option>
+                <option value="en-US" style="background: #0f172a; color: #f8fafc;">English</option>
+                <option value="ja-JP" style="background: #0f172a; color: #f8fafc;">日本語</option>
+                <option value="ko-KR" style="background: #0f172a; color: #f8fafc;">한국어</option>
+                <option value="vi-VN" style="background: #0f172a; color: #f8fafc;">Tiếng Việt</option>
+            </select>
         </div>
     </div>
 
@@ -790,36 +795,85 @@ export const SAAS_AVME_PROMO_HTML_ZH = `<!-- === 第 2 套教材：SaaS-AVME 3.0
         }
     };
 
+    const avmeLocaleOverrides = {
+        'zh-CN': {
+            badge_tag: "20 年系统架构总工程师的解题协议",
+            hero_h1: "开口即成片！",
+            hero_h2: "用白话文指挥 AI，打造 24 小时全自动短视频生产线",
+            hero_desc: "传统外包一支短视频要价数千元、反复修改 7 天起跳；自己学剪辑又卡死在时间轴拖拉、字幕对齐与调色的技术泥淖。拥有 20 年架构经验的系统团队，将价值 $5,000 美元的无人值守双引擎工作流封装落地——小白免写代码、免学剪辑，一句白话文指令，系统即刻自编、自导、自剪成片！",
+            hero_cta_hint: "请于下方 STEP 1 选择【信用卡/ATM 刷卡】或【Web3 USDT】即刻解锁 $99 大师手册",
+            hero_b1: "付款秒级发信下载 ＋ 支持电邮转发",
+            hero_b2: "全额纳入 25% 联盟推广分润 (10%级差+10%对等+5%分红)",
+            hero_b3: "选购教材系列满 $198 加码送 AI 寻客 365 天",
+            video_title: "双引擎短视频实战成果演示"
+        },
+        'ja-JP': {
+            badge_tag: "20年システムアーキテクトの自動化プロトコル",
+            hero_h1: "話すだけで動画完成！",
+            hero_h2: "自然言語でAIを指揮し、24時間全自動ショート動画ラインを構築",
+            hero_desc: "外注すると数万円・1週間以上かかり、自分で編集を学ぶとタイムライン作業に追われます。20年のシステム設計経験を持つチームが、$5,000相当のデュアルエンジン自動ワークフローをパッケージ化。コード不要・編集スキル不要で、一言の指示から自動脚本・演出・レンダリングを実現！",
+            hero_cta_hint: "下の STEP 1 から【クレジットカード】または【Web3 USDT】で $99 マスターハンドブックを即時解放",
+            hero_b1: "決済後即時メール納品 ＋ ワンクリックメール転送",
+            hero_b2: "25% アフィリエイト報酬対象 (10%差額+10%マッチング+5%世界分配)",
+            hero_b3: "$198 以上の購入で 365日 AI自動集客システム贈呈",
+            video_title: "デュアルエンジン実戦ショーケース"
+        },
+        'ko-KR': {
+            badge_tag: "20년 경력 수석 시스템 아키텍트 프로토콜",
+            hero_h1: "말 한마디로 영상 완성!",
+            hero_h2: "일상 언어로 AI를 지휘해 24시간 전자동 숏폼 생산 라인 구축",
+            hero_desc: "기존 외주 제작은 수십만 원과 7일 이상의 수정 시간이 걸리고, 직접 편집을 배우면 타임라인 작업에 갇히게 됩니다. 20년 아키텍처 경험의 엔지니어 팀이 $5,000 가치의 무인 듀얼 엔진 워크플로우를 패키징했습니다. 코딩·편집 기술 없이 자연어 명령 한 줄로 즉시 대본·연출·렌더링 완성!",
+            hero_cta_hint: "아래 STEP 1에서 【신용카드】 또는 【Web3 USDT】를 선택해 $99 마스터 매뉴얼을 즉시 잠금 해제하세요",
+            hero_b1: "결제 즉시 이메일 발송 + 원클릭 이메일 전달 지원",
+            hero_b2: "25% 제휴 마케팅 커미션 전액 반영 (10% 차등+10% 매칭+5% 글로벌 풀)",
+            hero_b3: "$198 이상 구매 시 365일 AI 자동 모객 패키지 추가 증정",
+            video_title: "듀アル 엔진 숏폼 실전 데모"
+        },
+        'vi-VN': {
+            badge_tag: "Giao thức từ Kiến trúc sư Hệ thống 20 năm kinh nghiệm",
+            hero_h1: "Nói Là Thành Phim!",
+            hero_h2: "Chỉ huy AI bằng ngôn ngữ tự nhiên, xây dựng dây chuyền Video ngắn tự động 24/7",
+            hero_desc: "Thuê ngoài tốn hàng백 đô và mất cả tuần chỉnh sửa; tự học dựng phim lại mắc kẹtใน timeline phức tạp. Đội ngũ kỹ sư 20 năm kinh nghiệm đã đóng gói quy trình Kép trị giá $5,000 — không cần viết code, không cần biết dựng phim, chỉ một câu lệnh tự nhiên để AI tự viết kịch bản, đạo diễn và xuất video!",
+            hero_cta_hint: "Chọn 【Thẻ Tín dụng/ATM】 hoặc 【Web3 USDT】 tại STEP 1 bên dưới để mở khóa Sổ tay $99 ngay",
+            hero_b1: "Giao qua Email tức thì + Hỗ trợ chuyển tiếp Email 1-Click",
+            hero_b2: "Hưởng trọn 25% Hoa hồng Liên kết (10% Chênh lệch + 10% Đối ứng + 5% Toàn cầu)",
+            hero_b3: "Đơn hàng >= $198 tặng kèm 365 ngày Hệ thống AI Tìm khách",
+            video_title: "Trình diễn Thực chiến Hệ thống AI Kép"
+        }
+    };
+
     const root = document.getElementById('saas-avme-wrapper');
     if (!root) return;
 
-    const docLang = (document.documentElement.lang || '').toLowerCase();
-    let currentLang = docLang.includes('en') ? 'en' : 'zh';
+    function getGlobalLocale() {
+        return window.__WEIXIANG_LANG__ || localStorage.getItem('lang') || document.documentElement.lang || 'zh-TW';
+    }
 
-    function switchAvmeLang(lang) {
-        currentLang = lang;
-        const dict = i18nConfig[lang];
-        if (!dict) return;
+    function switchAvmeLang(localeCode) {
+        const curLocale = localeCode || 'zh-TW';
+        const isZh = String(curLocale).toLowerCase().includes('zh');
+        const baseKey = isZh ? 'zh' : 'en';
+        const baseDict = i18nConfig[baseKey] || i18nConfig.zh;
+        const overrides = avmeLocaleOverrides[curLocale] || {};
+        const merged = Object.assign({}, baseDict, overrides);
 
         root.querySelectorAll('[data-avme]').forEach(function(el) {
             const key = el.getAttribute('data-avme');
-            if (key && dict[key]) {
-                el.innerHTML = dict[key];
+            if (key && merged[key]) {
+                el.innerHTML = merged[key];
             }
         });
 
         const shortsFrame = document.getElementById('avme-shorts-frame');
-        if (shortsFrame && dict.video_src) {
-            if (shortsFrame.getAttribute('src') !== dict.video_src) {
-                shortsFrame.setAttribute('src', dict.video_src);
+        if (shortsFrame && merged.video_src) {
+            if (shortsFrame.getAttribute('src') !== merged.video_src) {
+                shortsFrame.setAttribute('src', merged.video_src);
             }
         }
 
-        const btnZh = document.getElementById('avme-lang-zh');
-        const btnEn = document.getElementById('avme-lang-en');
-        if (btnZh && btnEn) {
-            btnZh.classList.toggle('active', lang === 'zh');
-            btnEn.classList.toggle('active', lang === 'en');
+        const selectEl = document.getElementById('avmeLangSelect');
+        if (selectEl && selectEl.value !== curLocale) {
+            selectEl.value = curLocale;
         }
     }
 
@@ -855,18 +909,24 @@ export const SAAS_AVME_PROMO_HTML_ZH = `<!-- === 第 2 套教材：SaaS-AVME 3.0
     }
 
     setTimeout(function() {
-        switchAvmeLang(currentLang);
+        switchAvmeLang(getGlobalLocale());
         setupAvmeCarousel();
-        const btnZh = document.getElementById('avme-lang-zh');
-        const btnEn = document.getElementById('avme-lang-en');
-        if (btnZh) btnZh.onclick = function() { switchAvmeLang('zh'); };
-        if (btnEn) btnEn.onclick = function() { switchAvmeLang('en'); };
-    }, 80);
+        const selectEl = document.getElementById('avmeLangSelect');
+        if (selectEl) {
+            selectEl.onchange = function(e) {
+                const chosen = e.target.value;
+                switchAvmeLang(chosen);
+                window.dispatchEvent(new CustomEvent('weixiang-select-lang', { detail: { lang: chosen } }));
+            };
+        }
+        window.addEventListener('weixiang-lang-change', function(e) {
+            if (e && e.detail && e.detail.lang) {
+                switchAvmeLang(e.detail.lang);
+            }
+        });
+    }, 60);
 })();
 </script>
 <!-- === 第 2 套教材：SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊結束 === -->`;
 
-export const SAAS_AVME_PROMO_HTML_EN = SAAS_AVME_PROMO_HTML_ZH.replace(
-  "let currentLang = docLang.includes('en') ? 'en' : 'zh';",
-  "let currentLang = 'en';"
-);
+export const SAAS_AVME_PROMO_HTML_EN = SAAS_AVME_PROMO_HTML_ZH;

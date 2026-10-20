@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
-import { useLanguage } from '@/lib/LanguageContext';
+import { useLanguage, Lang } from '@/lib/LanguageContext';
 import BuyNFTButton from './BuyNFTButton';
 import PayUniButton from './PayUniButton';
 import { BIGMONEY_PROMO_HTML_ZH, BIGMONEY_PROMO_HTML_EN } from '@/lib/bigmoneyPromoHtml';
@@ -13,10 +13,18 @@ interface TutorCourseSectionProps {
 }
 
 export default function TutorCourseSection({ courses }: TutorCourseSectionProps) {
-  const { lang } = useLanguage();
+  const { lang, setLang } = useLanguage();
   const { address } = useAccount();
   const isChinese = lang.includes('zh');
   const promoContainerRef = useRef<HTMLDivElement | null>(null);
+  const langOptions: { code: Lang; name: string }[] = [
+    { code: 'zh-TW', name: '繁體中文' },
+    { code: 'zh-CN', name: '简体中文' },
+    { code: 'en-US', name: 'English' },
+    { code: 'ja-JP', name: '日本語' },
+    { code: 'ko-KR', name: '한국어' },
+    { code: 'vi-VN', name: 'Tiếng Việt' }
+  ];
 
   const fallbackCourses = [
     {
@@ -175,7 +183,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
       newScript.text = oldScript.textContent || '';
       oldScript.parentNode?.replaceChild(newScript, oldScript);
     });
-  }, [customPromoHtml, selectedCourseId, isChinese]);
+  }, [customPromoHtml, selectedCourseId, lang]);
 
   return (
     <section id="tutor-courses" className="w-full max-w-7xl px-6 py-16 scroll-mt-20">
@@ -205,11 +213,28 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
             <h3 className="text-lg md:text-xl font-black text-white flex items-center gap-2">
               <span>📚</span>
-              {isChinese ? '請點選欲閱覽與選購的「AI頂配教材」專題：' : 'Select an AI Master Material to Preview & Order:'}
+              {lang === 'zh-TW' ? '請點選欲閱覽與選購的「AI頂配教材」專題：' :
+               lang === 'zh-CN' ? '请点选欲阅览与选购的「AI顶配教材」专题：' :
+               lang === 'ja-JP' ? '閲覧・購入する「AIマスター教材」を選択してください：' :
+               lang === 'ko-KR' ? '열람 및 구매할 「AI 마스터 교재」를 선택하세요:' :
+               lang === 'vi-VN' ? 'Chọn chuyên đề 「Giáo trình AI」 để xem & đặt mua:' :
+               'Select an AI Master Material to Preview & Order:'}
             </h3>
-            <span className="text-xs md:text-sm font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-3 py-1 rounded-full">
-              {isChinese ? '✨ 點擊卡片即可切換專屬介紹頁與結帳方案' : '✨ Click a tab to switch sales page & checkout'}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-emerald-300">🌐</span>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as Lang)}
+                aria-label="Select Language"
+                className="bg-slate-900 hover:bg-slate-800 text-white border border-emerald-400/50 rounded-full px-3.5 py-1.5 text-xs font-bold cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+              >
+                {langOptions.map((opt) => (
+                  <option key={opt.code} value={opt.code} className="bg-slate-900 text-white">
+                    {opt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
