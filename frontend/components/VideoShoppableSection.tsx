@@ -1,12 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage, Lang } from '@/lib/LanguageContext';
+import { LIVEGOOD_PROMO_HTML } from '@/lib/livegoodPromoHtml';
 
 export default function VideoShoppableSection() {
   const { lang, setLang } = useLanguage();
   const isZh = lang.includes('zh');
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [activeServiceTab, setActiveServiceTab] = useState<'shoppable' | 'livegood'>('shoppable');
+  const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = livegoodContainerRef.current;
+    if (!container) return;
+
+    const scripts = Array.from(container.querySelectorAll('script'));
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.text = oldScript.textContent || '';
+      oldScript.parentNode?.replaceChild(newScript, oldScript);
+    });
+  }, [activeServiceTab, lang]);
 
   const langOptions: { code: Lang; name: string }[] = [
     { code: 'zh-TW', name: '繁體中文' },
@@ -35,7 +53,7 @@ export default function VideoShoppableSection() {
         {/* 頂部導覽工具列 */}
         <div className="bg-[#0f172a] px-6 py-3.5 flex flex-wrap justify-between items-center gap-3 border-b border-white/15">
           <span className="text-[#38bdf8] text-xs md:text-sm font-extrabold tracking-wider">
-            ⚡ CTO SEN ARCHITECTURE · 20 YRS EXP
+            ⚡ CTO SEN ARCHITECTURE · CUSTOM SERVICES HUB
           </span>
           <div className="flex items-center gap-3">
             <a
@@ -67,11 +85,115 @@ export default function VideoShoppableSection() {
           </div>
         </div>
 
-        {/* 主標題區 (客製化服務定位) */}
-        <div
-          className="text-center px-6 py-10 text-white border-b-4 border-[#0284c7]"
-          style={{ background: 'radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 85%)' }}
-        >
+        {/* 客製化服務雙主題切換頁籤 (服務 01：AI影片導購系統 / 服務 02：LiveGood 會員訂閱與 AI 自動化協播) */}
+        <div className="bg-slate-900 px-6 py-5 border-b border-slate-700">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
+              <span className="text-xs md:text-sm font-extrabold text-sky-300 flex items-center gap-2">
+                <span>🛠️</span>
+                {lang === 'zh-TW' ? '請點選欲了解的「客製化建置與合作協播」服務方案：' :
+                 lang === 'zh-CN' ? '请点选欲了解的「客制化建置与合作协播」服务方案：' :
+                 lang === 'ja-JP' ? 'ご希望の「カスタム構築＆AI自動協播」サービスを選択してください：' :
+                 lang === 'ko-KR' ? '원하시는 「맞춤형 구축 및 AI 자동 홍보」 서비스를 선택하세요:' :
+                 lang === 'vi-VN' ? 'Chọn dịch vụ 「Xây dựng Tùy chỉnh & Hợp tác AI」:' :
+                 'Select a Custom Service or Co-Broadcasting Plan:'}
+              </span>
+              <span className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-3 py-0.5 rounded-full">
+                {isZh ? '✨ 點擊下方卡片即可切換服務詳情' : '✨ Click a tab to switch service details'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Tab 1: AI 影片導購系統 */}
+              <button
+                type="button"
+                onClick={() => setActiveServiceTab('shoppable')}
+                className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
+                  activeServiceTab === 'shoppable'
+                    ? 'bg-gradient-to-r from-sky-900/90 to-blue-900/90 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.35)]'
+                    : 'bg-slate-800/70 border-slate-700 hover:border-sky-500/50'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                      activeServiceTab === 'shoppable' ? 'bg-sky-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {isZh ? '🛒 客製服務 01' : '🛒 Service 01'}
+                    </span>
+                    <span className="text-xs font-bold text-sky-300">
+                      {isZh ? '官方 YouTube API · 1變多影分身導購' : 'YouTube API · Shadow Clone Shoppable'}
+                    </span>
+                  </div>
+                  <div className="font-black text-white text-sm md:text-base">
+                    {lang === 'zh-TW' ? '新開發 AI「影片導購系統」客製化建置' :
+                     lang === 'zh-CN' ? '新开发 AI「影片导购系统」客制化建置' :
+                     lang === 'ja-JP' ? '新開発 AI「動画コマース導線システム」カスタム構築' :
+                     lang === 'ko-KR' ? '신규 개발 AI 「비디오 쇼핑 전환 시스템」 맞춤형 구축' :
+                     lang === 'vi-VN' ? 'Xây dựng Hệ thống AI 「Video Mua sắm Tự động」' :
+                     'Custom AI Video Shoppable System Service'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm md:text-base font-black text-amber-400">
+                    {isZh ? '$300 USD 起' : 'From $300'}
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-bold">
+                    {activeServiceTab === 'shoppable' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
+                  </div>
+                </div>
+              </button>
+
+              {/* Tab 2: LiveGood 會員訂閱與 AI 自動化協播 */}
+              <button
+                type="button"
+                onClick={() => setActiveServiceTab('livegood')}
+                className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
+                  activeServiceTab === 'livegood'
+                    ? 'bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-amber-400 shadow-[0_0_25px_rgba(168,85,247,0.4)]'
+                    : 'bg-slate-800/70 border-slate-700 hover:border-purple-400/50'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                      activeServiceTab === 'livegood' ? 'bg-amber-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {isZh ? '⚡ 客製與協辦 02' : '⚡ Service 02'}
+                    </span>
+                    <span className="text-xs font-bold text-purple-300">
+                      {isZh ? '自行處理 $139.95 / 專人協辦 $180' : 'Self $139.95 / Concierge $180'}
+                    </span>
+                  </div>
+                  <div className="font-black text-white text-sm md:text-base">
+                    {lang === 'zh-TW' ? 'AI 點子變現商隊｜LiveGood 訂閱與 AI 自動協播' :
+                     lang === 'zh-CN' ? 'AI 点子变现商队｜LiveGood 订阅与 AI 自动协播' :
+                     lang === 'ja-JP' ? 'AI アイデア収益化｜LiveGood 購読＆AI 自動協播' :
+                     lang === 'ko-KR' ? 'AI 아이디어 수익화｜LiveGood 구독 & AI 자동 홍보' :
+                     lang === 'vi-VN' ? 'Đội Kiếm Tiền AI｜Đăng ký LiveGood & AI Tự động' :
+                     'AI Monetization Squad | LiveGood & AI Co-Broadcasting'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm md:text-base font-black text-amber-400">
+                    $139.95 / $180
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-bold">
+                    {activeServiceTab === 'livegood' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 主標題區 (客製化服務定位 - 僅在選擇服務 01 時顯示) */}
+        {activeServiceTab === 'shoppable' && (
+          <>
+            <div
+              className="text-center px-6 py-10 text-white border-b-4 border-[#0284c7]"
+              style={{ background: 'radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 85%)' }}
+            >
           <div className="inline-block bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-1.5 rounded-full text-xs font-extrabold shadow-lg mb-4">
             {lang === 'zh-TW' ? '企業/品牌客製化建置服務 · 專人架構對接' :
              lang === 'zh-CN' ? '企业/品牌客制化建置服务 · 专人架构对接' :
@@ -603,7 +725,23 @@ export default function VideoShoppableSection() {
               )}
             </ul>
           </div>
+          </div>
+          </>
+        )}
 
+        {/* 服務 02：AI 點子變現商隊 - LiveGood 會員訂閱與 AI 自動化協播 (保留原 HTML 架構・含 $139.95 自行處理 / $180 專人協辦 & 6 國語系 10 步驟註冊指南) */}
+        {activeServiceTab === 'livegood' && (
+          <div className="p-4 md:p-8 bg-slate-100">
+            <div
+              ref={livegoodContainerRef}
+              className="w-full"
+              dangerouslySetInnerHTML={{ __html: LIVEGOOD_PROMO_HTML }}
+            />
+          </div>
+        )}
+
+        {/* 共用底部聯絡中心與免責聲明 */}
+        <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
           {/* 6. 🤝 專屬客製化接洽聯絡中心 (電郵 + Line + 微信) */}
           <div
             id="shoppable-contact-hub"
@@ -612,13 +750,13 @@ export default function VideoShoppableSection() {
           >
             <h3 className="text-xl md:text-2xl font-black text-white mb-2">
               {isZh
-                ? '🤝 立即接洽總工程師 SEN・預約客製化評估'
-                : '🤝 Contact Chief Architect SEN for Custom Setup'}
+                ? '🤝 立即接洽總工程師 SEN・預約客製化建置與專人協辦'
+                : '🤝 Contact Chief Architect SEN for Custom Setup & Concierge'}
             </h3>
             <p className="text-xs md:text-sm text-slate-300 max-w-2xl mx-auto mb-6 leading-relaxed">
               {isZh
-                ? '無需自行摸索複雜設定！請透過下方任一管道聯繫總工程師，提供您的「品牌/商城網址」與「預計上線商品數量」，我們將為您提供一對一架構規劃與導入排程：'
-                : 'Skip the technical guesswork! Reach out directly via Email, Line, or WeChat with your store URL and target product count for a 1-on-1 implementation plan:'}
+                ? '無論是「AI 影片導購系統客製化導入」或「LiveGood $180 專人協辦到好方案（含 $139.95 官方費用）」，皆可透過下方任一管道直接聯繫總工程師一對一辦理：'
+                : 'Whether inquiring about Custom AI Video Shoppable implementation or the $180 LiveGood Concierge Setup (incl. $139.95 fee), reach out directly via Email, LINE, or WeChat:'}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
