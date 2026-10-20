@@ -78,7 +78,7 @@ export default function ChatWidget() {
   return (
     <>
       {/* Floating Buttons Stack (AI客製服務 + AI頂配教材 + AI客服) */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
+      <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-2 sm:gap-2.5 max-w-[calc(100vw-24px)]">
         {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
         {!isOpen && (
           <div className="relative group flex flex-col items-end">
@@ -91,7 +91,7 @@ export default function ChatWidget() {
                     window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'shoppable' } }));
                   }
                 }}
-                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-sky-600 text-sky-200 hover:text-white border border-sky-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+                className="px-3 py-1.5 sm:px-3.5 rounded-full bg-slate-900/95 hover:bg-sky-600 text-sky-200 hover:text-white border border-sky-400/60 text-[11px] sm:text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
                 {lang === 'zh-TW' ? '🛒 01｜AI影片導購系統' :
                  lang === 'zh-CN' ? '🛒 01｜AI影片导购系统' :
@@ -107,7 +107,7 @@ export default function ChatWidget() {
                     window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'livegood' } }));
                   }
                 }}
-                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+                className="px-3 py-1.5 sm:px-3.5 rounded-full bg-slate-900/95 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-400/60 text-[11px] sm:text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
                 {lang === 'zh-TW' ? '⚡ 02｜LiveGood 協辦與 AI協播' :
                  lang === 'zh-CN' ? '⚡ 02｜LiveGood 协办与 AI协播' :
@@ -120,9 +120,9 @@ export default function ChatWidget() {
 
             <a
               href="/#video-shoppable-service"
-              className="flex items-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
+              className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-3 py-2 sm:px-4 sm:py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-xs sm:text-sm whitespace-nowrap"
             >
-              <span className="text-base">🛠️</span>
+              <span className="text-sm sm:text-base">🛠️</span>
               <span>
                 {lang === 'zh-TW' ? 'AI客製服務' :
                  lang === 'zh-CN' ? 'AI客制服务' :
@@ -139,9 +139,9 @@ export default function ChatWidget() {
         {!isOpen && (
           <a
             href="/#tutor-courses"
-            className="group flex items-center gap-2 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 hover:from-amber-400 hover:to-cyan-400 text-black font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(16,185,129,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
+            className="group flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 hover:from-amber-400 hover:to-cyan-400 text-black font-black px-3 py-2 sm:px-4 sm:py-2.5 rounded-full shadow-[0_0_25px_rgba(16,185,129,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-xs sm:text-sm whitespace-nowrap"
           >
-            <span className="text-base">🎓</span>
+            <span className="text-sm sm:text-base">🎓</span>
             <span>
               {lang === 'zh-TW' ? 'AI頂配教材' :
                lang === 'zh-CN' ? 'AI顶配教材' :
@@ -154,11 +154,11 @@ export default function ChatWidget() {
         )}
 
         {/* AI 客服按鈕與氣泡 */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Animated Tooltip Bubble */}
           {!isOpen && (
             <div className="relative animate-bounce">
-              <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.5)] font-bold text-sm whitespace-nowrap border border-white/20">
+              <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.5)] font-bold text-xs sm:text-sm whitespace-nowrap border border-white/20">
                 {lang === 'en-US' ? 'Chat with us ✨' :
                  lang === 'ja-JP' ? 'チャットする ✨' :
                  lang === 'ko-KR' ? '채팅하기 ✨' :
@@ -173,7 +173,7 @@ export default function ChatWidget() {
 
           <button
             onClick={toggleChat}
-            className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform"
+            className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-110 transition-transform shrink-0"
           >
             {isOpen ? (
               <span className="text-2xl font-bold">×</span>

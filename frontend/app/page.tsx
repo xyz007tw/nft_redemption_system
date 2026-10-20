@@ -169,29 +169,29 @@ export default function Home() {
   const selectedPackage = displayCrowdfundPackages.find(p => p.id === selectedPackageId) || displayCrowdfundPackages[0];
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-[#0a0a0f] text-white font-sans selection:bg-purple-500/30">
+    <main className="flex min-h-screen w-full max-w-[100vw] overflow-x-hidden flex-col items-center bg-[#0a0a0f] text-white font-sans selection:bg-purple-500/30">
       {/* 頂部導覽列 */}
-      <nav className="fixed top-0 left-0 w-full flex justify-center z-50 bg-[#0a0a0f]/80 backdrop-blur-lg border-b border-white/5">
-        <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6 p-4 md:p-6">
-          <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+      <nav className="fixed top-0 left-0 right-0 w-full flex justify-center z-50 bg-[#0a0a0f]/85 backdrop-blur-lg border-b border-white/5">
+        <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center gap-2.5 md:gap-6 px-3 py-2.5 md:p-6">
+          <h1 className="text-xl md:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
             WeiXiang AI
           </h1>
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 md:gap-3">
             <a
               href="#tutor-courses"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 border border-emerald-400/50 text-emerald-300 font-bold text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105 whitespace-nowrap"
+              className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 border border-emerald-400/50 text-emerald-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105 whitespace-nowrap"
             >
               {navCourseText}
             </a>
             <a
               href="#video-shoppable-service"
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 whitespace-nowrap"
+              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 whitespace-nowrap"
             >
               {navShoppableText}
             </a>
             <Link
               href="/sponsor"
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 whitespace-nowrap"
+              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 whitespace-nowrap"
             >
               {navSponsorText}
             </Link>
@@ -202,18 +202,18 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="w-full max-w-7xl px-6 py-16 md:py-24 mt-20 flex flex-col items-center text-center relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <section className="w-full max-w-7xl px-4 sm:px-6 pt-36 pb-14 md:py-24 md:mt-20 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[800px] md:h-[800px] bg-purple-600/20 rounded-full blur-[90px] md:blur-[120px] pointer-events-none -z-10" />
         
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 text-sm md:text-base font-medium text-purple-300">
-          <span className="relative flex h-3 w-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 md:px-4 md:py-2 rounded-full bg-white/5 border border-white/10 mb-6 md:mb-8 text-xs sm:text-sm md:text-base font-medium text-purple-300 max-w-full">
+          <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-purple-500"></span>
           </span>
-          {heroBadgeText}
+          <span className="truncate">{heroBadgeText}</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-6 md:mb-8 tracking-tight leading-[1.15] px-1">
           {t.heroTitle1}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
@@ -221,7 +221,7 @@ export default function Home() {
           </span>
         </h1>
         
-        <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl leading-relaxed">
+        <p className="text-base sm:text-xl md:text-2xl text-gray-400 mb-10 md:mb-12 max-w-3xl leading-relaxed px-2">
           {t.heroSub}
         </p>
 
@@ -248,7 +248,7 @@ export default function Home() {
 
         {/* YouTube Short Video (置中) */}
         <div className="w-full flex justify-center">
-          <div className="w-[315px] h-[560px] rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/40 hover:border-purple-400 transition-colors duration-300">
+          <div className="w-full max-w-[315px] aspect-[9/16] rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/40 hover:border-purple-400 transition-colors duration-300">
             <iframe 
               width="100%" 
               height="100%" 
@@ -566,7 +566,7 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center w-full">
-            <div className="w-[315px] h-[560px] bg-gray-800 rounded-2xl overflow-hidden relative shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-purple-500/30 hover:shadow-[0_0_60px_rgba(168,85,247,0.5)] transition-shadow duration-500">
+            <div className="w-full max-w-[315px] aspect-[9/16] bg-gray-800 rounded-2xl overflow-hidden relative shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-purple-500/30 hover:shadow-[0_0_60px_rgba(168,85,247,0.5)] transition-shadow duration-500">
               <iframe 
                 width="100%" 
                 height="100%" 

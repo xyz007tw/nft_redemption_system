@@ -60,7 +60,7 @@ export default function VideoShoppableSection() {
   };
 
   return (
-    <section id="video-shoppable-service" className="w-full max-w-7xl px-6 py-12 scroll-mt-20">
+    <section id="video-shoppable-service" className="w-full max-w-7xl px-3 sm:px-6 py-10 md:py-12 scroll-mt-24 overflow-hidden">
       <div className="bg-[#f8fafc] text-[#1e293b] rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(2,132,199,0.25)] border-2 border-[#0284c7]">
         {/* 頂部導覽工具列 */}
         <div className="bg-[#0f172a] px-6 py-3.5 flex flex-wrap justify-between items-center gap-3 border-b border-white/15">

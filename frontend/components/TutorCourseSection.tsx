@@ -186,8 +186,8 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   }, [customPromoHtml, selectedCourseId, lang]);
 
   return (
-    <section id="tutor-courses" className="w-full max-w-7xl px-6 py-16 scroll-mt-20">
-      <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900/90 to-cyan-950/60 border border-emerald-500/40 rounded-3xl p-8 md:p-14 relative overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)]">
+    <section id="tutor-courses" className="w-full max-w-7xl px-3 sm:px-6 py-10 md:py-16 scroll-mt-24 overflow-hidden">
+      <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900/90 to-cyan-950/60 border border-emerald-500/40 rounded-3xl p-4 sm:p-8 md:p-14 relative overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)]">
         {/* 背景裝飾光暈 */}
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
