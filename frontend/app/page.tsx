@@ -51,12 +51,12 @@ export default function Home() {
     '💎 Sponsor & Unlock 25%';
 
   const navShoppableText =
-    lang === 'zh-TW' ? '🛒 AI影片導購客製' :
-    lang === 'zh-CN' ? '🛒 AI影片导购客制' :
-    lang === 'ja-JP' ? '🛒 AI動画コマース開発' :
-    lang === 'ko-KR' ? '🛒 AI 영상 커머스 구축' :
-    lang === 'vi-VN' ? '🛒 Hệ thống Video Mua sắm AI' :
-    '🛒 AI Video Shoppable';
+    lang === 'zh-TW' ? '🛠️ AI客製服務' :
+    lang === 'zh-CN' ? '🛠️ AI客制服务' :
+    lang === 'ja-JP' ? '🛠️ AIカスタム開発' :
+    lang === 'ko-KR' ? '🛠️ AI 맞춤 서비스' :
+    lang === 'vi-VN' ? '🛠️ Dịch vụ AI Tùy chỉnh' :
+    '🛠️ AI Custom Services';
 
   const heroBadgeText =
     lang === 'zh-TW' ? 'DePIN × Enterprise AI Agent 基礎設施' :

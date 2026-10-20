@@ -77,8 +77,64 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Buttons Stack (AI頂配教材 + AI客服) */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {/* Floating Buttons Stack (AI客製服務 + AI頂配教材 + AI客服) */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
+        {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
+        {!isOpen && (
+          <div className="relative group flex flex-col items-end">
+            {/* 懸浮展開之雙服務快速跳轉氣泡 */}
+            <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+              <a
+                href="/#video-shoppable-service"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'shoppable' } }));
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-sky-600 text-sky-200 hover:text-white border border-sky-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+              >
+                {lang === 'zh-TW' ? '🛒 01｜AI影片導購系統' :
+                 lang === 'zh-CN' ? '🛒 01｜AI影片导购系统' :
+                 lang === 'ja-JP' ? '🛒 01｜AI動画コマース構築' :
+                 lang === 'ko-KR' ? '🛒 01｜AI 영상 쇼핑 시스템' :
+                 lang === 'vi-VN' ? '🛒 01｜Video Mua sắm AI' :
+                 '🛒 01 | AI Video Shoppable'}
+              </a>
+              <a
+                href="/#video-shoppable-service"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'livegood' } }));
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+              >
+                {lang === 'zh-TW' ? '⚡ 02｜LiveGood 協辦與 AI協播' :
+                 lang === 'zh-CN' ? '⚡ 02｜LiveGood 协办与 AI协播' :
+                 lang === 'ja-JP' ? '⚡ 02｜LiveGood 代行＆AI協播' :
+                 lang === 'ko-KR' ? '⚡ 02｜LiveGood 대행 & AI홍보' :
+                 lang === 'vi-VN' ? '⚡ 02｜LiveGood & AI Tự động' :
+                 '⚡ 02 | LiveGood & AI Co-Broadcast'}
+              </a>
+            </div>
+
+            <a
+              href="/#video-shoppable-service"
+              className="flex items-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
+            >
+              <span className="text-base">🛠️</span>
+              <span>
+                {lang === 'zh-TW' ? 'AI客製服務' :
+                 lang === 'zh-CN' ? 'AI客制服务' :
+                 lang === 'ja-JP' ? 'AIカスタム開発' :
+                 lang === 'ko-KR' ? 'AI 맞춤 서비스' :
+                 lang === 'vi-VN' ? 'Dịch vụ AI Tùy chỉnh' :
+                 'AI Custom Services'}
+              </span>
+            </a>
+          </div>
+        )}
+
         {/* AI 頂配教材 Floating Pill (位於 AI 客服正上方) */}
         {!isOpen && (
           <a

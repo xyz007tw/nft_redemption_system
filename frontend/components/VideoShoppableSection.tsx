@@ -12,6 +12,18 @@ export default function VideoShoppableSection() {
   const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleSwitchTab = (e: any) => {
+      const targetTab = e?.detail?.tab;
+      if (targetTab === 'shoppable' || targetTab === 'livegood') {
+        setActiveServiceTab(targetTab);
+      }
+    };
+    window.addEventListener('weixiang-switch-service-tab', handleSwitchTab);
+    return () => window.removeEventListener('weixiang-switch-service-tab', handleSwitchTab);
+  }, []);
+
+  useEffect(() => {
     const container = livegoodContainerRef.current;
     if (!container) return;
 
