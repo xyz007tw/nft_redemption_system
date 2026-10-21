@@ -51,14 +51,14 @@ export default function SponsorPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center pt-28 pb-20 px-4 relative">
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#0a0a0f] text-white flex flex-col items-center pt-28 pb-28 md:pb-20 px-4 relative">
 
       {/* 頂部導覽列 */}
-      <div className="w-full max-w-7xl flex justify-between items-center p-6 absolute top-0 left-0 right-0 mx-auto">
-        <Link href="/" className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 cursor-pointer hover:scale-105 transition-transform">
-          WeiXiang AI
+      <div className="w-full max-w-7xl flex justify-between items-center p-4 md:p-6 absolute top-0 left-0 right-0 mx-auto z-30">
+        <Link href="/" className="text-xl md:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 cursor-pointer hover:scale-105 transition-transform">
+          ← WeiXiang AI
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <LanguageSwitcher />
         </div>
       </div>
@@ -95,7 +95,7 @@ export default function SponsorPage() {
           
           {/* Shorts Video */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-end">
-            <div className="w-[315px] h-[560px] bg-black rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/40 hover:border-purple-400 transition-colors duration-300">
+            <div className="w-full max-w-[315px] aspect-[9/16] bg-black rounded-3xl overflow-hidden relative shadow-[0_0_40px_rgba(147,51,234,0.3)] border border-purple-500/40 hover:border-purple-400 transition-colors duration-300">
               <iframe 
                 width="100%" 
                 height="100%" 

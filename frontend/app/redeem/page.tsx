@@ -6,12 +6,14 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { WEIXIANG_NFT_ADDRESS, WEIXIANG_NFT_ABI } from '@/lib/contractAbi';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function RedeemPage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const [email, setEmail] = useState('');
+  const [statusBanner, setStatusBanner] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   // 信用卡/Email 用戶核銷狀態
   const [fiatEmail, setFiatEmail] = useState('');
@@ -34,8 +36,15 @@ export default function RedeemPage() {
 
   // 1. Web3 錢包持有者核銷流程
   const handleRedeem = async () => {
-    if (!address) return alert("請先連結錢包");
-    if (!email || !email.includes('@')) return alert("請輸入有效的電子郵件，我們將發送系統設定表單給您。");
+    setStatusBanner(null);
+    if (!address) {
+      setStatusBanner({ type: 'error', text: '⚠️ 請先連結錢包' });
+      return;
+    }
+    if (!email || !email.includes('@')) {
+      setStatusBanner({ type: 'error', text: '⚠️ 請輸入有效的電子郵件，我們將發送系統設定表單給您。' });
+      return;
+    }
 
     try {
       setIsVerifying(true);
@@ -55,12 +64,12 @@ export default function RedeemPage() {
         throw new Error(data.error || 'API 請求失敗');
       }
 
-      alert("🎉 開通成功！我們已發送一封「系統設定指南」到您的信箱，請查收並回覆相關資料。");
-      router.push('/dashboard');
+      setStatusBanner({ type: 'success', text: '🎉 開通成功！我們已發送一封「系統設定指南」到您的信箱，即將導向會員中心...' });
+      setTimeout(() => router.push('/dashboard'), 1200);
       
     } catch (error: any) {
       console.error(error);
-      alert("錯誤: " + (error.message || '開通失敗，請確認您已拒絕簽名或稍後再試。'));
+      setStatusBanner({ type: 'error', text: '❌ 錯誤: ' + (error.message || '開通失敗，請確認簽名或稍後再試。') });
     } finally {
       setIsVerifying(false);
     }
@@ -69,8 +78,10 @@ export default function RedeemPage() {
   // 2. 信用卡 / ATM 刷卡用戶 Email 核銷流程
   const handleFiatRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatusBanner(null);
     if (!fiatEmail || !fiatEmail.includes('@')) {
-      return alert("請輸入有效的付款電子郵件地址");
+      setStatusBanner({ type: 'error', text: '⚠️ 請輸入有效的付款電子郵件地址' });
+      return;
     }
 
     try {
@@ -108,11 +119,11 @@ export default function RedeemPage() {
       localStorage.setItem('weixiang_user_email', cleanEmail);
       localStorage.setItem('weixiang_user_address', authData.userAddress);
 
-      alert("🎉 兌換成功！已為您的帳號啟用 180 天 AI 自動來客產線，並已寄送設定指南至您的信箱！");
-      router.push('/dashboard');
+      setStatusBanner({ type: 'success', text: '🎉 兌換成功！已為您的帳號啟用 180 天 AI 自動來客產線，即將導向會員中心...' });
+      setTimeout(() => router.push('/dashboard'), 1200);
     } catch (err: any) {
       console.error(err);
-      alert("核銷失敗: " + (err.message || '請確認您輸入的 Email 與付款時相同'));
+      setStatusBanner({ type: 'error', text: '❌ 核銷失敗: ' + (err.message || '請確認您輸入的 Email 與付款時相同') });
     } finally {
       setIsFiatVerifying(false);
     }
@@ -123,21 +134,34 @@ export default function RedeemPage() {
   // =========================================================
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center justify-center p-6 relative">
-        <div className="absolute top-8 left-8">
-          <Link href="/" className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+      <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center justify-center px-4 pt-24 pb-28 md:p-6 relative">
+        <div className="absolute top-6 left-4 md:top-8 md:left-8 z-20">
+          <Link href="/" className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
             ← 回首頁
           </Link>
         </div>
+        <div className="absolute top-6 right-4 md:top-8 md:right-8 z-20">
+          <LanguageSwitcher />
+        </div>
 
-        <div className="max-w-xl w-full bg-gray-900/90 border border-gray-800 rounded-3xl p-8 backdrop-blur-xl shadow-2xl text-center">
+        <div className="max-w-xl w-full bg-gray-900/90 border border-gray-800 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-2xl text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg shadow-purple-500/30">
             🎟️
           </div>
           <h1 className="text-3xl font-black mb-3">VIP 權限兌換專區</h1>
-          <p className="text-sm text-gray-400 mb-8">
+          <p className="text-sm text-gray-400 mb-6">
             驗證您的微享憑證，正式啟動每枚 180 天的專屬 AI 影音與 SEO 來客產線
           </p>
+
+          {statusBanner && (
+            <div className={`mb-6 p-3.5 rounded-xl border text-xs md:text-sm font-bold text-left ${
+              statusBanner.type === 'success'
+                ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
+                : 'bg-red-950/80 border-red-500/50 text-red-300'
+            }`}>
+              {statusBanner.text}
+            </div>
+          )}
 
           {/* 途徑 1：Web3 錢包連線兌換 */}
           <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-6 mb-6 text-left">
@@ -191,23 +215,36 @@ export default function RedeemPage() {
   // 已連線狀態：顯示 Web3 鏈上持有量與核銷表單
   // =========================================================
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center pt-24 pb-16 px-4 text-white relative">
-      <div className="absolute top-8 left-8">
-        <Link href="/" className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center pt-24 pb-28 md:pb-16 px-4 text-white relative">
+      <div className="absolute top-6 left-4 md:top-8 md:left-8 z-20">
+        <Link href="/" className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
           ← 回首頁
         </Link>
       </div>
+      <div className="absolute top-6 right-4 md:top-8 md:right-8 z-20">
+        <LanguageSwitcher />
+      </div>
 
-      <div className="max-w-2xl w-full bg-gray-900 border border-gray-800 p-8 md:p-10 rounded-3xl text-center shadow-2xl">
+      <div className="max-w-2xl w-full bg-gray-900 border border-gray-800 p-6 md:p-10 rounded-3xl text-center shadow-2xl">
         <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg shadow-green-500/30">
           🎟️
         </div>
         <h1 className="text-3xl md:text-4xl font-black mb-3 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
           VIP 權限開通專區
         </h1>
-        <p className="text-gray-400 mb-8 text-base">
+        <p className="text-gray-400 mb-6 text-base">
           已連線錢包：<span className="text-cyan-400 font-mono">{address?.substring(0, 6)}...{address?.substring(38)}</span>
         </p>
+
+        {statusBanner && (
+          <div className={`mb-6 p-3.5 rounded-xl border text-xs md:text-sm font-bold text-left ${
+            statusBanner.type === 'success'
+              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
+              : 'bg-red-950/80 border-red-500/50 text-red-300'
+          }`}>
+            {statusBanner.text}
+          </div>
+        )}
 
         {isReadingBalance ? (
           <div className="text-xl text-yellow-400 animate-pulse py-8">正在掃描區塊鏈上的微享憑證...</div>

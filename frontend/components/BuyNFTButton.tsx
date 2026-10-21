@@ -46,14 +46,15 @@ export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonPro
   });
 
   const [txType, setTxType] = useState<'approve' | 'buy' | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (isConfirmed) {
       if (txType === 'approve') {
         refetchAllowance();
       } else if (txType === 'buy') {
-        alert("🎉 眾籌成功！即將為您導向兌換與分佣頁面...");
-        router.push('/redeem');
+        setStatusMsg("🎉 眾籌成功！即將為您導向兌換與分佣頁面...");
+        setTimeout(() => router.push('/redeem'), 1000);
       }
       setTxType(null);
     }
@@ -61,9 +62,10 @@ export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonPro
 
   const handleAction = () => {
     if (!isConnected) {
-      alert("請先連結錢包");
+      setStatusMsg("⚠️ 請先連結錢包");
       return;
     }
+    setStatusMsg(null);
 
     if (needsApproval) {
       setTxType('approve');
@@ -96,12 +98,16 @@ export default function BuyNFTButton({ packageId, priceInUSDT }: BuyNFTButtonPro
   return (
     <div className="flex flex-col items-center w-full">
       <button 
+        type="button"
         onClick={handleAction}
         disabled={isPending || isConfirming || !isConnected}
-        className="w-full py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]"
+        className="w-full py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)] cursor-pointer"
       >
         {buttonText}
       </button>
+      {statusMsg && (
+        <p className="text-emerald-400 text-xs mt-2 font-bold">{statusMsg}</p>
+      )}
       {isConfirmed && txType === 'approve' && (
         <p className="text-green-400 text-sm mt-2">{t.buyApproveSuccess}</p>
       )}

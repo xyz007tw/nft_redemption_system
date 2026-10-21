@@ -22,6 +22,17 @@ export default function VideoShoppableSection() {
       }
     };
     window.addEventListener('weixiang-switch-service-tab', handleSwitchTab);
+
+    // 支援從子頁面跳轉回來時透過網址參數或 hash 帶入預設 tab
+    const hash = window.location.hash;
+    if (hash.includes('tab=livegood')) {
+      setActiveServiceTab('livegood');
+    } else if (hash.includes('tab=free365')) {
+      setActiveServiceTab('free365');
+    } else if (hash.includes('tab=shoppable')) {
+      setActiveServiceTab('shoppable');
+    }
+
     return () => window.removeEventListener('weixiang-switch-service-tab', handleSwitchTab);
   }, []);
 

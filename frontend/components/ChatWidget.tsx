@@ -49,6 +49,29 @@ export default function ChatWidget() {
     }
   };
 
+  const handleJumpToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+    serviceTab?: 'shoppable' | 'livegood' | 'free365'
+  ) => {
+    setMobileMenuOpen(false);
+    setIsOpen(false);
+    if (typeof window === 'undefined') return;
+
+    if (serviceTab) {
+      window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: serviceTab } }));
+    }
+
+    const targetEl = document.getElementById(sectionId);
+    if (targetEl) {
+      e.preventDefault();
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.replaceState(null, '', `/#${sectionId}`);
+    } else if (serviceTab) {
+      window.location.href = `/#${sectionId}?tab=${serviceTab}`;
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -87,11 +110,7 @@ export default function ChatWidget() {
             <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
               <a
                 href="/#video-shoppable-service"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'shoppable' } }));
-                  }
-                }}
+                onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'shoppable')}
                 className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-sky-600 text-sky-200 hover:text-white border border-sky-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
                 {lang === 'zh-TW' ? '🛒 01｜AI影片導購系統' :
@@ -103,11 +122,7 @@ export default function ChatWidget() {
               </a>
               <a
                 href="/#video-shoppable-service"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'livegood' } }));
-                  }
-                }}
+                onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'livegood')}
                 className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
                 {lang === 'zh-TW' ? '⚡ 02｜LiveGood 協辦與 AI協播' :
@@ -119,11 +134,7 @@ export default function ChatWidget() {
               </a>
               <a
                 href="/#video-shoppable-service"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'free365' } }));
-                  }
-                }}
+                onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'free365')}
                 className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-emerald-600 text-emerald-200 hover:text-white border border-emerald-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
                 {lang === 'zh-TW' ? '🚀 03｜AI尋客365天免錢 ($660)' :
@@ -137,6 +148,7 @@ export default function ChatWidget() {
 
             <a
               href="/#video-shoppable-service"
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service')}
               className="flex items-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
             >
               <span className="text-base">🛠️</span>
@@ -156,6 +168,7 @@ export default function ChatWidget() {
         {!isOpen && (
           <a
             href="/#tutor-courses"
+            onClick={(e) => handleJumpToSection(e, 'tutor-courses')}
             className="group flex items-center gap-2 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 hover:from-amber-400 hover:to-cyan-400 text-black font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(16,185,129,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
           >
             <span className="text-base">🎓</span>
@@ -220,12 +233,7 @@ export default function ChatWidget() {
             </div>
             <a
               href="/#video-shoppable-service"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'shoppable' } }));
-                }
-              }}
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'shoppable')}
               className="px-3 py-2 rounded-xl bg-sky-950/80 hover:bg-sky-600 text-sky-200 border border-sky-400/40 text-xs font-extrabold flex items-center justify-between"
             >
               <span>{lang.includes('zh') ? '🛒 01｜AI影片導購系統' : '🛒 01 | AI Video Shoppable'}</span>
@@ -233,12 +241,7 @@ export default function ChatWidget() {
             </a>
             <a
               href="/#video-shoppable-service"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'livegood' } }));
-                }
-              }}
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'livegood')}
               className="px-3 py-2 rounded-xl bg-purple-950/80 hover:bg-purple-600 text-purple-200 border border-purple-400/40 text-xs font-extrabold flex items-center justify-between"
             >
               <span>{lang.includes('zh') ? '⚡ 02｜LiveGood 協辦與 AI協播' : '⚡ 02 | LiveGood & AI'}</span>
@@ -246,12 +249,7 @@ export default function ChatWidget() {
             </a>
             <a
               href="/#video-shoppable-service"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'free365' } }));
-                }
-              }}
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'free365')}
               className="px-3 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 border border-emerald-400/40 text-xs font-extrabold flex items-center justify-between"
             >
               <span>{lang.includes('zh') ? '🚀 03｜AI尋客365天免錢' : '🚀 03 | AI 365-Day Free'}</span>
@@ -265,10 +263,7 @@ export default function ChatWidget() {
           {/* 左：AI 頂配教材 */}
           <a
             href="/#tutor-courses"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setIsOpen(false);
-            }}
+            onClick={(e) => handleJumpToSection(e, 'tutor-courses')}
             className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 text-slate-950 font-black text-xs shadow-md whitespace-nowrap"
           >
             <span>🎓</span>

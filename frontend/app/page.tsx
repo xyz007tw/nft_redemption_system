@@ -264,7 +264,7 @@ export default function Home() {
       </section>
 
       {/* 核心價值主張 */}
-      <section id="whitepaper" className="w-full max-w-7xl px-6 py-12 md:py-16 border-t border-white/5">
+      <section id="whitepaper" className="w-full max-w-7xl px-6 py-12 md:py-16 border-t border-white/5 scroll-mt-28">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10">
             <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 border border-emerald-500/30">
@@ -461,7 +461,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="crowdfund" className="w-full max-w-7xl px-6 py-24">
+      <section id="crowdfund" className="w-full max-w-7xl px-6 py-24 scroll-mt-28">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black mb-6">{t.crowdTitle}</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">

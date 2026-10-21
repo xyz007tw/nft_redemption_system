@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
@@ -29,6 +29,7 @@ export default function Dashboard() {
 
   // 業務數據
   const [referralLink, setReferralLink] = useState('');
+  const [copiedLink, setCopiedLink] = useState(false);
   const [stats, setStats] = useState({ totalSales: 0, pendingCommission: 0 });
   const [payoutWallet, setPayoutWallet] = useState('');
   const [isSavingPayout, setIsSavingPayout] = useState(false);
@@ -156,12 +157,12 @@ export default function Dashboard() {
   // ========================================================
   if (!activeAddress) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6 relative">
-        <div className="absolute top-8 right-8">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0f] text-white px-4 pt-24 pb-28 md:p-6 relative">
+        <div className="absolute top-6 right-4 md:top-8 md:right-8 z-20">
           <LanguageSwitcher />
         </div>
-        <div className="absolute top-8 left-8">
-          <Link href="/" className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+        <div className="absolute top-6 left-4 md:top-8 md:left-8 z-20">
+          <Link href="/" className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
             ← 回首頁
           </Link>
         </div>
@@ -229,10 +230,11 @@ export default function Dashboard() {
   // 已登入狀態：顯示會員中心儀表板
   // ========================================================
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 md:p-12 relative">
-      <div className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-4">
+    <div className="min-h-screen bg-gray-900 text-white px-4 pt-6 pb-28 md:p-12 relative">
+      <div className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-3 z-20">
         {activeEmail && (
           <button
+            type="button"
             onClick={handleLogout}
             className="text-xs px-3 py-1.5 border border-gray-700 rounded-lg hover:bg-gray-800 text-gray-400 transition-colors"
           >
@@ -318,15 +320,24 @@ export default function Dashboard() {
               className="flex-1 bg-gray-900 border border-gray-600 rounded-xl px-4 md:px-6 py-4 text-white text-base md:text-lg focus:outline-none focus:border-purple-500 transition-colors"
             />
             <button 
+              type="button"
               onClick={() => {
-                navigator.clipboard.writeText(referralLink);
-                alert(t.dashCopied);
+                if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                  navigator.clipboard.writeText(referralLink).catch(() => {});
+                }
+                setCopiedLink(true);
+                setTimeout(() => setCopiedLink(false), 3000);
               }}
               className="px-8 py-4 bg-purple-600 hover:bg-purple-700 rounded-xl text-lg md:text-xl font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)] cursor-pointer"
             >
-              {t.dashCopyBtn}
+              {copiedLink ? `✓ ${t.dashCopied}` : t.dashCopyBtn}
             </button>
           </div>
+          {copiedLink && (
+            <p className="text-emerald-400 mt-3 text-sm font-bold">
+              ✅ {t.dashCopied}
+            </p>
+          )}
           <p className="text-pink-400 mt-6 text-sm font-medium">
             ※ 推薦服務的三項回饋制度 - 含每個推薦團隊僅計算業績1萬美元/年
           </p>
