@@ -3,7 +3,7 @@ import { PAYUNI_MERCHANT_ID, encryptTradeInfo, generateTradeSha } from '@/lib/pa
 
 export async function POST(req: Request) {
   try {
-    const { packageId, priceInUSDT, buyerAddress, walletAddress, email, refCode } = await req.json();
+    const { packageId, priceInUSDT, productType, productName, buyerAddress, walletAddress, email, refCode } = await req.json();
     const finalWallet = buyerAddress || walletAddress || '';
 
     if (!PAYUNI_MERCHANT_ID) {
@@ -11,23 +11,24 @@ export async function POST(req: Request) {
     }
 
     // Convert USDT to TWD (Fixed rate for now: 1 USDT = 32 TWD)
-    const amountTWD = priceInUSDT * 32;
+    const amountTWD = Math.round(Number(priceInUSDT) * 32);
     const orderNo = `ORD${Date.now()}`;
+    const customField3Value = productType ? `${packageId}|${productType}|${Number(priceInUSDT)}` : packageId.toString();
 
     // Payload for PayUni
     const tradeData = {
       MerID: PAYUNI_MERCHANT_ID,
       MerTradeNo: orderNo,
       TradeAmt: amountTWD.toString(),
-      ProdDesc: `WeiXiang AI Package ${packageId}`,
+      ProdDesc: productName ? productName.slice(0, 45) : `WeiXiang AI Package ${packageId}`,
       TradeType: '1', // 1: 整合支付頁 (Credit Card / ATM / CVS)
-      ReturnURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft-redemption-system.onrender.com'}/dashboard`, 
-      NotifyURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft-redemption-system.onrender.com'}/api/payuni/callback`,
+      ReturnURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party'}/dashboard`, 
+      NotifyURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party'}/api/payuni/callback`,
       UsrMail: email,
       // Pass our custom Web3 data in a custom field so we can process it in the callback
       CustomField1: finalWallet,
       CustomField2: refCode || '',
-      CustomField3: packageId.toString(),
+      CustomField3: customField3Value,
     };
 
     const TradeInfo = encryptTradeInfo(tradeData);

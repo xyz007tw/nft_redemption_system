@@ -531,12 +531,16 @@ export default function Home() {
               </div>
 
               <div className="w-full relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
-                <PayUniButton 
-                  packageId={selectedPackage.id}
-                  priceInUSDT={selectedPackage.price}
-                />
-                <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12 animate-pulse">
+                <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+                <div className="relative z-10">
+                  <PayUniButton 
+                    packageId={selectedPackage.id}
+                    priceInUSDT={selectedPackage.price}
+                    productType={selectedPackage.product_type || 'NFT_REDEEM'}
+                    productName={getPkgName(selectedPackage)}
+                  />
+                </div>
+                <div className="pointer-events-none absolute -top-3 -right-3 z-20 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12 animate-pulse">
                   {t.payCard}
                 </div>
               </div>

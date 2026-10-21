@@ -67,6 +67,10 @@ export async function POST(req: Request) {
       if (pkg) {
         courseName = pkg.name_zh || courseName;
         if (pkg.course_link) courseLink = pkg.course_link;
+      } else if (Number(packageId) === 101) {
+        courseName = '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）';
+      } else if (Number(packageId) === 102) {
+        courseName = '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊';
       }
     } else {
       const { data: allPkgs } = await supabase

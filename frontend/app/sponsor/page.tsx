@@ -203,6 +203,8 @@ export default function SponsorPage() {
                 <PayUniButton 
                   packageId={selectedPackage.id}
                   priceInUSDT={selectedPackage.price}
+                  productType="SPONSOR"
+                  productName={lang === 'zh-TW' ? selectedPackage.name_zh : selectedPackage.name_en}
                 />
               </div>
             )}

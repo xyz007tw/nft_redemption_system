@@ -28,7 +28,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
 
   const fallbackCourses = [
     {
-      id: 6,
+      id: 101,
       name_zh: '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
       name_en: 'Course 01 | BIGMONEY.AI · AI Master Practical Materials (Incl. 2 NFTs)',
       amount: 2,
@@ -40,7 +40,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
       promo_html_en: BIGMONEY_PROMO_HTML_EN
     },
     {
-      id: 7,
+      id: 102,
       name_zh: '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊',
       name_en: 'Course 02 | SaaS-AVME 3.0 Dual-Engine AI Short Video Master Manual',
       amount: 1,
@@ -403,6 +403,8 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
               <PayUniButton
                 packageId={selectedCourse.id}
                 priceInUSDT={selectedCourse.price}
+                productType="DIRECT_COURSE"
+                productName={isChinese ? selectedCourse.name_zh : (selectedCourse.name_en || selectedCourse.name_zh)}
               />
               <div className="relative flex items-center py-2">
                 <div className="flex-grow border-t border-gray-800"></div>
@@ -410,7 +412,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
                 <div className="flex-grow border-t border-gray-800"></div>
               </div>
               <BuyNFTButton
-                packageId={selectedCourse.id}
+                packageId={selectedCourse.id === 101 ? 2 : selectedCourse.id === 102 ? 1 : selectedCourse.id}
                 priceInUSDT={selectedCourse.price}
               />
             </div>

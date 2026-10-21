@@ -7,19 +7,23 @@ import { useLanguage } from '@/lib/LanguageContext';
 interface PayUniButtonProps {
   packageId: number;
   priceInUSDT: number;
+  productType?: string;
+  productName?: string;
 }
 
-export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonProps) {
+export default function PayUniButton({ packageId, priceInUSDT, productType, productName }: PayUniButtonProps) {
   const { address } = useAccount();
   const { t, lang } = useLanguage();
   const isChinese = lang.includes('zh');
   const [email, setEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handlePayUniCheckout = async () => {
+    setErrorMsg(null);
     if (!email || !email.includes('@')) {
-      alert("請填寫有效的聯絡電子信箱 (Email)");
+      setErrorMsg(isChinese ? '⚠️ 請填寫有效的聯絡電子信箱 (Email) 以接收憑證與開通知！' : '⚠️ Please enter a valid email address.');
       return;
     }
     
@@ -32,6 +36,8 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
         body: JSON.stringify({
           packageId,
           priceInUSDT,
+          productType: productType || '',
+          productName: productName || '',
           buyerAddress: address || '',
           email: email.trim().toLowerCase(),
           refCode
@@ -45,6 +51,7 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = 'https://api.payuni.com.tw/api/upp'; // Production URL
+      form.target = '_self';
       
       const fields = {
         MerID: data.MerID,
@@ -66,7 +73,7 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
       
     } catch (err: any) {
       console.error(err);
-      alert("錯誤: " + err.message);
+      setErrorMsg('❌ 錯誤: ' + (err.message || '連線異常'));
       setIsProcessing(false);
     }
   };
@@ -74,8 +81,9 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
   if (!showEmailInput) {
     return (
       <button 
+        type="button"
         onClick={() => setShowEmailInput(true)}
-        className="w-full mt-4 py-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
+        className="relative z-10 w-full mt-4 py-4 px-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 active:scale-[0.99] rounded-xl text-base md:text-lg font-extrabold text-white transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer"
       >
         <span>💳</span> {t.payCard}
       </button>
@@ -83,21 +91,49 @@ export default function PayUniButton({ packageId, priceInUSDT }: PayUniButtonPro
   }
 
   return (
-    <div className="w-full mt-4 p-4 bg-gray-900 border border-gray-700 rounded-xl text-left">
-      <p className="text-sm text-gray-400 mb-2">{t.payEmailLabel}</p>
+    <div className="relative z-10 w-full mt-4 p-4 bg-gray-900 border-2 border-emerald-500/60 rounded-xl text-left shadow-xl">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs sm:text-sm font-bold text-emerald-300">{t.payEmailLabel}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setShowEmailInput(false);
+            setErrorMsg(null);
+          }}
+          className="text-xs text-gray-400 hover:text-white px-1.5 cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
       <input
         type="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (errorMsg) setErrorMsg(null);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handlePayUniCheckout();
+          }
+        }}
+        autoFocus
         placeholder="example@gmail.com"
-        className="w-full mb-4 bg-black border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+        className="w-full mb-3 bg-black border border-gray-600 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
       />
+      {errorMsg && (
+        <div className="mb-3 p-2.5 rounded-lg bg-red-500/20 border border-red-500/40 text-red-200 text-xs font-bold">
+          {errorMsg}
+        </div>
+      )}
       <button 
+        type="button"
         onClick={handlePayUniCheckout}
-        disabled={isProcessing || !email}
-        className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 disabled:opacity-50 rounded-lg font-bold transition-all cursor-pointer"
+        disabled={isProcessing}
+        className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 disabled:opacity-50 rounded-lg font-extrabold text-white transition-all cursor-pointer shadow-lg"
       >
-        {isProcessing ? t.payJumping : t.payConfirm}
+        {isProcessing ? t.payJumping : `${t.payConfirm} (NT$ ${(priceInUSDT * 32).toLocaleString()})`}
       </button>
       <p className="text-gray-400 text-xs mt-3 text-center">
         {address 

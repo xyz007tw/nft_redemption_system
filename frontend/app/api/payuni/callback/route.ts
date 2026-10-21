@@ -33,7 +33,9 @@ export async function POST(req: Request) {
     // Extract custom Web3 data we sent
     let walletAddress = decryptedInfo.CustomField1;
     const refCode = decryptedInfo.CustomField2;
-    const packageId = decryptedInfo.CustomField3;
+    const rawCustom3 = String(decryptedInfo.CustomField3 || '');
+    const [parsedPkgId, parsedProductType, parsedPriceUsdt] = rawCustom3.split('|');
+    const packageId = parsedPkgId || rawCustom3;
     const email = decryptedInfo.BuyerMail; // PayUni standard field
 
     if (!walletAddress || !walletAddress.startsWith('0x')) {
@@ -49,7 +51,41 @@ export async function POST(req: Request) {
       .select('*')
       .eq('id', Number(packageId))
       .single();
-    const pkgData = unpackPackageRow(rawPkgData);
+    let pkgData = unpackPackageRow(rawPkgData);
+
+    // Fallback for built-in AI Master Courses (101 / 102) or if CustomField3 explicitly specifies productType
+    if (!pkgData) {
+      if (Number(packageId) === 101) {
+        pkgData = {
+          id: 101,
+          name_zh: '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
+          price: Number(parsedPriceUsdt) || 198,
+          product_type: 'DIRECT_COURSE',
+          course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
+        };
+      } else if (Number(packageId) === 102) {
+        pkgData = {
+          id: 102,
+          name_zh: '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊',
+          price: Number(parsedPriceUsdt) || 99,
+          product_type: 'DIRECT_COURSE',
+          course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
+        };
+      } else {
+        pkgData = {
+          id: Number(packageId),
+          name_zh: `方案 #${packageId}`,
+          price: Number(parsedPriceUsdt) || Math.round(Number(decryptedInfo.TradeAmt || 0) / 32),
+          product_type: parsedProductType || 'NFT_REDEEM',
+          course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
+        };
+      }
+    } else if (parsedProductType) {
+      pkgData.product_type = parsedProductType;
+      if (parsedPriceUsdt && Number(parsedPriceUsdt) > 0) {
+        pkgData.price = Number(parsedPriceUsdt);
+      }
+    }
     
     const packagePriceUSDT = pkgData?.price || 0;
 
