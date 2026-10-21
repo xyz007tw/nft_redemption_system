@@ -615,7 +615,7 @@ export default function Home() {
       <VideoShoppableSection />
 
       {/* 推廣區塊 */}
-      <section className="w-full bg-white/5 border-t border-white/10 py-12">
+      <section className="w-full bg-white/5 border-t border-white/10 py-12 pb-24 md:pb-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h4 className="text-xl font-bold mb-2">{t.footerNodeTitle}</h4>
