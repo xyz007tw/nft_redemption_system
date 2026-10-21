@@ -203,7 +203,7 @@ export default function VideoShoppableSection() {
                 </div>
               </button>
 
-              {/* Tab 3: AI尋客365天攏免錢 ($600 全包辦) */}
+              {/* Tab 3: AI尋客365天攏免錢 ($660 全包辦) */}
               <button
                 type="button"
                 onClick={() => setActiveServiceTab('free365')}
@@ -235,7 +235,7 @@ export default function VideoShoppableSection() {
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-sm md:text-base font-black text-amber-400">
-                    $600 USD
+                    $660 USD
                   </div>
                   <div className="text-[11px] text-slate-300 font-bold">
                     {activeServiceTab === 'free365' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
@@ -799,7 +799,7 @@ export default function VideoShoppableSection() {
           </div>
         )}
 
-        {/* 服務 03：AI尋客365天攏免錢 - 全球網購連鎖店計劃 ($600 USD / NT$ 18,000 全包辦・送 $198 頂配教材 + 享 25% 聯盟分潤) */}
+        {/* 服務 03：AI尋客365天攏免錢 - 全球網購連鎖店計劃 ($660 USD 全包辦・送 $198 頂配教材 + 享 25% 聯盟分潤) */}
         {activeServiceTab === 'free365' && (
           <div className="bg-[#0b0f19]">
             <div
@@ -825,8 +825,8 @@ export default function VideoShoppableSection() {
             </h3>
             <p className="text-xs md:text-sm text-slate-300 max-w-2xl mx-auto mb-6 leading-relaxed">
               {isZh
-                ? '無論是「01｜AI 影片導購系統客製化導入」、「02｜LiveGood $180 專人協辦方案」或「03｜AI尋客365天攏免錢 $600 全包辦旗艦方案」，皆可透過下方任一管道直接聯繫總工程師一對一辦理：'
-                : 'Whether inquiring about 01 Custom AI Video Shoppable, 02 $180 LiveGood Concierge Setup, or 03 $600 AI 365-Day Free Lead Gen Flagship Plan, reach out directly via Email, LINE, or WeChat:'}
+                ? '無論是「01｜AI 影片導購系統客製化導入」、「02｜LiveGood $180 專人協辦方案」或「03｜AI尋客365天攏免錢 $660 全包辦旗艦方案」，皆可透過下方任一管道直接聯繫總工程師一對一辦理：'
+                : 'Whether inquiring about 01 Custom AI Video Shoppable, 02 $180 LiveGood Concierge Setup, or 03 $660 AI 365-Day Free Lead Gen Flagship Plan, reach out directly via Email, LINE, or WeChat:'}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">

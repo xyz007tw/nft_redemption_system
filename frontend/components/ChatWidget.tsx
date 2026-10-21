@@ -125,12 +125,12 @@ export default function ChatWidget() {
                 }}
                 className="px-3 py-1.5 sm:px-3.5 rounded-full bg-slate-900/95 hover:bg-emerald-600 text-emerald-200 hover:text-white border border-emerald-400/60 text-[11px] sm:text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
               >
-                {lang === 'zh-TW' ? '🚀 03｜AI尋客365天免錢 ($600)' :
-                 lang === 'zh-CN' ? '🚀 03｜AI寻客365天免钱 ($600)' :
-                 lang === 'ja-JP' ? '🚀 03｜AI集客365日無料 ($600)' :
-                 lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료 ($600)' :
-                 lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($600)' :
-                 '🚀 03 | AI 365-Day Free Plan ($600)'}
+                {lang === 'zh-TW' ? '🚀 03｜AI尋客365天免錢 ($660)' :
+                 lang === 'zh-CN' ? '🚀 03｜AI寻客365天免钱 ($660)' :
+                 lang === 'ja-JP' ? '🚀 03｜AI集客365日無料 ($660)' :
+                 lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료 ($660)' :
+                 lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($660)' :
+                 '🚀 03 | AI 365-Day Free Plan ($660)'}
               </a>
             </div>
 

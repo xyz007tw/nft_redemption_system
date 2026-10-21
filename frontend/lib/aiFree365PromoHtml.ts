@@ -1,4 +1,4 @@
-export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365天攏免錢 ($600 USD 全球網購連鎖店計劃・已升級 $198 頂配教材、25% 分潤制度、主站 6 國語系連動) === -->
+export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365天攏免錢 ($660 USD 全球網購連鎖店計劃・已升級 $198 頂配教材、25% 分潤制度、主站 6 國語系連動) === -->
 <div id="ai-landing-wrapper">
     <style>
         #ai-landing-wrapper,
@@ -685,7 +685,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
     <!-- 頂部品牌與主站 6 國語系同步選單 -->
     <div class="top-lang-bar">
         <div style="color: #14b8a6; font-weight: 900; font-size: 14px; letter-spacing: 0.5px;">
-            🚀 AI 365-DAY FREE LEAD ENGINE · $600 FRANCHISE
+            🚀 AI 365-DAY FREE LEAD ENGINE · $660 FRANCHISE
         </div>
         <div class="lang-select-pill">
             <span style="font-size: 13px;">🌐</span>
@@ -713,7 +713,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         <div class="price-tag" style="border: 2px solid var(--accent-color); padding: 25px 40px; border-radius: 20px; display: inline-block; background-color: rgba(13, 148, 136, 0.1);">
             <div class="lang-zh" style="font-size: 14px; color: #cbd5e1; margin-bottom: 8px;">一次性加盟技術費（終身鎖定系統權益）</div>
             <div class="lang-en" style="font-size: 14px; color: #cbd5e1; margin-bottom: 8px;">One-Time Franchise & Tech Fee</div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: var(--accent-glow);">NT$ 18,000 / $600 USD</div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: var(--accent-glow);">$660 USD</div>
         </div>
     </header>
 
@@ -786,8 +786,8 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
     </section>
 
     <section class="container tech-grid-section">
-        <h2 class="section-title lang-zh">🔥 600美元 加盟方案：四大神級科技與權益圖列</h2>
-        <h2 class="section-title lang-en">🔥 $600 USD Package: 4 Core Pillars Illustrated</h2>
+        <h2 class="section-title lang-zh">🔥 $660 美元加盟方案：四大神級科技與權益圖列</h2>
+        <h2 class="section-title lang-en">🔥 $660 USD Package: 4 Core Pillars Illustrated</h2>
         
         <div class="tech-grid">
             <div class="tech-card">
@@ -941,12 +941,12 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
     </section>
 
     <section class="container faq-section">
-        <h2 class="faq-title lang-zh">💬 關於 18,000台幣（600美元）方案，你想問的都在這：</h2>
-        <h2 class="faq-title lang-en">💬 Frequently Asked Questions (FAQ):</h2>
+        <h2 class="faq-title lang-zh">💬 關於 $660 美元方案，你想問的都在這：</h2>
+        <h2 class="faq-title lang-en">💬 Frequently Asked Questions ($660 USD Plan):</h2>
         
         <div class="faq-item">
-            <div class="faq-q lang-zh">Q1：除了加盟的 18,000台幣，後面還有其他隱藏系統費嗎？</div>
-            <div class="faq-q lang-en">Q1: Are there any hidden fees after paying the $600 USD?</div>
+            <div class="faq-q lang-zh">Q1：除了加盟的 $660 美元，後面還有其他隱藏系統費嗎？</div>
+            <div class="faq-q lang-en">Q1: Are there any hidden fees after paying the $660 USD?</div>
             <div class="faq-a lang-zh">完全沒有！一次性投入，即可擁有長達一整年（365天）由20年經驗架構師維護的「AI多語系文案自動生成、全渠道定時發帖、多平台社群轉送聯動」完整系統服務。</div>
             <div class="faq-a lang-en">None! The tech fee secures your 12-month license to the AI Client Capture machine including 365-day automated copy generation, scheduled posting, and social syndication.</div>
         </div>
@@ -978,9 +978,9 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
             <p class="lang-zh" style="color: var(--warning-color); font-weight: 700; margin-top: 15px;">🔥 全球高流量節點限量釋出，越早鎖定位置，上方滑落的客群越多！</p>
             <p class="lang-en" style="color: var(--warning-color); font-weight: 700; margin-top: 15px;">🔥 Traffic positions are assigned chronologically. Lock your spot now to benefit from immediate spillover!</p>
 
-            <!-- 修改項目 4：取消原雙排按鈕，改為單一隨語系切換的「🤝 立即預約總工程師・專人協辦本方案 ($600 全包辦)」直達下方接洽中心 -->
-            <a href="#shoppable-contact-hub" class="cta-btn lang-zh">🤝 立即預約總工程師・專人協辦本方案 ($600 全包辦) 👇</a>
-            <a href="#shoppable-contact-hub" class="cta-btn lang-en">🤝 Book 1-on-1 Concierge Setup ($600 All-Inclusive) 👇</a>
+            <!-- 修改項目 4：取消原雙排按鈕，改為單一隨語系切換的「🤝 立即預約總工程師・專人協辦本方案 ($660 全包辦)」直達下方接洽中心 -->
+            <a href="#shoppable-contact-hub" class="cta-btn lang-zh">🤝 立即預約總工程師・專人協辦本方案 ($660 全包辦) 👇</a>
+            <a href="#shoppable-contact-hub" class="cta-btn lang-en">🤝 Book 1-on-1 Concierge Setup ($660 All-Inclusive) 👇</a>
         </div>
     </section>
 
