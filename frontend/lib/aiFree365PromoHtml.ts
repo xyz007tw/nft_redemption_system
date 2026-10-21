@@ -102,7 +102,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
             border-radius: 50px !important;
             font-size: 14px !important;
             font-weight: 700 !important;
-            display: inline-block !important;
+            display: inline-block;
             margin: 0 auto 25px auto !important;
             letter-spacing: 1.5px !important;
         }
@@ -351,7 +351,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
 
         /* 卡片三內部專屬健康產品連結按鈕與 LiveGood 官方 YT 按鈕 */
         #ai-landing-wrapper .health-link-btn {
-            display: inline-flex !important;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -374,7 +374,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         }
 
         #ai-landing-wrapper .lg-yt-link-btn {
-            display: inline-flex !important;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -434,7 +434,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         }
 
         #ai-landing-wrapper .course-detail-btn {
-            display: inline-flex !important;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -613,7 +613,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         }
 
         #ai-landing-wrapper .cta-btn {
-            display: inline-block !important;
+            display: inline-block;
             background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%) !important;
             color: #ffffff !important;
             padding: 18px 40px !important;
@@ -1031,20 +1031,20 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         const isZh = String(code).toLowerCase().includes('zh');
 
         root.querySelectorAll('.lang-zh').forEach(function(el) {
-            el.style.display = 'none';
+            el.style.setProperty('display', 'none', 'important');
         });
         root.querySelectorAll('.lang-en').forEach(function(el) {
-            el.style.display = 'none';
+            el.style.setProperty('display', 'none', 'important');
         });
 
         const targetClass = isZh ? '.lang-zh' : '.lang-en';
         root.querySelectorAll(targetClass).forEach(function(el) {
             if (el.tagName === 'TD' || el.tagName === 'TH') {
-                el.style.display = 'table-cell';
+                el.style.setProperty('display', 'table-cell', 'important');
             } else if (el.classList.contains('cta-btn') || el.classList.contains('health-link-btn') || el.classList.contains('lg-yt-link-btn') || el.classList.contains('course-detail-btn') || el.classList.contains('badge')) {
-                el.style.display = 'inline-flex';
+                el.style.setProperty('display', 'inline-flex', 'important');
             } else {
-                el.style.display = 'block';
+                el.style.setProperty('display', 'block', 'important');
             }
         });
 
