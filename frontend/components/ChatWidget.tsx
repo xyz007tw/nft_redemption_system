@@ -82,7 +82,7 @@ export default function ChatWidget() {
         {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
         {!isOpen && (
           <div className="relative group flex flex-col items-end">
-            {/* 懸浮展開之雙服務快速跳轉氣泡 */}
+            {/* 懸浮展開之三服務快速跳轉氣泡 */}
             <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
               <a
                 href="/#video-shoppable-service"
@@ -115,6 +115,22 @@ export default function ChatWidget() {
                  lang === 'ko-KR' ? '⚡ 02｜LiveGood 대행 & AI홍보' :
                  lang === 'vi-VN' ? '⚡ 02｜LiveGood & AI Tự động' :
                  '⚡ 02 | LiveGood & AI Co-Broadcast'}
+              </a>
+              <a
+                href="/#video-shoppable-service"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('weixiang-switch-service-tab', { detail: { tab: 'free365' } }));
+                  }
+                }}
+                className="px-3 py-1.5 sm:px-3.5 rounded-full bg-slate-900/95 hover:bg-emerald-600 text-emerald-200 hover:text-white border border-emerald-400/60 text-[11px] sm:text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+              >
+                {lang === 'zh-TW' ? '🚀 03｜AI尋客365天免錢 ($600)' :
+                 lang === 'zh-CN' ? '🚀 03｜AI寻客365天免钱 ($600)' :
+                 lang === 'ja-JP' ? '🚀 03｜AI集客365日無料 ($600)' :
+                 lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료 ($600)' :
+                 lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($600)' :
+                 '🚀 03 | AI 365-Day Free Plan ($600)'}
               </a>
             </div>
 

@@ -3,19 +3,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage, Lang } from '@/lib/LanguageContext';
 import { LIVEGOOD_PROMO_HTML } from '@/lib/livegoodPromoHtml';
+import { AI_FREE365_PROMO_HTML } from '@/lib/aiFree365PromoHtml';
 
 export default function VideoShoppableSection() {
   const { lang, setLang } = useLanguage();
   const isZh = lang.includes('zh');
   const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [activeServiceTab, setActiveServiceTab] = useState<'shoppable' | 'livegood'>('shoppable');
+  const [activeServiceTab, setActiveServiceTab] = useState<'shoppable' | 'livegood' | 'free365'>('shoppable');
   const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
+  const free365ContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleSwitchTab = (e: any) => {
       const targetTab = e?.detail?.tab;
-      if (targetTab === 'shoppable' || targetTab === 'livegood') {
+      if (targetTab === 'shoppable' || targetTab === 'livegood' || targetTab === 'free365') {
         setActiveServiceTab(targetTab);
       }
     };
@@ -24,7 +26,12 @@ export default function VideoShoppableSection() {
   }, []);
 
   useEffect(() => {
-    const container = livegoodContainerRef.current;
+    const container =
+      activeServiceTab === 'livegood'
+        ? livegoodContainerRef.current
+        : activeServiceTab === 'free365'
+        ? free365ContainerRef.current
+        : null;
     if (!container) return;
 
     const scripts = Array.from(container.querySelectorAll('script'));
@@ -97,9 +104,9 @@ export default function VideoShoppableSection() {
           </div>
         </div>
 
-        {/* 客製化服務雙主題切換頁籤 (服務 01：AI影片導購系統 / 服務 02：LiveGood 會員訂閱與 AI 自動化協播) */}
-        <div className="bg-slate-900 px-6 py-5 border-b border-slate-700">
-          <div className="max-w-5xl mx-auto">
+        {/* 客製化服務三主題切換頁籤 (服務 01：AI影片導購系統 / 服務 02：LiveGood 會員訂閱與 AI 自動化協播 / 服務 03：AI尋客365天攏免錢 $600 全包辦) */}
+        <div className="bg-slate-900 px-4 sm:px-6 py-5 border-b border-slate-700">
+          <div className="max-w-6xl mx-auto">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
               <span className="text-xs md:text-sm font-extrabold text-sky-300 flex items-center gap-2">
                 <span>🛠️</span>
@@ -115,7 +122,7 @@ export default function VideoShoppableSection() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {/* Tab 1: AI 影片導購系統 */}
               <button
                 type="button"
@@ -127,17 +134,17 @@ export default function VideoShoppableSection() {
                 }`}
               >
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
                     <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
                       activeServiceTab === 'shoppable' ? 'bg-sky-400 text-slate-950' : 'bg-slate-700 text-slate-300'
                     }`}>
                       {isZh ? '🛒 客製服務 01' : '🛒 Service 01'}
                     </span>
-                    <span className="text-xs font-bold text-sky-300">
-                      {isZh ? '官方 YouTube API · 1變多影分身導購' : 'YouTube API · Shadow Clone Shoppable'}
+                    <span className="text-[11px] font-bold text-sky-300">
+                      {isZh ? 'YouTube API 影分身導購' : 'Shadow Clone Shoppable'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm md:text-base">
+                  <div className="font-black text-white text-sm md:text-base leading-snug">
                     {lang === 'zh-TW' ? '新開發 AI「影片導購系統」客製化建置' :
                      lang === 'zh-CN' ? '新开发 AI「影片导购系统」客制化建置' :
                      lang === 'ja-JP' ? '新開発 AI「動画コマース導線システム」カスタム構築' :
@@ -167,17 +174,17 @@ export default function VideoShoppableSection() {
                 }`}
               >
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
                     <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
                       activeServiceTab === 'livegood' ? 'bg-amber-400 text-slate-950' : 'bg-slate-700 text-slate-300'
                     }`}>
                       {isZh ? '⚡ 客製與協辦 02' : '⚡ Service 02'}
                     </span>
-                    <span className="text-xs font-bold text-purple-300">
-                      {isZh ? '自行處理 $139.95 / 專人協辦 $180' : 'Self $139.95 / Concierge $180'}
+                    <span className="text-[11px] font-bold text-purple-300">
+                      {isZh ? '自辦 $139.95 / 協辦 $180' : 'Self $139.95 / Concierge $180'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm md:text-base">
+                  <div className="font-black text-white text-sm md:text-base leading-snug">
                     {lang === 'zh-TW' ? 'AI 點子變現商隊｜LiveGood 訂閱與 AI 自動協播' :
                      lang === 'zh-CN' ? 'AI 点子变现商队｜LiveGood 订阅与 AI 自动协播' :
                      lang === 'ja-JP' ? 'AI アイデア収益化｜LiveGood 購読＆AI 自動協播' :
@@ -192,6 +199,46 @@ export default function VideoShoppableSection() {
                   </div>
                   <div className="text-[11px] text-slate-300 font-bold">
                     {activeServiceTab === 'livegood' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
+                  </div>
+                </div>
+              </button>
+
+              {/* Tab 3: AI尋客365天攏免錢 ($600 全包辦) */}
+              <button
+                type="button"
+                onClick={() => setActiveServiceTab('free365')}
+                className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
+                  activeServiceTab === 'free365'
+                    ? 'bg-gradient-to-r from-emerald-900/95 to-teal-900/95 border-emerald-400 shadow-[0_0_25px_rgba(20,184,166,0.45)]'
+                    : 'bg-slate-800/70 border-slate-700 hover:border-emerald-400/50'
+                }`}
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                      activeServiceTab === 'free365' ? 'bg-emerald-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {isZh ? '🚀 客製與協辦 03' : '🚀 Service 03'}
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-300">
+                      {isZh ? '送$198頂配教材+享25%分潤' : 'Incl. $198 Course + 25% Share'}
+                    </span>
+                  </div>
+                  <div className="font-black text-white text-sm md:text-base leading-snug">
+                    {lang === 'zh-TW' ? 'AI尋客365天攏免錢｜全球網購連鎖店計劃' :
+                     lang === 'zh-CN' ? 'AI寻客365天拢免钱｜全球网购连锁店计划' :
+                     lang === 'ja-JP' ? 'AI集客365日完全無料｜グローバル連鎖店計画' :
+                     lang === 'ko-KR' ? 'AI 모객 365일 무료｜글로벌 체인점 플랜' :
+                     lang === 'vi-VN' ? 'AI Tìm Khách 365 Ngày｜Chuỗi Cửa Hàng Toàn Cầu' :
+                     'AI 365-Day Free Lead Gen | Global Chain Store Plan'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm md:text-base font-black text-amber-400">
+                    $600 USD
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-bold">
+                    {activeServiceTab === 'free365' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
               </button>
@@ -752,6 +799,17 @@ export default function VideoShoppableSection() {
           </div>
         )}
 
+        {/* 服務 03：AI尋客365天攏免錢 - 全球網購連鎖店計劃 ($600 USD / NT$ 18,000 全包辦・送 $198 頂配教材 + 享 25% 聯盟分潤) */}
+        {activeServiceTab === 'free365' && (
+          <div className="bg-[#0b0f19]">
+            <div
+              ref={free365ContainerRef}
+              className="w-full"
+              dangerouslySetInnerHTML={{ __html: AI_FREE365_PROMO_HTML }}
+            />
+          </div>
+        )}
+
         {/* 共用底部聯絡中心與免責聲明 */}
         <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
           {/* 6. 🤝 專屬客製化接洽聯絡中心 (電郵 + Line + 微信) */}
@@ -767,8 +825,8 @@ export default function VideoShoppableSection() {
             </h3>
             <p className="text-xs md:text-sm text-slate-300 max-w-2xl mx-auto mb-6 leading-relaxed">
               {isZh
-                ? '無論是「AI 影片導購系統客製化導入」或「LiveGood $180 專人協辦到好方案（含 $139.95 官方費用）」，皆可透過下方任一管道直接聯繫總工程師一對一辦理：'
-                : 'Whether inquiring about Custom AI Video Shoppable implementation or the $180 LiveGood Concierge Setup (incl. $139.95 fee), reach out directly via Email, LINE, or WeChat:'}
+                ? '無論是「01｜AI 影片導購系統客製化導入」、「02｜LiveGood $180 專人協辦方案」或「03｜AI尋客365天攏免錢 $600 全包辦旗艦方案」，皆可透過下方任一管道直接聯繫總工程師一對一辦理：'
+                : 'Whether inquiring about 01 Custom AI Video Shoppable, 02 $180 LiveGood Concierge Setup, or 03 $600 AI 365-Day Free Lead Gen Flagship Plan, reach out directly via Email, LINE, or WeChat:'}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
