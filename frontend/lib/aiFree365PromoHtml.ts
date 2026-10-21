@@ -378,7 +378,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 18px;
             padding: 10px 22px;
             border-radius: 50px;
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
@@ -810,7 +810,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
                 </div>
             </div>
 
-            <!-- 修改項目 1：第三張卡片「三、送『全球AI健康』實體產品」內嵌連結至 https://aitutor.vip/po009 的按鈕 + 下方 LiveGood 官方 YouTube 頻道按鈕 -->
+            <!-- 修改項目 1：第三張卡片「三、送『全球AI健康』實體產品」內嵌連結至 https://aitutor.vip/po009 的綠色按鈕 -->
             <div class="tech-card">
                 <div>
                     <div class="tech-icon-box">🎁</div>
@@ -826,15 +826,10 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
                     <a href="https://aitutor.vip/po009" target="_blank" rel="noopener noreferrer" class="health-link-btn lang-en">
                         🌿 Explore Global AI Wellness Products ↗
                     </a>
-                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-zh">
-                        ▶️ 前往 LiveGood 官方 YouTube 頻道（產品與制度介紹） ↗
-                    </a>
-                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-en">
-                        ▶️ Visit LiveGood Official YouTube Channel ↗
-                    </a>
                 </div>
             </div>
 
+            <!-- 第四張卡片「四、一整年份會員訂閱分潤」內嵌 LiveGood 官方 YouTube 頻道紅色按鈕，使左右兩欄高度對稱平衡 -->
             <div class="tech-card">
                 <div>
                     <div class="tech-icon-box">💰</div>
@@ -842,6 +837,14 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
                     <h3 class="tech-card-title lang-en">IV. 365-Day Subscription Payouts</h3>
                     <p class="tech-card-desc lang-zh">完美對接全球最火熱的 LiveGood 會員訂閱制系統。長達一整年（365天）自動為您綁定流量、追蹤分潤。所有的快速啟動、零售及矩陣滑落收益全歸您！</p>
                     <p class="tech-card-desc lang-en">Fully connected with LiveGood. Secures a 365-day tracking cookie for your traffic to continuously generate Fast Start, retail, and matrix spillover pools.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-zh">
+                        ▶️ 前往 LiveGood 官方 YouTube 頻道（產品與制度介紹） ↗
+                    </a>
+                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-en">
+                        ▶️ Visit LiveGood Official YouTube Channel ↗
+                    </a>
                 </div>
             </div>
         </div>
