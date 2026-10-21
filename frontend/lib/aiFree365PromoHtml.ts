@@ -349,7 +349,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
             text-align: center !important;
         }
 
-        /* 卡片三內部專屬健康產品連結按鈕 */
+        /* 卡片三內部專屬健康產品連結按鈕與 LiveGood 官方 YT 按鈕 */
         #ai-landing-wrapper .health-link-btn {
             display: inline-flex !important;
             align-items: center;
@@ -371,6 +371,29 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         #ai-landing-wrapper .health-link-btn:hover {
             transform: scale(1.04);
             box-shadow: 0 6px 22px rgba(20, 184, 166, 0.55) !important;
+        }
+
+        #ai-landing-wrapper .lg-yt-link-btn {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            font-size: 0.88rem !important;
+            text-decoration: none !important;
+            border: 1px solid #f87171 !important;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35) !important;
+            transition: all 0.25s ease;
+        }
+
+        #ai-landing-wrapper .lg-yt-link-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 22px rgba(239, 68, 68, 0.6) !important;
         }
 
         /* 高階教材展示與 25% 分潤專區 */
@@ -787,7 +810,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
                 </div>
             </div>
 
-            <!-- 修改項目 1：第三張卡片「三、送『全球AI健康』實體產品」內嵌連結至 https://aitutor.vip/po009 的按鈕 -->
+            <!-- 修改項目 1：第三張卡片「三、送『全球AI健康』實體產品」內嵌連結至 https://aitutor.vip/po009 的按鈕 + 下方 LiveGood 官方 YouTube 頻道按鈕 -->
             <div class="tech-card">
                 <div>
                     <div class="tech-icon-box">🎁</div>
@@ -796,12 +819,18 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
                     <p class="tech-card-desc lang-zh">立即免費贈送您一套 LiveGood 原廠生產的頂級營養體驗包。無任何重消壓力，帶您體驗「破壞式定價」帶來的極致高品質競爭力！</p>
                     <p class="tech-card-desc lang-en">Receive a complimentary physical wellness set directly from LiveGood. No forced auto-ships, experience the extreme cost-to-quality advantage first-hand.</p>
                 </div>
-                <div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                     <a href="https://aitutor.vip/po009" target="_blank" rel="noopener noreferrer" class="health-link-btn lang-zh">
                         🌿 參觀「全球AI健康」官方產品與制度 ↗
                     </a>
                     <a href="https://aitutor.vip/po009" target="_blank" rel="noopener noreferrer" class="health-link-btn lang-en">
                         🌿 Explore Global AI Wellness Products ↗
+                    </a>
+                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-zh">
+                        ▶️ 前往 LiveGood 官方 YouTube 頻道（產品與制度介紹） ↗
+                    </a>
+                    <a href="https://www.youtube.com/@livegoodsupplements" target="_blank" rel="noopener noreferrer" class="lg-yt-link-btn lang-en">
+                        ▶️ Visit LiveGood Official YouTube Channel ↗
                     </a>
                 </div>
             </div>
@@ -1012,7 +1041,7 @@ export const AI_FREE365_PROMO_HTML = `<!-- === 客製與協辦 03：AI尋客365�
         root.querySelectorAll(targetClass).forEach(function(el) {
             if (el.tagName === 'TD' || el.tagName === 'TH') {
                 el.style.display = 'table-cell';
-            } else if (el.classList.contains('cta-btn') || el.classList.contains('health-link-btn') || el.classList.contains('course-detail-btn') || el.classList.contains('badge')) {
+            } else if (el.classList.contains('cta-btn') || el.classList.contains('health-link-btn') || el.classList.contains('lg-yt-link-btn') || el.classList.contains('course-detail-btn') || el.classList.contains('badge')) {
                 el.style.display = 'inline-flex';
             } else {
                 el.style.display = 'block';
