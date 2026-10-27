@@ -117,6 +117,7 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 - 首頁頂部導覽列與右下角 AI 客服正上方皆設有「🎓 AI頂配教材 (AI Master Courses)」快捷按鈕，點擊可直接跳轉至首頁「AI 頂配家教課程專區 (#tutor-courses)」。
 - 支援信用卡/ATM 與 USDT 雙軌付費，付款後系統秒級解鎖教材下載，並自動寄送課程連結至購課信箱。
 - 內建「一鍵轉發電郵 (Forward Email)」功能：已購課學員可在專區內輸入親友或備用 Email，將課程教材與下載連結一鍵轉寄分享。
+- 雲端高速託管規範：所有電子書與教材檔案統一託管於微享專用 Cloudflare R2 儲存槽（主網域 https://1.5208.uk 與鏡像 https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev），管理後台支援一鍵直傳 R2，讀者寄送電郵與下載連結皆享受全球 CDN 秒級下載與不限速頻寬。
 - 分潤機制：家教課程全額納入 25% 聯盟推廣分潤體系（10% 級差 + 10% 對等 + 5% 全球領袖分紅），僅純斗內贊助 (SPONSOR) 不計入分潤。
 
 🌍 全球化作品展示區與官方總部統一導流規則 (Globalized Works Showcase at https://nft1314.party/)：
