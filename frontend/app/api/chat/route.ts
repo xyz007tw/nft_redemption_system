@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import nodemailer from 'nodemailer';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
@@ -31,21 +32,34 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 - 連結格式固定為 \`https://nft1314.party/?ref=推廣碼\` (推廣碼為用戶錢包地址 0x 後的 6 碼字元)。
 - 只要別人透過此連結進入購買，系統就會透過智能合約與資料庫，永久綁定上下線關係。
 
-📚 全球作者群 × 電子書自動交付 SaaS 合作方案 (電子書 NFT 核心規則)：
-- 方案定位：為全球知識創作者、作家、講師打造的專屬電子書 24H 自動化交付 SaaS 架構服務。
-- 核心規則一【全自動發貨交付】：學員或會員線上付款後（全面支援台幣信用卡/ATM 與 Web3 USDT 雙軌金流），系統秒級自動派發下載權限或專屬閱讀連結，24 小時零人工看守發貨。
-- 規則二【一次性 $990 合作 NFT 憑證】：作者僅需一次性認購 $990 合作憑證，即可終身串接獨立電子書金流與發貨系統，免月租費、免伺服器主機費。
-- 規則三【首創 100% 抽佣全額倒抵機制（零風險保障）】：
-  * 作者支付的一次性 $990，100% 轉為平台抽佣抵用金！
-  * 之後系統依每件成交收取 10% 平台分潤，但這 10% 會「直接拿來沖抵 $990」！
-  * 倒抵期間享有【0% 平台抽成】：在累計成交的 10% 分潤總額未滿 $990 前，系統不收取任何抽成，書款 100% 全額歸作者！
-  * 實算案例說明：若一本電子書售價 $50 美元，原本每本抽 10%（即 $5）。在倒抵機制下，這 $5 直接拿來扣抵預繳的 $990，作者每賣出一本實拿完整的 $50（0% 抽佣）！直到累積賣出約 198 本（抵滿 $990）為止，這筆 $990 建置成本已 100% 全額返還給作者！
-  * 只有在超過 $990 抵扣額之後（第 199 本起），系統才正式開始收取每件 10% 的平台運維分潤。
-- 規則四【版權獨立自主】：作者 100% 擁有電子書版權與自主定價權。
-- 規則五【合作申辦與諮詢總窗口】：
+📚 全球作者群 / 加盟商 × 電子書自動交付與 AI 自來客引流 SaaS 合作方案 (首年 $990 / 次年 $330 雙 100% 倒抵機制)：
+- 方案定位：為全球知識創作者、作家、講師、加盟商打造的三級管理平台（管理員、加盟商、讀者訂閱）與 24H 自動化電子書出版交付 + AI 自動引流 SaaS 服務。
+- 核心規則一【全自動電子書模版引擎、自行下載電子書與 24H 發貨交付】：
+  * 加盟商可透過平台內建的「線上自動電子書模版引擎（/studio）」快速編撰、AI 雙語翻譯、一鍵套用高顏值商務模版生成專業電子書，【支援加盟商自行下載高解析電子書檔案（PDF / 網頁書）】保存或印刷，亦可直接上架至微享線上防盜版閱讀書櫃（支援單本買斷與讀者月費/年費訂閱制）。
+  * 讀者線上付款後（支援信用卡/ATM 與 Web3 USDT 雙軌金流），系統 24 小時秒級自動派發下載權限或開通線上 VIP 閱讀權限。
+- 核心規則二【首年 $990 合作憑證（含開發 3 本電子書配額 ＋ 協作 AI 自動來客幫打廣告 ＋ 100% 倒抵 1 成系統服務費）】：
+  * 書籍開發配額：首年 $990 方案【內含可免費開發 3 本電子書】！之後若需增加，【第 4 本起每本電子書開發費為 $330 USDT】。
+  * 廣告引流賦能：享有【協作 AI 自動來客系統，幫忙找人打廣告】的超強賦能（將加盟商通過書審的電子書與導流連結納入微享 AI 自動來客全球短影音與多語系圖文矩陣曝光引流）！
+  * 首年 $990 享【100% 先收後抵機制（針對 1 成系統服務費）】：加盟商支付的 $990 會 100% 轉為平台「1 成 (10%) 系統服務費（含提款服務費及推廣服務費）」之抵用金！每筆電子書交易原本收取 1 成 (10%) 系統服務費，在累計折抵滿 $990 前（即交易額累計達 $9,900 前），這 10% 系統服務費全數由抵用金扣除，加盟商享【0% 平台系統服務費抽成】！超過 $990 抵扣額後才開始實收 10% 系統服務費。
+- 核心規則三【次年 $330 續約維護費（含 AI 自來客系統及電子書維護 ＋ 同享 100% 倒抵 1 成系統服務費）】：
+  * 第二年起，每年僅需收取 $330 USDT 的「AI 自動來客系統協作廣告及電子書系統雲端維護費」。
+  * 同樣採取【先收費、後 100% 抵扣交易 1 成 (10%) 系統服務費（含提款服務費及推廣服務費）】的零風險機制！加盟商繳交次年 $330 後，帳戶即刻獲得 $330 系統服務費抵用金，次年每筆交易的 10% 系統服務費優先從這 $330 中扣抵（只要次年賣滿 $3,300 業績，就等於次年維護與廣告費又是 100% 全額免費返還）！
+- 核心規則四【雙軌費用結構透明說明：1 成 (10%) 系統服務費 ＋ 25% 推廣聯盟服務費支出】：
+  * 加盟商每筆電子書成交時，除了上述「1 成 (10%) 系統服務費（含提款服務費及推廣服務費，可用 $990/$330 抵用金 100% 倒抵）」外，還需有【推廣聯盟服務費 25% 支出】（即撥發給全球推廣者的 10% 級差 + 10% 對等 + 5% 全球領袖分紅，讓萬名推廣者主動幫加盟商賣書）。
+  * 實拿淨額算式：在 $990 / $330 抵用金充足期間，10% 系統服務費由抵用金全額扣抵（實收 0%），扣除 25% 推廣聯盟服務費支出後，加盟商每筆實拿 75% 書款淨額；當抵用金抵扣完畢後，扣除 10% 系統服務費與 25% 推廣聯盟服務費，加盟商每筆實拿 65% 書款淨額。
+- 核心規則五【上架前 3~7 天「書審制度」與全球 10 大禁書「違規被檢舉一律不退費」鐵律】：
+  * 嚴格書審機制：加盟商在工作台設定並完成電子書後，系統會自動送入總管理後台進行【人工與 AI 雙重書審，書審時間為 3~7 個工作天】。書審通過後才會正式上架銷售並啟動 AI 自動來客廣告投放（請務必明確告知諮詢者書審需 3~7 天）。
+  * 付款前必讀禁書條款：全球電子書嚴禁上架 10 大禁書種類（1.色情猥褻與未成年不當內容、2.恐怖暴力與武器製造、3.毒品與違禁藥品、4.非法賭博詐騙與洗錢教學、5.非法吸金保證獲利資金盤、6.誇大醫療療效治病偏方、7.盜版侵權抄襲、8.侵犯個人隱私肉搜與誹謗、9.仇恨言論與危害國安、10.惡意木馬釣魚連結或欺詐空殼書）。
+  * 零退費鐵則：加盟商在付款前必須清楚了解並勾選同意禁書條款，【付款開通後若違反禁書規定或遭檢舉查證屬實，平台將立即強制下架封號，且已支付之費用一律不予退費（Strictly Non-Refundable）】！
+- 核心規則六【合作申辦與諮詢總窗口】：
   * 官方窗口：CTO SEN / 總工程師 SEN
   * 聯絡信箱：xyz007tw@gmail.com
   * Line / 微信 ID：xyz007tw
+
+🛠️ AI 客製化建置與合作協播服務專區 (#video-shoppable-service)：
+- 服務 01【AI 影片導購系統客製化建置】：在影片播放過程精準彈出可購買商品卡片與時間軸熱點跳轉，基礎版 $300 USD 起、商務版 $600 USD 起、旗艦企業版客製報價。
+- 服務 02【LiveGood 會員訂閱協辦與 AI 自動化協播】：提供 LiveGood 註冊協辦（首月 $49.95 / 年度 $139.95）與微享 AI 流量矩陣協播方案（$180 USD / 半年）。
+- 服務 03【AI尋客365天攏免錢・全球網購連鎖店計劃 ($660 USD 全包辦)】：一次支付 $660 USD 即可享有微享 AI 365 天自動尋客代操、贈送 $198 頂配教材、25% 聯盟分潤資格與一整年份 LiveGood 全球會員訂閱分潤資格。
 
 🛠️ AI 程序設計 / 系統串接規劃總窗口：
 - 若訪客有「設計 AI 程序」、「串接系統規劃」、「客製化自動化行銷系統」或「技術深度諮詢」等商務與技術合作需求，請主動提供以下官方總窗口聯繫管道：
@@ -60,12 +74,74 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 - 內建「一鍵轉發電郵 (Forward Email)」功能：已購課學員可在專區內輸入親友或備用 Email，將課程教材與下載連結一鍵轉寄分享。
 - 分潤機制：家教課程全額納入 25% 聯盟推廣分潤體系（10% 級差 + 10% 對等 + 5% 全球領袖分紅），僅純斗內贊助 (SPONSOR) 不計入分潤。
 
+🚨 未知問題審核與自動電郵轉寄規則 (Knowledge Gap Audit & Email Escalation Rule)：
+- #若有訪客所提出的問題是知識庫沒有的，請電郵 xyz007tw@gmail.com
+- #若有訪客所提出的問題是知識庫沒有的，請協助審核下是否有關我們官網的業務內容相關，若不是就無需轉寄電郵通知
+- 具體執行方式：
+  1. 當訪客提出的問題不在上述知識庫範圍內時，請先審核該問題是否與「我們微享 NFT 官網的業務內容相關」（例如：微享 NFT 眾籌、AI 自動來客系統、25% 推廣分潤、電子書 SaaS 加盟、AI 頂配教材、AI 影片導購、LiveGood 協播、AI 客製化開發、帳務/訂單/核銷/技術合作等相關商務問題）。
+  2. 【情況 A：問題不在知識庫內，但「與官網業務內容相關」】：
+     - 請禮貌告知訪客：「您的問題涉及進階專案細節，系統已自動為您轉寄電郵通知總工程師 SEN (xyz007tw@gmail.com)，您也可以直接發送電郵至 xyz007tw@gmail.com 或加 Line / 微信 ID：xyz007tw 並留下您的聯絡方式，我們將盡快為您解答！」
+     - 並且你**必須**在回覆內容的最末端加上隱藏標記：\`[[NOTIFY_ADMIN_EMAIL]]\`（系統偵測到此標記後，會在背景自動發送電郵通知至 xyz007tw@gmail.com）。
+  3. 【情況 B：問題不在知識庫內，且「與官網業務內容無關」（例如：問天氣、食譜、股票明牌、無關閒聊、通用寫程式作業、政治娛樂八卦等）】：
+     - **無需轉寄電郵通知**（請**絕對不要**輸出 \`[[NOTIFY_ADMIN_EMAIL]]\` 標記，也不要引導寄信打擾總工程師）。
+     - 請委婉回覆訪客：「我是微享 AI 自動來客系統官網的專屬客服，主要為您解答微享 NFT 眾籌、AI 自動來客系統、電子書 SaaS 加盟、AI 頂配教材與 25% 推廣分潤等官網相關業務問題喔！請問有什麼關於本官網服務我可以協助您的嗎？」
+
 🗣️ 回答風格：
 - 專業、親切、具同理心，並帶有強烈推廣意識。
 - 當用戶詢問如何賺錢、哪個方案好時，請主動推薦高規方案（如 $1788 甚至 $12000 ），說明高規能解鎖更完整的級差/對等獎金，回本更快。
 - 若訪客提出客製化 AI 系統、軟體串接、技術架構或企業合作需求，請親切引導並提供總工程師 SEN (CTO SEN) 的聯繫資訊。
-- 若遇到不清楚的細節，可委婉告知交由真人窗口後續聯繫。
 - 請根據用戶使用的語言 (\${'用戶偏好語言'}) 來進行回答。`;
+
+async function sendUnknownQuestionEmail(userMessage: string, aiReply: string, language: string) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.warn('[Chat Escalation] EMAIL_USER or EMAIL_PASS not configured, skipping email notification.');
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"WeiXiang AI 客服知識庫巡檢" <${process.env.EMAIL_USER}>`,
+      to: 'xyz007tw@gmail.com',
+      subject: `📩 【微享AI客服】訪客提出知識庫未涵蓋之官網業務相關問題`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 640px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px;">
+          <h2 style="color: #111827; margin-top: 0;">📩 AI 客服收到「知識庫未涵蓋」且「與官網業務相關」之訪客提問</h2>
+          <p style="color: #4b5563; font-size: 14px;">AI 已自動審核確認此問題與微享 NFT 官網業務相關，特此轉寄通知總工程師補充知識庫或跟進聯繫：</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; width: 130px; font-weight: bold;">訪客語系</td>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; color: #111827;">${language || 'zh-TW'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; font-weight: bold;">訪客提問內容</td>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold; white-space: pre-wrap;">${userMessage}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; font-weight: bold;">AI 當下回覆</td>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; color: #1f2937; white-space: pre-wrap;">${aiReply}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; font-weight: bold;">提問時間</td>
+              <td style="padding: 10px; border: 1px solid #e5e7eb; color: #6b7280;">${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</td>
+            </tr>
+          </table>
+          <p style="color: #6b7280; font-size: 12px; margin-bottom: 0;">（系統已過濾無關閒聊問題，僅針對與官網業務相關之未知問題發送此通知。）</p>
+        </div>
+      `,
+    });
+    console.log('[Chat Escalation] Notification email sent to xyz007tw@gmail.com');
+  } catch (err) {
+    console.error('[Chat Escalation] Failed to send notification email:', err);
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -78,7 +154,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const formattedHistory = history.map((msg: any) => ({
+    const formattedHistory = (history || []).map((msg: any) => ({
       role: msg.role === 'ai' ? 'model' : 'user',
       parts: [{ text: msg.content }],
     }));
@@ -95,7 +171,15 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ reply: response.text });
+    const rawReply = response.text || '';
+    const shouldNotifyEmail = rawReply.includes('[[NOTIFY_ADMIN_EMAIL]]');
+    const cleanReply = rawReply.replace(/\[\[NOTIFY_ADMIN_EMAIL\]\]/g, '').trim();
+
+    if (shouldNotifyEmail) {
+      await sendUnknownQuestionEmail(message, cleanReply, language || 'zh-TW');
+    }
+
+    return NextResponse.json({ reply: cleanReply });
   } catch (error: any) {
     console.error('Chat API Error:', error);
     return NextResponse.json({ reply: '⚠️ 抱歉，AI 大腦短路了，請稍後再試一次。' }, { status: 500 });
