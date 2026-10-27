@@ -187,21 +187,38 @@ export const EBOOK_THEMES = {
   }
 };
 
-// 生成可獨立下載與列印為精美 PDF 的完整獨立電子書 HTML (含封面、自動目錄、中英雙語排版、頁尾加盟商導流 QR Code)
-export function generateStandaloneEBookHTML(book: EBookProject, buyerWatermark?: string): string {
+export type EBookExportLangMode = 'BILINGUAL' | 'ZH_ONLY' | 'EN_ONLY';
+
+// 生成可獨立下載與列印為精美 PDF 的完整獨立電子書 HTML (支援 3 種語系版面模式：BILINGUAL 中英雙語對照版 / ZH_ONLY 純繁體中文版 / EN_ONLY 純英文版)
+export function generateStandaloneEBookHTML(
+  book: EBookProject,
+  buyerWatermark?: string,
+  langMode?: EBookExportLangMode
+): string {
+  const effectiveMode: EBookExportLangMode =
+    langMode || (book.bilingual_mode ? 'BILINGUAL' : 'ZH_ONLY');
+  const showZh = effectiveMode === 'BILINGUAL' || effectiveMode === 'ZH_ONLY';
+  const showEn = effectiveMode === 'BILINGUAL' || effectiveMode === 'EN_ONLY';
+
   const theme = EBOOK_THEMES[book.theme_id] || EBOOK_THEMES.tech_blue;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(book.author_cta_url || 'https://aitutor.vip/waia')}`;
 
   const tocHtml = book.chapters
-    .map(
-      (ch, idx) => `
+    .map((ch, idx) => {
+      const tocLabel =
+        effectiveMode === 'EN_ONLY'
+          ? ch.title_en || ch.title_zh
+          : effectiveMode === 'ZH_ONLY'
+          ? ch.title_zh
+          : `${ch.title_zh}${ch.title_en ? ` / ${ch.title_en}` : ''}`;
+      return `
       <li class="toc-item">
         <a href="#chapter-${idx + 1}">
           <span class="toc-num">Chapter 0${idx + 1}</span>
-          <span class="toc-title">${ch.title_zh}${book.bilingual_mode && ch.title_en ? ` / ${ch.title_en}` : ''}</span>
+          <span class="toc-title">${tocLabel}</span>
         </a>
-      </li>`
-    )
+      </li>`;
+    })
     .join('');
 
   const chaptersHtml = book.chapters
@@ -210,22 +227,30 @@ export function generateStandaloneEBookHTML(book: EBookProject, buyerWatermark?:
       <section class="chapter-page" id="chapter-${idx + 1}">
         <div class="chapter-header">
           <div class="chapter-badge">CHAPTER 0${idx + 1}</div>
-          <h2 class="chapter-title-zh">${ch.title_zh}</h2>
-          ${book.bilingual_mode && ch.title_en ? `<h3 class="chapter-title-en">${ch.title_en}</h3>` : ''}
+          ${
+            effectiveMode === 'EN_ONLY'
+              ? `<h2 class="chapter-title-zh">${ch.title_en || ch.title_zh}</h2>`
+              : `<h2 class="chapter-title-zh">${ch.title_zh}</h2>
+                 ${showEn && ch.title_en ? `<h3 class="chapter-title-en">${ch.title_en}</h3>` : ''}`
+          }
         </div>
         <div class="chapter-body">
-          <div class="lang-block-zh">
-            ${ch.content_zh
-              .split('\n')
-              .filter(p => p.trim())
-              .map(p => `<p>${p}</p>`)
-              .join('')}
-          </div>
           ${
-            book.bilingual_mode && ch.content_en
-              ? `<div class="lang-block-en">
-                  <div class="en-label">ENGLISH EDITION</div>
-                  ${ch.content_en
+            showZh
+              ? `<div class="lang-block-zh">
+                  ${(ch.content_zh || '')
+                    .split('\n')
+                    .filter(p => p.trim())
+                    .map(p => `<p>${p}</p>`)
+                    .join('')}
+                </div>`
+              : ''
+          }
+          ${
+            showEn && (ch.content_en || ch.content_zh)
+              ? `<div class="${effectiveMode === 'EN_ONLY' ? 'lang-block-zh' : 'lang-block-en'}">
+                  ${effectiveMode === 'BILINGUAL' ? '<div class="en-label">ENGLISH EDITION</div>' : ''}
+                  ${(ch.content_en || ch.content_zh)
                     .split('\n')
                     .filter(p => p.trim())
                     .map(p => `<p>${p}</p>`)
@@ -235,19 +260,26 @@ export function generateStandaloneEBookHTML(book: EBookProject, buyerWatermark?:
           }
         </div>
         <div class="page-footer">
-          <span>《${book.title_zh}》 — ${book.author_name} 著</span>
-          <span>第 ${idx + 1} 章 ${buyerWatermark ? `｜授權讀者：${buyerWatermark}` : ''}</span>
+          <span>${effectiveMode === 'EN_ONLY' ? `"${book.title_en || book.title_zh}" — by ${book.author_name}` : `《${book.title_zh}》 — ${book.author_name} 著`}</span>
+          <span>${effectiveMode === 'EN_ONLY' ? `Chapter ${idx + 1}` : `第 ${idx + 1} 章`} ${buyerWatermark ? `｜授權讀者：${buyerWatermark}` : ''}</span>
         </div>
       </section>`
     )
     .join('');
 
+  const modeBadgeLabel =
+    effectiveMode === 'BILINGUAL'
+      ? '🌍 中/英雙語對照版 (Bilingual Edition)'
+      : effectiveMode === 'ZH_ONLY'
+      ? '🇹🇼 純繁體中文版 (Traditional Chinese Edition)'
+      : '🇺🇸 純英文版 (English Edition)';
+
   return `<!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="${effectiveMode === 'EN_ONLY' ? 'en' : 'zh-TW'}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${book.title_zh} - ${book.author_name}</title>
+  <title>${effectiveMode === 'EN_ONLY' ? book.title_en || book.title_zh : book.title_zh} - ${book.author_name}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
     * { box-sizing: border-box; }
@@ -444,7 +476,7 @@ export function generateStandaloneEBookHTML(book: EBookProject, buyerWatermark?:
 <body>
   <div class="toolbar-no-print">
     <div>
-      <strong>📘 微享自動電子書模版引擎（母檔預覽與印刷導出）</strong>
+      <strong>📘 微享自動電子書模版引擎（${modeBadgeLabel}）</strong>
       <span style="margin-left:12px;font-size:13px;color:#94a3b8;">提示：點擊右側按鈕即可直接另存為印刷級高解析 PDF 檔案</span>
     </div>
     <button class="toolbar-btn" onclick="window.print()">🖨️ 一鍵匯出 / 列印為精裝 PDF</button>
@@ -454,10 +486,15 @@ export function generateStandaloneEBookHTML(book: EBookProject, buyerWatermark?:
     <!-- 封面頁 -->
     <section class="cover-page">
       <div>
-        <div class="cover-badge">WEIXIANG GLOBAL E-BOOK PUBLISHING</div>
-        <h1 class="cover-title-zh">${book.title_zh}</h1>
-        ${book.bilingual_mode && book.title_en ? `<h2 class="cover-title-en">${book.title_en}</h2>` : ''}
-        <p class="cover-sub">${book.subtitle_zh}${book.bilingual_mode && book.subtitle_en ? `<br/>${book.subtitle_en}` : ''}</p>
+        <div class="cover-badge">WEIXIANG GLOBAL E-BOOK PUBLISHING · ${effectiveMode}</div>
+        ${
+          effectiveMode === 'EN_ONLY'
+            ? `<h1 class="cover-title-zh">${book.title_en || book.title_zh}</h1>
+               <p class="cover-sub">${book.subtitle_en || book.subtitle_zh}</p>`
+            : `<h1 class="cover-title-zh">${book.title_zh}</h1>
+               ${showEn && book.title_en ? `<h2 class="cover-title-en">${book.title_en}</h2>` : ''}
+               <p class="cover-sub">${book.subtitle_zh}${showEn && book.subtitle_en ? `<br/>${book.subtitle_en}` : ''}</p>`
+        }
       </div>
       <div class="cover-author-box">
         <div>

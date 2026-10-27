@@ -54,9 +54,9 @@ export default function ReaderEBookStorePage() {
     }
   };
 
-  // 讀者下載含購買者專屬浮水印之精裝 PDF
+  // 讀者下載含購買者專屬浮水印之精裝 PDF（依照讀者目前所選的語系版本：BILINGUAL 中英雙語版 / ZH_ONLY 純繁體中文版 / EN_ONLY 純英文版）
   const handleReaderDownloadPDF = (book: EBookProject) => {
-    const html = generateStandaloneEBookHTML(book, readerEmail || 'VIP Reader');
+    const html = generateStandaloneEBookHTML(book, readerEmail || 'VIP Reader', readingModeLang);
     const win = window.open('', '_blank');
     if (win) {
       win.document.write(html);

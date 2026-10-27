@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import {
   EBookProject,
+  EBookExportLangMode,
   FranchiseeProfile,
   EBOOK_THEMES,
   GLOBAL_BANNED_BOOK_CATEGORIES,
@@ -64,6 +65,7 @@ export default function FranchiseStudioPage() {
   const [savingLoading, setSavingLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showBannedRules, setShowBannedRules] = useState(false);
+  const [exportLangMode, setExportLangMode] = useState<EBookExportLangMode>('BILINGUAL');
 
   const fetchStoreData = async () => {
     try {
@@ -211,9 +213,14 @@ export default function FranchiseStudioPage() {
     }
   };
 
-  // 功能 A：加盟商自行下載電子書母檔 (.html 獨立電子書檔 / 一鍵轉精裝印刷級 PDF)
-  const handleDownloadMasterBook = (bookToExport: EBookProject, triggerPrintPdf: boolean) => {
-    const htmlContent = generateStandaloneEBookHTML(bookToExport);
+  // 功能 A：加盟商自行下載電子書母檔 (.html 獨立電子書檔 / 一鍵轉精裝印刷級 PDF，支援 3 版語系：中英雙語版 / 純中文版 / 純英文版)
+  const handleDownloadMasterBook = (
+    bookToExport: EBookProject,
+    triggerPrintPdf: boolean,
+    modeOverride?: EBookExportLangMode
+  ) => {
+    const mode = modeOverride || exportLangMode;
+    const htmlContent = generateStandaloneEBookHTML(bookToExport, undefined, mode);
 
     if (triggerPrintPdf) {
       const win = window.open('', '_blank');
@@ -232,7 +239,8 @@ export default function FranchiseStudioPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${bookToExport.title_zh.replace(/\s+/g, '_')}_Master_EBook.html`;
+      const suffix = mode === 'EN_ONLY' ? 'EN' : mode === 'ZH_ONLY' ? 'ZH' : 'Bilingual';
+      a.download = `${bookToExport.title_zh.replace(/\s+/g, '_')}_${suffix}_Master_EBook.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -735,22 +743,57 @@ export default function FranchiseStudioPage() {
                 </button>
               </div>
 
-              {/* 加盟商自行下載雙按鈕 */}
+              {/* 加盟商自行下載雙按鈕（含 3 版語系選擇：中英雙語對照版 / 純繁體中文版 / 純英文版） */}
               <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 mb-5 space-y-3">
                 <div className="text-xs font-bold text-cyan-300">
-                  📥 【功能 A：加盟商自行下載電子書母檔（免等書審立即可下）】
+                  📥 【功能 A：加盟商自行下載電子書母檔（共 3 版語系，免等書審立即可下）】
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setExportLangMode('BILINGUAL')}
+                    className={`py-2 px-1.5 rounded-lg text-[11px] font-black border transition-all cursor-pointer ${
+                      exportLangMode === 'BILINGUAL'
+                        ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-md'
+                        : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
+                    }`}
+                  >
+                    🌍 中英雙語版
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExportLangMode('ZH_ONLY')}
+                    className={`py-2 px-1.5 rounded-lg text-[11px] font-black border transition-all cursor-pointer ${
+                      exportLangMode === 'ZH_ONLY'
+                        ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-md'
+                        : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
+                    }`}
+                  >
+                    🇹🇼 純繁體中文版
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExportLangMode('EN_ONLY')}
+                    className={`py-2 px-1.5 rounded-lg text-[11px] font-black border transition-all cursor-pointer ${
+                      exportLangMode === 'EN_ONLY'
+                        ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-md'
+                        : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
+                    }`}
+                  >
+                    🇺🇸 純英文版
+                  </button>
                 </div>
                 <button
-                  onClick={() => handleDownloadMasterBook(currentBook, true)}
+                  onClick={() => handleDownloadMasterBook(currentBook, true, exportLangMode)}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm shadow-lg cursor-pointer"
                 >
-                  🖨️ 一鍵導出 / 下載「印刷級精裝 PDF 電子書」
+                  🖨️ 一鍵導出 / 下載「{exportLangMode === 'BILINGUAL' ? '中英雙語對照版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 精裝 PDF」
                 </button>
                 <button
-                  onClick={() => handleDownloadMasterBook(currentBook, false)}
+                  onClick={() => handleDownloadMasterBook(currentBook, false, exportLangMode)}
                   className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer"
                 >
-                  💾 下載「獨立網頁版雙語電子書 (.html 母檔)」
+                  💾 下載「{exportLangMode === 'BILINGUAL' ? '中英雙語對照版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 獨立網頁母檔 (.html)」
                 </button>
               </div>
 
