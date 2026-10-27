@@ -300,7 +300,7 @@ export default function Dashboard() {
           <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-lg">
             <h3 className="text-gray-400 mb-2 font-medium">{t.dashCurrentLevel}</h3>
             <p className="text-5xl font-black text-purple-400">
-              {stats.totalSales >= 15000 ? '10%' : stats.totalSales >= 6000 ? '6%' : stats.totalSales >= 600 ? '3%' : '0%'}
+              {stats.totalSales > 15000 ? '10%' : stats.totalSales > 6000 ? '6%' : stats.totalSales >= 600 ? '3%' : '0%'}
             </p>
             <p className="text-sm text-gray-500 mt-2">{t.dashNextLevel}</p>
           </div>
@@ -349,20 +349,22 @@ export default function Dashboard() {
             </div>
             <ul className="list-disc list-inside space-y-1 text-gray-300">
               <li>
-                <strong className="text-cyan-300">1. 無限代級差獎金（最高 10%）</strong>：依個人累積業績劃分 0% / 3% (&ge;$600) / 6% (&ge;$6,000) / 10% (&ge;$15,000)，由下而上發放直推與差額獎金。
+                <strong className="text-cyan-300">1. 無限代級差獎金（最高 10%）</strong>：依個人累積業績劃分等級區間：<strong className="text-white">&gt;$600 ~ $6,000 ➔ 3% 推廣級差</strong>、{' '}
+                <strong className="text-white">&gt;$6,000 ~ $15,000 ➔ 6% 推廣級差</strong>、{' '}
+                <strong className="text-white">&gt;$15,000 ➔ 10% 推廣級差</strong>，由下而上發放直推與差額獎金。
               </li>
               <li>
                 <strong className="text-emerald-300">2. 對等獎金 100% 匹配（最高 10%）</strong>：被推薦人（下線）領取多少級差獎金，其直接推薦人（上線）即 100% 領取同等金額之對等獎金。
               </li>
               <li>
-                <strong className="text-amber-300">3. 全球領袖永久均分（5%）</strong>：凡業績達最高階 10% (&ge;$15,000 USDT) 之全球領袖，每筆新訂單皆提撥 5% 永久均分全球分紅（純斗內贊助方案不計入分潤）。
+                <strong className="text-amber-300">3. 全球領袖永久均分（5%）</strong>：凡業績達最高階 10% (&gt;$15,000 USDT) 之全球領袖，每筆新訂單皆提撥 5% 永久均分全球分紅（純斗內贊助方案不計入分潤）。
               </li>
               <li>
                 <strong className="text-pink-300">🔥 非推廣者的訪客（自然流量）下訂單分潤方式</strong>：當非透過推廣連結的自然流量訪客下訂單時，系統仍固定提撥 <strong className="text-white">25% 推廣服務費</strong>，並<strong className="text-yellow-300">由系統自動去綁定推廣最高的 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅</strong>！
               </li>
               <li>
-                <strong className="text-emerald-400">📈 自消費併入「級差分潤資格認定累積業績」規則</strong>：所有微享 NFT 的數位產品、斗內贊助、眾籌、電子書加盟（$990/$330）、AI頂配教材與客製化服務等<strong className="text-white">「自消費」業績，皆可併入計算您的「級差分潤累積業績」來認定晉升等級（3% / 6% / 10%）</strong>；但自消費僅作為「升級資格認定」，不會對自己的消費發放 25% 推廣佣金（只有真正推廣他人成交才依認定等級計算佣金）。<br/>
-                <span className="text-gray-400 text-xs">👉 實例：若您斗內 $3 ＋ 成為電子書加盟商 $990 ＝ 自消費累積 $993（落在 $600~$6,000 區間），即直接認定享有 <strong className="text-cyan-300">3% 推廣級差資格</strong>！</span>
+                <strong className="text-emerald-400">📈 自消費併入「級差分潤資格認定累積業績」＆ 客製化服務結案認列規則</strong>：所有微享 NFT 的數位產品、斗內贊助、眾籌、電子書加盟（$990/$330）、AI頂配教材與客製化服務等<strong className="text-white">「自消費」業績，皆可併入計算您的「級差分潤累積業績」來認定晉升等級（3% / 6% / 10%）</strong>；但自消費僅作為「升級資格認定」，不會對自己的消費發放 25% 推廣佣金（只有真正推廣他人成交才依認定等級計算佣金）。<br/>
+                <span className="text-gray-400 text-xs">👉 實例：若您斗內 $3 ＋ 成為電子書加盟商 $990 ＝ 自消費累積 $993（落在 &gt;$600~$6,000 區間），即直接認定享有 <strong className="text-cyan-300">3% 推廣級差資格</strong>！另「客製化服務」於諮詢需求、簽定協議與議價、成品完成並收到尾款後，由管理員後台指定客戶正式計入推廣業績。</span>
               </li>
             </ul>
           </div>

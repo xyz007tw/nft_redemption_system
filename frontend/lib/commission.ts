@@ -1,11 +1,15 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
-// 定義不同等級的極差趴數 (可依據您的業務制度自由修改)
-const TIERS = [
-  { threshold: 0, rate: 0.03 },      // 3% (初階業務)
-  { threshold: 600, rate: 0.06 },    // 6% (中階主任)
-  { threshold: 6000, rate: 0.10 }    // 10% (高階總監)
-];
+// 定義不同等級的級差趴數：
+// > $600 ~ $6,000 ➔ 3% 推廣級差
+// > $6,000 ~ $15,000 ➔ 6% 推廣級差
+// > $15,000 ➔ 10% 推廣級差
+function getUplineDifferentialRate(totalSales: number): number {
+  if (totalSales > 15000) return 0.10;
+  if (totalSales > 6000) return 0.06;
+  if (totalSales >= 600) return 0.03;
+  return 0;
+}
 
 const OFFICIAL_TOP_LEADER_WALLET =
   process.env.OFFICIAL_TOP_LEADER_WALLET || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
@@ -92,8 +96,8 @@ export async function calculateAndDistributeCommissions(
     
     if (!upline) break;
 
-    // 計算該上線目前的級別與應得趴數
-    const uplineRate = TIERS.slice().reverse().find(t => upline.total_personal_sales >= t.threshold)?.rate || 0.03;
+    // 計算該上線目前的級別與應得趴數 (> $600~$6,000 ➔ 3%, > $6,000~$15,000 ➔ 6%, > $15,000 ➔ 10%)
+    const uplineRate = getUplineDifferentialRate(Number(upline.total_personal_sales || 0));
 
     // 只有當上線的趴數「大於」下線的趴數，才能賺取中間的極差利潤
     if (uplineRate > previousRate) {

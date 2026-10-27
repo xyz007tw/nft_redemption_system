@@ -6,21 +6,34 @@ const supabase = createClient(
 );
 
 const TIERS = [
-  { threshold: 15000, rate: 0.10 }, // 10%
-  { threshold: 6000, rate: 0.06 },  // 6%
-  { threshold: 600, rate: 0.03 },   // 3%
-  { threshold: 0, rate: 0.0 }       // 0%
+  { threshold: 15000, rate: 0.10 }, // > $15,000 ➔ 10% 推廣級差
+  { threshold: 6000, rate: 0.06 },  // > $6,000 ~ $15,000 ➔ 6% 推廣級差
+  { threshold: 600, rate: 0.03 },   // > $600 ~ $6,000 ➔ 3% 推廣級差
+  { threshold: 0, rate: 0.0 }       // <= $600 ➔ 0%
 ];
 
 // 官方預設頂階領袖節點（當自然流量訪客無推薦碼、或資料庫暫無達標 10% 領袖時，自動作為最高 10% 級差與 10% 對等綁定節點）
 const OFFICIAL_TOP_LEADER_WALLET =
   process.env.OFFICIAL_TOP_LEADER_WALLET || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
 
-function getCommissionRate(totalSales: number) {
-  for (const tier of TIERS) {
-    if (totalSales >= tier.threshold) return tier.rate;
-  }
+/**
+ * 依據個人累積業績認定級差分潤等級：
+ * - > $600 ~ $6,000 ➔ 3% 推廣級差
+ * - > $6,000 ~ $15,000 ➔ 6% 推廣級差
+ * - > $15,000 ➔ 10% 推廣級差
+ */
+export function getCommissionRate(totalSales: number) {
+  if (totalSales > 15000) return 0.10;
+  if (totalSales > 6000) return 0.06;
+  if (totalSales >= 600) return 0.03;
   return 0;
+}
+
+export function getCommissionTierLabel(totalSales: number): '10%' | '6%' | '3%' | '0%' {
+  if (totalSales > 15000) return '10%';
+  if (totalSales > 6000) return '6%';
+  if (totalSales >= 600) return '3%';
+  return '0%';
 }
 
 /**
@@ -32,7 +45,7 @@ async function resolveTopTierLeaderForOrganicVisitor(excludeWallet: string): Pro
     const { data: topLeaders } = await supabase
       .from('users')
       .select('wallet_address, total_sales, referrer_address')
-      .gte('total_sales', 15000)
+      .gt('total_sales', 15000)
       .neq('wallet_address', excludeWallet)
       .order('total_sales', { ascending: false })
       .limit(1);
@@ -56,14 +69,14 @@ async function resolveTopTierLeaderForOrganicVisitor(excludeWallet: string): Pro
     console.warn('[Affiliate] resolveTopTierLeaderForOrganicVisitor fallback:', e);
   }
 
-  // 確保官方預設頂階領袖節點存在且具備 >= 15000 頂階資格
+  // 確保官方預設頂階領袖節點存在且具備 > $15,000 頂階 10% 資格
   try {
     await supabase.from('users').upsert(
       {
         wallet_address: OFFICIAL_TOP_LEADER_WALLET,
         status: 'ACTIVE',
         has_purchased: true,
-        total_sales: 15000,
+        total_sales: 15001,
         referrer_address: OFFICIAL_TOP_LEADER_WALLET
       },
       { onConflict: 'wallet_address' }
@@ -226,11 +239,11 @@ export async function processAffiliateCommissions(
     }
   }
 
-  // 3. 永久 5% 全球領袖均分 (GLOBAL_POOL) - 均分給所有達成 10% 級差條件 (業績 >= 15000) 的領袖
+  // 3. 永久 5% 全球領袖均分 (GLOBAL_POOL) - 均分給所有達成 10% 級差條件 (業績 > $15,000) 的領袖
   let { data: globalLeaders } = await supabase
     .from('users')
     .select('wallet_address')
-    .gte('total_sales', 15000);
+    .gt('total_sales', 15000);
 
   if (!globalLeaders || globalLeaders.length === 0) {
     const fallbackLeader = await resolveTopTierLeaderForOrganicVisitor(walletAddress);
