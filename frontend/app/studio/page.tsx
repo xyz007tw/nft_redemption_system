@@ -377,6 +377,57 @@ export default function FranchiseStudioPage() {
           </div>
         </div>
 
+        {/* 🧭 加盟商後台「4 步傻瓜式製作說明」＆「24H 全雲端 AI 協作分工表」 */}
+        <div className="bg-gradient-to-r from-slate-900/90 via-indigo-950/60 to-slate-900/90 border border-indigo-500/30 rounded-3xl p-6 mb-8 shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <span className="text-xs font-black text-cyan-400 uppercase tracking-wider">
+                ☁️ 100% CLOUD-NATIVE AUTOMATION (24H 雲端獨立運行・免安裝軟體)
+              </span>
+              <h2 className="text-lg sm:text-xl font-black text-white mt-0.5">
+                🧭 加盟商線上電子書製作 4 步 SOP 指引 ＆ 雲端 AI 協作說明
+              </h2>
+            </div>
+            <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold w-fit">
+              ⚡ 全程於雲端伺服器自動執行
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+              <div className="font-black text-pink-400 text-sm mb-1">步驟 ① 設定書名與導流 QR</div>
+              <p className="text-gray-300 leading-relaxed mb-2">
+                於下方 STEP 1 填入您的書名、署名、售價與您的專屬導流網址（系統會自動轉為高解析 QR Code 印在書末）。
+              </p>
+              <div className="text-[11px] text-cyan-300 font-bold">🤝 協作方：雲端模版排版引擎</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+              <div className="font-black text-purple-400 text-sm mb-1">步驟 ② AI 一鍵自動編撰雙語書</div>
+              <p className="text-gray-300 leading-relaxed mb-2">
+                於 STEP 2 輸入一句主題，點擊「🔥 一鍵由 AI 自動編撰整本雙語電子書」，10 秒內自動寫完中英雙語章節！
+              </p>
+              <div className="text-[11px] text-cyan-300 font-bold">🤝 協作方：Google Cloud Gemini 2.5 AI 總編</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+              <div className="font-black text-cyan-400 text-sm mb-1">步驟 ③ 自行下載精裝 PDF 母檔</div>
+              <p className="text-gray-300 leading-relaxed mb-2">
+                於右側 STEP 3 點擊「🖨️ 一鍵導出印刷級精裝 PDF」或下載網頁母檔，立即保存在您自己的電腦或手機中。
+              </p>
+              <div className="text-[11px] text-cyan-300 font-bold">🤝 協作方：雲端向量 PDF 渲染核心</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+              <div className="font-black text-amber-400 text-sm mb-1">步驟 ④ 提交總後台書審 (3~7天)</div>
+              <p className="text-gray-300 leading-relaxed mb-2">
+                點擊「⚖️ 提交至管理後台書審」，通過 3~7 天書審後即公開上架 `/ebook-store`，並啟動 AI 自動來客幫您打廣告！
+              </p>
+              <div className="text-[11px] text-cyan-300 font-bold">🤝 協作方：微享總管理後台 ＋ AI 自來客矩陣</div>
+            </div>
+          </div>
+        </div>
+
         {/* 展開式：全球 10 大禁書與違規不退費提醒 */}
         {showBannedRules && (
           <div className="bg-red-950/40 border-2 border-red-500/50 rounded-2xl p-6 mb-8">
