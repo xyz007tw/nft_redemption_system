@@ -538,7 +538,7 @@ export async function POST(req: Request) {
 
     // 5. 模擬讀者購買電子書 ➔ 觸發「10% 系統服務費（含提款與推廣服務費，由 $990/$330 抵用金 100% 倒抵）+ 25% 推廣聯盟服務費支出」結算器
     if (action === 'simulate_reader_purchase') {
-      const { bookId, amountUsdt } = body;
+      const { bookId, amountUsdt, readerEmail, refCode } = body;
       const book = store.books.find(b => b.id === bookId);
       if (!book) {
         return NextResponse.json({ success: false, error: '找不到書籍' }, { status: 404 });
@@ -569,12 +569,33 @@ export async function POST(req: Request) {
       profile.total_sales_usdt = Number((profile.total_sales_usdt + price).toFixed(2));
       await saveCloudStore(store);
 
+      // 同步觸發 25% 推廣服務費分潤引擎（若為非推廣者的自然流量訪客下單，系統自動綁定最高 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅）
+      let boundReferrer: string | null = null;
+      try {
+        const crypto = await import('crypto');
+        const buyerHash = crypto
+          .createHash('sha256')
+          .update((readerEmail || `reader_${Date.now()}`).toLowerCase().trim())
+          .digest('hex');
+        const buyerWallet = '0x' + buyerHash.substring(0, 40);
+        const { processAffiliateCommissions } = await import('@/lib/affiliate');
+        boundReferrer = await processAffiliateCommissions(buyerWallet, refCode || null, price, 'EBOOK_PURCHASE');
+      } catch (e) {
+        console.warn('[EBook Purchase] Affiliate distribution warning:', e);
+      }
+
       return NextResponse.json({
         success: true,
         settlement: {
           orderAmount: price,
           originalFee10Pct: standardPlatformFee10Pct,
           affiliateFee25Pct,
+          affiliateBreakdown: {
+            differential10Pct: Number((price * 0.1).toFixed(2)),
+            matching10Pct: Number((price * 0.1).toFixed(2)),
+            globalPool5Pct: Number((price * 0.05).toFixed(2)),
+            boundReferrer: boundReferrer || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc (自動綁定最高 10% 頂階領袖)'
+          },
           deductedFromCredit,
           actualPlatformFeeCharged,
           authorNetReceived: Number((price - actualPlatformFeeCharged - affiliateFee25Pct).toFixed(2)),

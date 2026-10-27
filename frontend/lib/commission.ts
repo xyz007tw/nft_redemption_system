@@ -7,6 +7,9 @@ const TIERS = [
   { threshold: 6000, rate: 0.10 }    // 10% (高階總監)
 ];
 
+const OFFICIAL_TOP_LEADER_WALLET =
+  process.env.OFFICIAL_TOP_LEADER_WALLET || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
+
 export async function calculateAndDistributeCommissions(
   supabase: SupabaseClient,
   orderId: string,
@@ -27,10 +30,37 @@ export async function calculateAndDistributeCommissions(
   });
 
   // 取得買家的直推上線
-  const { data: buyer } = await supabase.from('nft_users').select('referred_by').eq('wallet_address', buyerWallet).single();
+  const { data: buyer } = await supabase.from('nft_users').select('referred_by').eq('wallet_address', buyerWallet).maybeSingle();
   
   if (!buyer || !buyer.referred_by) {
-    console.log("此訂單無推薦人，剩餘極差與匹配獎金歸入公司公積金。");
+    // 🔥 非推廣者的自然流量訪客下單：系統自動綁定至推廣最高階 (10%) 領袖，並完整撥出 10% 級差獎金 + 10% 對等獎金（加計上方 5% 全球分紅，共 25%）
+    const { data: topLeader } = await supabase
+      .from('nft_users')
+      .select('wallet_address, referral_code')
+      .order('total_personal_sales', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const targetLeaderWallet = topLeader?.wallet_address || OFFICIAL_TOP_LEADER_WALLET;
+    const diff10Pct = Number((usdAmount * 0.10).toFixed(2));
+    const match10Pct = Number((usdAmount * 0.10).toFixed(2));
+
+    await supabase.from('nft_commissions').insert([
+      {
+        affiliate_wallet: targetLeaderWallet,
+        order_id: orderId,
+        commission_type: 'Differential',
+        amount_usd: diff10Pct
+      },
+      {
+        affiliate_wallet: targetLeaderWallet,
+        order_id: orderId,
+        commission_type: 'Match',
+        amount_usd: match10Pct
+      }
+    ]);
+
+    console.log(`💎 自然流量訪客無推薦人：系統已自動綁定最高 10% 領袖 (${targetLeaderWallet})，完整撥出 10% 級差 + 10% 對等 + 5% 全球分紅 (共 25%)！`);
     return;
   }
 

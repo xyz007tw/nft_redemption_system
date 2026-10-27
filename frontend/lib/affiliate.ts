@@ -12,6 +12,10 @@ const TIERS = [
   { threshold: 0, rate: 0.0 }       // 0%
 ];
 
+// 官方預設頂階領袖節點（當自然流量訪客無推薦碼、或資料庫暫無達標 10% 領袖時，自動作為最高 10% 級差與 10% 對等綁定節點）
+const OFFICIAL_TOP_LEADER_WALLET =
+  process.env.OFFICIAL_TOP_LEADER_WALLET || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
+
 function getCommissionRate(totalSales: number) {
   for (const tier of TIERS) {
     if (totalSales >= tier.threshold) return tier.rate;
@@ -19,31 +23,106 @@ function getCommissionRate(totalSales: number) {
   return 0;
 }
 
-export async function processAffiliateCommissions(walletAddress: string, refCode: string | null, packagePriceUSDT: number, productType?: string) {
-  let matchedReferrer = null;
-  if (refCode) {
+/**
+ * 尋找系統中最高階 (10%，業績 >= 15,000) 的推廣領袖作為「非推廣者（自然流量）訪客」的自動綁定上線
+ * 確保每一筆訂單 100% 觸發並完整撥出 25% 推廣服務費（10% 級差獎金 + 10% 對等獎金 + 5% 永久均分全球分紅）
+ */
+async function resolveTopTierLeaderForOrganicVisitor(excludeWallet: string): Promise<string> {
+  try {
+    const { data: topLeaders } = await supabase
+      .from('users')
+      .select('wallet_address, total_sales, referrer_address')
+      .gte('total_sales', 15000)
+      .neq('wallet_address', excludeWallet)
+      .order('total_sales', { ascending: false })
+      .limit(1);
+
+    if (topLeaders && topLeaders.length > 0 && topLeaders[0].wallet_address) {
+      return topLeaders[0].wallet_address;
+    }
+
+    // 若目前資料庫尚無 >= 15000 的用戶，取全系統業績最高者或官方預設頂階領袖節點，並確保官方頂階節點存在於資料庫
+    const { data: highestUser } = await supabase
+      .from('users')
+      .select('wallet_address, total_sales')
+      .neq('wallet_address', excludeWallet)
+      .order('total_sales', { ascending: false })
+      .limit(1);
+
+    if (highestUser && highestUser.length > 0 && highestUser[0].wallet_address) {
+      return highestUser[0].wallet_address;
+    }
+  } catch (e) {
+    console.warn('[Affiliate] resolveTopTierLeaderForOrganicVisitor fallback:', e);
+  }
+
+  // 確保官方預設頂階領袖節點存在且具備 >= 15000 頂階資格
+  try {
+    await supabase.from('users').upsert(
+      {
+        wallet_address: OFFICIAL_TOP_LEADER_WALLET,
+        status: 'ACTIVE',
+        has_purchased: true,
+        total_sales: 15000,
+        referrer_address: OFFICIAL_TOP_LEADER_WALLET
+      },
+      { onConflict: 'wallet_address' }
+    );
+  } catch {
+    // ignore
+  }
+
+  return OFFICIAL_TOP_LEADER_WALLET;
+}
+
+export async function processAffiliateCommissions(
+  walletAddress: string,
+  refCode: string | null,
+  packagePriceUSDT: number,
+  productType?: string
+) {
+  let matchedReferrer: string | null = null;
+  if (refCode && refCode.trim() !== '') {
+    const cleanRef = refCode.trim().replace(/^0x/i, '');
     const { data: potentialReferrer } = await supabase
       .from('users')
       .select('wallet_address')
-      .ilike('wallet_address', `0x${refCode}%`)
-      .single();
-      
-    if (potentialReferrer) {
+      .ilike('wallet_address', `0x${cleanRef}%`)
+      .neq('wallet_address', walletAddress)
+      .limit(1)
+      .maybeSingle();
+
+    if (potentialReferrer?.wallet_address) {
       matchedReferrer = potentialReferrer.wallet_address;
     }
   }
 
-  const { data: existingUser } = await supabase.from('users').select('referrer_address').eq('wallet_address', walletAddress).single();
-  const finalReferrer = existingUser?.referrer_address || matchedReferrer;
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('referrer_address')
+    .eq('wallet_address', walletAddress)
+    .maybeSingle();
+
+  let finalReferrer = existingUser?.referrer_address || matchedReferrer;
+
+  // 🔥 核心鐵律：若為「非推廣者的訪客（無 refCode 且尚未綁定上線）」下訂單，
+  // 系統自動去綁定推廣最高的 10% 級差獎金領袖，確保 10% 級差、10% 對等獎金及永久 5% 全球分紅全額啟動！
+  const isAutoBoundOrganic = !finalReferrer;
+  if (!finalReferrer) {
+    finalReferrer = await resolveTopTierLeaderForOrganicVisitor(walletAddress);
+  }
 
   const { data: user, error: userError } = await supabase
     .from('users')
-    .upsert({ 
-      wallet_address: walletAddress, 
-      status: 'ACTIVE',
-      has_purchased: true,
-      ...(existingUser ? {} : { referrer_address: finalReferrer })
-    }, { onConflict: 'wallet_address' })
+    .upsert(
+      {
+        wallet_address: walletAddress,
+        status: 'ACTIVE',
+        has_purchased: true,
+        referrer_address: finalReferrer
+      },
+      { onConflict: 'wallet_address' }
+    )
     .select()
     .single();
 
@@ -54,30 +133,35 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
     return user.referrer_address;
   }
 
-  const referrerAddress = user.referrer_address;
+  const referrerAddress = user.referrer_address || finalReferrer;
   if (!referrerAddress) return null;
 
-  let currentReferrer = referrerAddress;
-  let distributedRate = 0; 
+  let currentReferrer: string | null = referrerAddress;
+  let distributedRate = 0;
+  const visitedWallets = new Set<string>();
 
   // 2. 無限代級差獎金 (最頂 10%) & 對等獎金 (100% 匹配被推薦人的級差獎金)
-  while (currentReferrer && distributedRate < TIERS[0].rate) {
+  while (currentReferrer && distributedRate < TIERS[0].rate && !visitedWallets.has(currentReferrer)) {
+    visitedWallets.add(currentReferrer);
+
     const { data: refUser } = await supabase
       .from('users')
       .select('referrer_address, total_sales')
       .eq('wallet_address', currentReferrer)
-      .single();
+      .maybeSingle();
 
     if (!refUser) break;
 
-    const myRate = getCommissionRate(refUser.total_sales);
-    const diffRate = myRate - distributedRate;
+    // 若為系統自動綁定之非推廣者訪客訂單，或該上線已是最高階領袖，確保最高 10% 級差完整釋放
+    const rawRate = getCommissionRate(Number(refUser.total_sales || 0));
+    const myRate = isAutoBoundOrganic && distributedRate === 0 ? TIERS[0].rate : rawRate;
+    const diffRate = Number((myRate - distributedRate).toFixed(4));
 
     if (diffRate > 0) {
-      const commissionAmount = packagePriceUSDT * diffRate;
+      const commissionAmount = Number((packagePriceUSDT * diffRate).toFixed(2));
       const commissionType = distributedRate === 0 ? 'DIRECT' : 'DIFFERENTIAL';
 
-      // 發放級差 / 直推獎金
+      // (A) 發放級差 / 直推獎金 (最高 10%)
       await supabase.from('commissions').insert({
         wallet_address: currentReferrer,
         from_buyer: walletAddress,
@@ -85,20 +169,23 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
         commission_type: commissionType
       });
 
-      // 發放對等獎金 (被推薦人領多少，推薦人就領多少)
-      if (refUser.referrer_address) {
-        await supabase.from('commissions').insert({
-          wallet_address: refUser.referrer_address,
-          from_buyer: walletAddress,
-          amount: commissionAmount,
-          commission_type: 'MATCHING'
-        });
-      }
+      // (B) 發放 100% 對等獎金 (MATCHING，最高 10%：被推薦人領多少級差，其推薦人或頂階領袖就領多少)
+      const matchingRecipient =
+        refUser.referrer_address && refUser.referrer_address !== ''
+          ? refUser.referrer_address
+          : currentReferrer;
+
+      await supabase.from('commissions').insert({
+        wallet_address: matchingRecipient,
+        from_buyer: walletAddress,
+        amount: commissionAmount,
+        commission_type: 'MATCHING'
+      });
 
       if (commissionType === 'DIRECT') {
         await supabase
           .from('users')
-          .update({ total_sales: refUser.total_sales + packagePriceUSDT })
+          .update({ total_sales: Number(refUser.total_sales || 0) + packagePriceUSDT })
           .eq('wallet_address', currentReferrer);
       }
 
@@ -108,16 +195,44 @@ export async function processAffiliateCommissions(walletAddress: string, refCode
     currentReferrer = refUser.referrer_address;
   }
 
-  // 3. 全球領袖獎 (5%) - 均分給所有達成 10% 級差條件 (業績 >= 15000) 的領袖
-  const { data: globalLeaders } = await supabase
+  // 若向上追溯完畢後，級差獎金尚未發滿 10%（例如組織鏈路頂端尚未達 10%），剩餘差額自動歸屬最高 10% 頂階領袖並同步發放對應 100% 對等獎金
+  if (distributedRate < TIERS[0].rate) {
+    const remainingRate = Number((TIERS[0].rate - distributedRate).toFixed(4));
+    const topLeaderWallet = await resolveTopTierLeaderForOrganicVisitor(walletAddress);
+    const remainingCommission = Number((packagePriceUSDT * remainingRate).toFixed(2));
+
+    if (remainingCommission > 0) {
+      await supabase.from('commissions').insert({
+        wallet_address: topLeaderWallet,
+        from_buyer: walletAddress,
+        amount: remainingCommission,
+        commission_type: distributedRate === 0 ? 'DIRECT' : 'DIFFERENTIAL'
+      });
+
+      await supabase.from('commissions').insert({
+        wallet_address: topLeaderWallet,
+        from_buyer: walletAddress,
+        amount: remainingCommission,
+        commission_type: 'MATCHING'
+      });
+    }
+  }
+
+  // 3. 永久 5% 全球領袖均分 (GLOBAL_POOL) - 均分給所有達成 10% 級差條件 (業績 >= 15000) 的領袖
+  let { data: globalLeaders } = await supabase
     .from('users')
     .select('wallet_address')
     .gte('total_sales', 15000);
 
+  if (!globalLeaders || globalLeaders.length === 0) {
+    const fallbackLeader = await resolveTopTierLeaderForOrganicVisitor(walletAddress);
+    globalLeaders = [{ wallet_address: fallbackLeader }];
+  }
+
   if (globalLeaders && globalLeaders.length > 0) {
-    const globalPoolAmount = packagePriceUSDT * 0.05; // 5%
-    const splitAmount = globalPoolAmount / globalLeaders.length;
-    
+    const globalPoolAmount = Number((packagePriceUSDT * 0.05).toFixed(2)); // 永久 5% 全球分紅
+    const splitAmount = Number((globalPoolAmount / globalLeaders.length).toFixed(2));
+
     for (const leader of globalLeaders) {
       await supabase.from('commissions').insert({
         wallet_address: leader.wallet_address,

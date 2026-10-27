@@ -29,13 +29,16 @@ export default function ReaderEBookStorePage() {
   // 模擬讀者購買或訂閱解鎖 (並自動驗算加盟商 $990 / $330 抵用金 100% 倒抵 10% 平台服務費)
   const handleSimulateUnlock = async (book: EBookProject, isMonthlySub: boolean) => {
     const price = isMonthlySub ? book.price_monthly_sub_usdt : book.price_single_usdt;
+    const savedRef = typeof window !== 'undefined' ? localStorage.getItem('weixiang_referrer') : null;
     const res = await fetch('/api/ebook', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'simulate_reader_purchase',
         bookId: book.id,
-        amountUsdt: price
+        amountUsdt: price,
+        readerEmail,
+        refCode: savedRef
       })
     });
     const data = await res.json();
@@ -44,8 +47,9 @@ export default function ReaderEBookStorePage() {
         setUnlockedBookIds([...unlockedBookIds, book.id]);
       }
       const s = data.settlement;
+      const bd = s.affiliateBreakdown;
       setSettlementNotice(
-        `🎉 讀者結帳成功（$${s.orderAmount} USDT）！系統自動執行雙軌結算：【1】1成 (10%) 系統服務費（含提款與推廣服務費）$${s.originalFee10Pct} 已由加盟商抵用金扣抵 $${s.deductedFromCredit}（實收系統費 $${s.actualPlatformFeeCharged}）；【2】另支出「推廣聯盟服務費 25%」$${s.affiliateFee25Pct} 撥發推廣體系 ➔ 加盟商本筆實拿淨額 $${s.authorNetReceived} USDT（剩餘抵用金 $${s.remainingCreditBalance} USDT）！`
+        `🎉 讀者結帳成功（$${s.orderAmount} USDT）！系統自動執行雙軌結算：【1】1成 (10%) 系統服務費（含提款與推廣服務費）$${s.originalFee10Pct} 已由加盟商抵用金扣抵 $${s.deductedFromCredit}（實收系統費 $${s.actualPlatformFeeCharged}）；【2】另支出「推廣服務費 25%」$${s.affiliateFee25Pct}（若為非推廣者訪客下單，系統自動綁定最高 10% 級差獎金 $${bd?.differential10Pct ?? (s.orderAmount * 0.1).toFixed(2)} ＋ 10% 對等獎金 $${bd?.matching10Pct ?? (s.orderAmount * 0.1).toFixed(2)} ＋ 永久 5% 均分全球分紅 $${bd?.globalPool5Pct ?? (s.orderAmount * 0.05).toFixed(2)}）➔ 加盟商本筆實拿淨額 $${s.authorNetReceived} USDT（剩餘抵用金 $${s.remainingCreditBalance} USDT）！`
       );
     }
   };

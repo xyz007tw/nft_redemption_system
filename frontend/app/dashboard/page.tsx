@@ -341,6 +341,27 @@ export default function Dashboard() {
           <p className="text-pink-400 mt-6 text-sm font-medium">
             ※ 推薦服務的三項回饋制度 - 含每個推薦團隊僅計算業績1萬美元/年
           </p>
+
+          {/* 25% 聯盟推廣服務費三大機制與「非推廣者訪客下單自動綁定」說明 */}
+          <div className="mt-6 p-5 rounded-xl bg-gray-900/80 border border-purple-500/30 space-y-2.5 text-xs md:text-sm text-gray-300 leading-relaxed">
+            <div className="font-black text-purple-300 text-sm md:text-base flex items-center gap-2">
+              <span>💎</span> 推廣服務費 25% 三大獎金分配與「非推廣者訪客」自動綁定機制
+            </div>
+            <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <li>
+                <strong className="text-cyan-300">1. 無限代級差獎金（最高 10%）</strong>：依個人累積業績劃分 0% / 3% (&ge;$600) / 6% (&ge;$6,000) / 10% (&ge;$15,000)，由下而上發放直推與差額獎金。
+              </li>
+              <li>
+                <strong className="text-emerald-300">2. 對等獎金 100% 匹配（最高 10%）</strong>：被推薦人（下線）領取多少級差獎金，其直接推薦人（上線）即 100% 領取同等金額之對等獎金。
+              </li>
+              <li>
+                <strong className="text-amber-300">3. 全球領袖永久均分（5%）</strong>：凡業績達最高階 10% (&ge;$15,000 USDT) 之全球領袖，每筆新訂單皆提撥 5% 永久均分全球分紅（純斗內贊助方案不計入分潤）。
+              </li>
+              <li>
+                <strong className="text-pink-300">🔥 非推廣者的訪客（自然流量）下訂單分潤方式</strong>：當非透過推廣連結的自然流量訪客下訂單時，系統仍固定提撥 <strong className="text-white">25% 推廣服務費</strong>，並<strong className="text-yellow-300">由系統自動去綁定推廣最高的 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅</strong>！
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* 獎金提領帳號設定 (給純 Email 用戶綁定錢包收款) */}
