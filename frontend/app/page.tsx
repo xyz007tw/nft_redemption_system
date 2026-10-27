@@ -8,6 +8,7 @@ import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
 import TutorCourseSection from '@/components/TutorCourseSection';
 import VideoShoppableSection from '@/components/VideoShoppableSection';
+import FranchiseEBookSection from '@/components/FranchiseEBookSection';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -298,106 +299,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 全球作者群 × 電子書自動交付 SaaS 合作計畫 */}
-      <section id="author-coop" className="w-full max-w-7xl px-6 py-16">
-        <div className="bg-gradient-to-br from-purple-900/50 via-indigo-950/60 to-pink-950/40 border border-pink-500/30 rounded-3xl p-8 md:p-14 text-center relative overflow-hidden shadow-[0_0_50px_rgba(236,72,153,0.15)]">
-          {/* 背景裝飾光暈 */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
-
-          {/* 徽章 Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/20 border border-pink-500/40 text-pink-300 text-sm font-semibold mb-6">
-            {t.coopBadge}
-          </div>
-
-          <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-white drop-shadow-lg leading-tight">
-            {t.coopTitle}
-          </h2>
-          
-          <p className="text-lg md:text-2xl text-pink-200 mb-10 max-w-4xl mx-auto leading-relaxed font-medium">
-            {t.coopDesc}
-          </p>
-
-          {/* 三大亮點特色卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
-            {/* 卡片 1: 24H 全自動發貨 SaaS */}
-            <div className="bg-white/5 border border-white/10 hover:border-pink-500/50 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(236,72,153,0.25)] flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-2xl mb-4 shadow-lg">
-                  ⚡
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {t.coopCard1Title}
-                </h3>
-                <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                  {t.coopCard1Desc}
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-xs font-semibold text-pink-400">
-                {t.coopCard1Tag}
-              </div>
-            </div>
-
-            {/* 卡片 2: 一次性 $990 合作 NFT */}
-            <div className="bg-white/5 border border-white/10 hover:border-purple-500/50 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)] flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl mb-4 shadow-lg">
-                  🛡️
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {t.coopCard2Title}
-                </h3>
-                <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                  {t.coopCard2Desc}
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-xs font-semibold text-purple-400">
-                {t.coopCard2Tag}
-              </div>
-            </div>
-
-            {/* 卡片 3: 首創 100% 倒抵零風險機制 */}
-            <div className="bg-white/5 border border-white/10 hover:border-emerald-500/50 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(16,185,129,0.25)] flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl mb-4 shadow-lg">
-                  💎
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {t.coopCard3Title}
-                </h3>
-                <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                  {t.coopCard3Desc}
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 text-xs font-semibold text-emerald-400">
-                {t.coopCard3Tag}
-              </div>
-            </div>
-          </div>
-
-          {/* CTA 行動按鈕 */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button 
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('open-ai-chat', { 
-                    detail: { query: isChinese ? '我想諮詢全球作者電子書 $990 合作方案' : 'I would like to inquire about the Global Author E-Book $990 partnership plan' } 
-                  }));
-                }
-              }}
-              className="px-8 py-4 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl text-lg font-bold transition-all shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:scale-105 cursor-pointer flex items-center gap-2"
-            >
-              {t.coopBtn}
-            </button>
-            <a 
-              href="mailto:xyz007tw@gmail.com?subject=全球作者電子書SaaS合作諮詢"
-              className="px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-base font-medium transition-all backdrop-blur-sm hover:scale-105 flex items-center gap-2"
-            >
-              {t.coopBtnMail}
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* 全球作者群 / 加盟商 × 電子書自動交付與 AI 自來客引流 SaaS 合作計畫 (外掛獨立模組) */}
+      <FranchiseEBookSection />
 
       {/* 眾籌認購區塊 */}
 

@@ -108,6 +108,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               📦 NFT 智能合約
             </Link>
           )}
+          <Link href="/admin/franchise" className="block px-4 py-3 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-300 hover:bg-pink-500/20 transition-colors font-bold">
+            📚 電子書書審與加盟商
+          </Link>
         </nav>
         <div className="p-4 border-t border-gray-700 text-xs text-gray-500 text-center">
           Wallet: {address?.substring(0, 6)}...{address?.substring(38)}
