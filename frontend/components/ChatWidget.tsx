@@ -326,10 +326,17 @@ export default function ChatWidget() {
       {isOpen && (
         <div className="fixed bottom-16 right-3 left-3 sm:left-auto sm:bottom-24 sm:right-6 sm:w-96 h-[460px] sm:h-[500px] bg-[#0F172A] border border-white/10 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden backdrop-blur-xl">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex items-center justify-between">
-            <h3 className="text-white font-bold flex items-center gap-2">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3.5 flex items-center justify-between">
+            <h3 className="text-white font-bold flex items-center gap-2 text-sm">
               <span className="animate-pulse">🤖</span> WeiXiang AI Agent
             </h3>
+            <a
+              href="https://nft1314.party/#video-shoppable-service"
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service')}
+              className="text-[11px] font-black bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-full border border-white/30 transition-all whitespace-nowrap"
+            >
+              {lang.includes('zh') ? '🌍 全球化作品展示區 →' : '🌍 Global Showcase →'}
+            </a>
           </div>
 
           {/* Messages Area */}

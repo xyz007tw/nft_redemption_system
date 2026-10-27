@@ -12,6 +12,17 @@ const CP_VALUE_MODEL_CHAIN = [
   'gemini-2.0-flash'
 ];
 
+// 🌐 跨網域 CORS Header 標準：支援微享全球四大 WordPress 網站 (5208.uk, 5201788.cc, 1801314.cc, 131466.uk) 統一連線諮詢
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: CORS_HEADERS });
+}
+
 // 系統核心知識庫 (MVP)
 const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 的專屬 AI 智能客服，請遵循以下知識庫來回答客戶問題：
 
@@ -107,6 +118,16 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 - 支援信用卡/ATM 與 USDT 雙軌付費，付款後系統秒級解鎖教材下載，並自動寄送課程連結至購課信箱。
 - 內建「一鍵轉發電郵 (Forward Email)」功能：已購課學員可在專區內輸入親友或備用 Email，將課程教材與下載連結一鍵轉寄分享。
 - 分潤機制：家教課程全額納入 25% 聯盟推廣分潤體系（10% 級差 + 10% 對等 + 5% 全球領袖分紅），僅純斗內贊助 (SPONSOR) 不計入分潤。
+
+🌍 全球化作品展示區與官方總部統一導流規則 (Globalized Works Showcase at https://nft1314.party/)：
+- 本 AI 客服系統已全面統一串聯官方總部 https://nft1314.party/ 與微享旗下全球四大知識矩陣網站（https://5208.uk 、https://5201788.cc 、https://1801314.cc 、https://131466.uk）。
+- 無論訪客是從哪一個 WordPress 網站或官網進入諮詢，請主動、熱情地邀請並引導訪客點擊連結前往 **https://nft1314.party/** 參觀我們的 **「實際全球化作品展示區」**！
+- 在 https://nft1314.party/ 的實際全球化作品展示區中，訪客可以親自體驗與觀看：
+  1. 🎬 **多國語系 AI 知識圖表短影音 & 4K 男女雙主播口播實績**（涵蓋中、英、日、韓、越、西、法、德等多國語言全自動生成與全球社群矩陣發佈展示）
+  2. 🛒 **AI 互動式影片導購系統實機展示**（https://nft1314.party/#video-shoppable-service ，邊看影片邊跳出商品購買卡片）
+  3. 📚 **3 版語系（中英雙語 / 純中 / 純英）AI 自動電子書雲端書櫃與創作引擎展示**（https://nft1314.party/ebook-store）
+  4. 🎓 **AI 頂配家教實戰教材與萬人算力眾籌系統**（https://nft1314.party/#tutor-courses）
+- 每次回答訪客關於系統效果、作品案例、如何運作、短影音/多語系行銷或合作方案時，請務必附上明確引導語與網址：「👉 歡迎立即前往我們的官方總站 https://nft1314.party/ 參觀【實際全球化作品展示區】！」
 
 🚨 未知問題審核與自動電郵轉寄規則 (Knowledge Gap Audit & Email Escalation Rule)：
 - #若有訪客所提出的問題是知識庫沒有的，請電郵 xyz007tw@gmail.com
@@ -219,7 +240,7 @@ export async function POST(req: Request) {
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { reply: '⚠️ 系統管理員未設置 Gemini API 金鑰，請稍後再試。' },
-        { status: 200 }
+        { status: 200, headers: CORS_HEADERS }
       );
     }
 
@@ -248,9 +269,9 @@ export async function POST(req: Request) {
       reply: cleanReply,
       activeModel: patrolResult.usedModel,
       failoverTriggered: !!patrolResult.switchedFrom
-    });
+    }, { headers: CORS_HEADERS });
   } catch (error: any) {
     console.error('Chat API Error:', error);
-    return NextResponse.json({ reply: '⚠️ 抱歉，AI 大腦短路了，請稍後再試一次。' }, { status: 500 });
+    return NextResponse.json({ reply: '⚠️ 抱歉，AI 大腦短路了，請稍後再試一次。' }, { status: 500, headers: CORS_HEADERS });
   }
 }
