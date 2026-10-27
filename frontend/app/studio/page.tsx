@@ -326,14 +326,14 @@ export default function FranchiseStudioPage() {
       setR2Uploading(false);
     }
   };
-  // 模擬加購第 4 本起配額 ($330/本)、次年續約 ($330 同享 100% 倒抵) 或 單書加購 30 次修改權限 ($30)
-  const handleUpgradeAction = async (upgradeType: 'ADD_1_BOOK_330' | 'RENEW_YEAR2_330' | 'ADD_30_EDITS_30') => {
+  // 模擬加購第 4 本起配額 ($360/本)、次年續約 ($450 同享 100% 倒抵) 或 單書加購 1 次修改權限 ($30)
+  const handleUpgradeAction = async (upgradeType: 'ADD_1_BOOK_360' | 'RENEW_YEAR2_450' | 'ADD_1_EDIT_30') => {
     const label =
-      upgradeType === 'ADD_1_BOOK_330'
-        ? '確認支付 $330 USDT 加購「1 本額外電子書開發配額」？'
-        : upgradeType === 'RENEW_YEAR2_330'
-        ? '確認支付 $330 USDT 續約「次年 AI 自來客廣告與電子書維護費（可 100% 抵扣交易 1 成服務費）」？'
-        : '確認支付修改費 $30 USDT，為本書再增加「+30 次修改權限」？';
+      upgradeType === 'ADD_1_BOOK_360'
+        ? '確認支付 $360 USDT 加購「1 本額外電子書開發配額」？'
+        : upgradeType === 'RENEW_YEAR2_450'
+        ? '確認支付 $450 USDT 續約「次年 AI 自來客廣告與電子書系統服務維護費（可 100% 抵扣交易 1 成服務費）」？'
+        : '確認支付修改費 $30 USDT，為本書再增加「+1 次修改權限」？';
     if (!window.confirm(label)) return;
 
     const res = await fetch('/api/ebook', {
@@ -352,11 +352,11 @@ export default function FranchiseStudioPage() {
       if (data.book) setCurrentBook(data.book);
       fetchStoreData();
       setStatusMessage(
-        upgradeType === 'ADD_1_BOOK_330'
+        upgradeType === 'ADD_1_BOOK_360'
           ? '✅ 已成功擴充 +1 本電子書開發配額！'
-          : upgradeType === 'RENEW_YEAR2_330'
-          ? '✅ 已完成次年 $330 維護續約！您的服務費抵用金水庫已自動增加 +$330 USDT（享 100% 倒抵 10% 交易服務費）！'
-          : '✅ 已支付修改費 $30 USDT，本書已成功擴充 +30 次修改權限！'
+          : upgradeType === 'RENEW_YEAR2_450'
+          ? '✅ 已完成次年 $450 系統服務維護續約！您的服務費抵用金水庫已自動增加 +$450 USDT（享 100% 倒抵 10% 交易服務費）！'
+          : '✅ 已支付修改費 $30 USDT，本書已成功擴充 +1 次修改權限！'
       );
     }
   };
@@ -400,24 +400,24 @@ export default function FranchiseStudioPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
         {/* 頂部：加盟商四大核心配額與倒抵水庫儀表板 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {/* 1. 電子書開發配額 ($990 含 3 本，之後 $330/本) */}
+          {/* 1. 電子書開發配額 ($990 含 3 本，之後 $360/本) */}
           <div className="bg-gradient-to-br from-pink-950/50 to-purple-950/40 border border-pink-500/30 rounded-2xl p-5 flex flex-col justify-between">
             <div>
               <div className="text-xs text-pink-300 font-bold mb-1">📚 電子書開發配額 ($990 含 3 本)</div>
               <div className="text-3xl font-black text-white">
                 {books.length} / {profile.book_quota_total} <span className="text-sm font-normal text-gray-400">本</span>
               </div>
-              <p className="text-xs text-gray-400 mt-1">第 4 本起每新增 1 本電子書開發費 $330</p>
+              <p className="text-xs text-gray-400 mt-1">第 4 本起每新增 1 本電子書開發費 $360</p>
             </div>
             <button
-              onClick={() => handleUpgradeAction('ADD_1_BOOK_330')}
+              onClick={() => handleUpgradeAction('ADD_1_BOOK_360')}
               className="mt-4 w-full py-2 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 border border-pink-400/50 text-pink-200 text-xs font-bold transition-all cursor-pointer"
             >
-              ➕ 加購新書開發配額 ($330 / 本)
+              ➕ 加購新書開發配額 ($360 / 本)
             </button>
           </div>
 
-          {/* 2. 10% 系統服務費 100% 倒抵水庫 ($990 首年 / $330 次年) + 25% 推廣聯盟支出說明 */}
+          {/* 2. 10% 系統服務費 100% 倒抵水庫 ($990 首年 / $450 次年) + 25% 推廣聯盟支出說明 */}
           <div className="bg-gradient-to-br from-emerald-950/50 to-teal-950/40 border border-emerald-500/30 rounded-2xl p-5 flex flex-col justify-between">
             <div>
               <div className="text-xs text-emerald-300 font-bold mb-1">💎 1成 (10%) 系統服務費倒抵金餘額</div>
@@ -433,7 +433,7 @@ export default function FranchiseStudioPage() {
             </div>
           </div>
 
-          {/* 3. AI 自動來客系統廣告協作狀態 & 次年 $330 維護續約 */}
+          {/* 3. AI 自動來客系統廣告協作狀態 & 次年 $450 系統服務維護續約 */}
           <div className="bg-gradient-to-br from-cyan-950/50 to-blue-950/40 border border-cyan-500/30 rounded-2xl p-5 flex flex-col justify-between">
             <div>
               <div className="text-xs text-cyan-300 font-bold mb-1">🔥 AI 自動來客系統幫打廣告</div>
@@ -442,14 +442,14 @@ export default function FranchiseStudioPage() {
                 協作曝光運行中
               </div>
               <p className="text-xs text-gray-400 mt-2">
-                次年維護費 $330/年（一樣先收費後可 100% 抵扣交易 1 成服務費）
+                次年系統服務費 $450/年（一樣先收費後可 100% 抵扣交易 1 成服務費）
               </p>
             </div>
             <button
-              onClick={() => handleUpgradeAction('RENEW_YEAR2_330')}
+              onClick={() => handleUpgradeAction('RENEW_YEAR2_450')}
               className="mt-4 w-full py-2 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-400/50 text-cyan-200 text-xs font-bold transition-all cursor-pointer"
             >
-              🔄 預繳次年維護費 $330 (+獲 $330 倒抵金)
+              🔄 預繳次年系統服務費 $450 (+獲 $450 倒抵金)
             </button>
           </div>
 
@@ -842,7 +842,7 @@ export default function FranchiseStudioPage() {
                 您可以隨時將製作好的電子書<strong>直接下載回您的電腦/手機保存或印刷</strong>；若要在微享讀者書櫃上架銷售並啟動 AI 自動來客廣告，請點擊下方「提交總後台書審（審核時間 3~7 天）」。
               </p>
 
-              {/* 單書 30 次修改計數器與 $30 加購修改權限面板 */}
+              {/* 單書 30 次修改計數器與 $30 加購 1 次修改權限面板 */}
               <div className="p-3.5 rounded-2xl bg-purple-950/50 border border-purple-500/40 mb-4 flex items-center justify-between gap-3">
                 <div>
                   <div className="text-xs font-bold text-purple-300">
@@ -851,15 +851,15 @@ export default function FranchiseStudioPage() {
                   <div className="text-sm font-black text-white mt-0.5">
                     已修改 {currentBook.edit_count ?? 0} / {currentBook.edit_quota_max ?? 30} 次
                     <span className="text-[11px] font-normal text-gray-400 ml-2">
-                      (滿30次後需付$30再享30次)
+                      (滿30次後需付$30可修改1次)
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={() => handleUpgradeAction('ADD_30_EDITS_30')}
+                  onClick={() => handleUpgradeAction('ADD_1_EDIT_30')}
                   className="px-3 py-2 rounded-xl bg-purple-600/40 hover:bg-purple-600/60 border border-purple-400 text-purple-200 text-xs font-bold shrink-0 cursor-pointer"
                 >
-                  ➕ 付 $30 加購 30 次修改
+                  ➕ 付 $30 加購 1 次修改
                 </button>
               </div>
 

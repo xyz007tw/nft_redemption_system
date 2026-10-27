@@ -26,7 +26,7 @@ export default function ReaderEBookStorePage() {
       .catch(console.error);
   }, []);
 
-  // 模擬讀者購買或訂閱解鎖 (並自動驗算加盟商 $990 / $330 抵用金 100% 倒抵 10% 平台服務費)
+  // 模擬讀者購買或訂閱解鎖 (並自動驗算加盟商 $990 / $450 抵用金 100% 倒抵 10% 平台服務費)
   const handleSimulateUnlock = async (book: EBookProject, isMonthlySub: boolean) => {
     const price = isMonthlySub ? book.price_monthly_sub_usdt : book.price_single_usdt;
     const savedRef = typeof window !== 'undefined' ? localStorage.getItem('weixiang_referrer') : null;

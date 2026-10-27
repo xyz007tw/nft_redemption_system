@@ -4,12 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { GoogleGenAI } from '@google/genai';
 import crypto from 'crypto';
 import { EBookProject, FranchiseeProfile, scanBannedContent, generateStandaloneEBookHTML } from '@/lib/ebookEngine';
-
-// 專用 Cloudflare R2 雙公開網域常數設定 (1.5208.uk & pub-2006e181b8544782b8d026affdaa34ab.r2.dev)
-const R2_PRIMARY_PUBLIC_DOMAIN = 'https://1.5208.uk';
-const R2_DEV_PUBLIC_DOMAIN = 'https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev';
-const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '2ecef792d2c54e7d88cfd1f5184c117b';
-const CF_R2_BUCKET = process.env.CF_R2_BUCKET_NAME || 'aivideo';
+import { putObjectToDedicatedR2, R2_PRIMARY_PUBLIC_DOMAIN, R2_DEV_PUBLIC_DOMAIN } from '@/lib/r2Storage';
 
 // 🤖 旗艦級電子書大腦模型序列 (優先採用 Google 4 Argon 系列，若遇更新或特定環境自動彈性容錯至最新旗艦序列)
 const EBOOK_AI_MODEL_SEQUENCE = [
@@ -37,89 +32,6 @@ async function generateEBookAIWithFallback(contents: any[], tools?: any[]) {
     }
   }
   throw lastError;
-}
-
-/**
- * 透過原生 AWS Signature V4 將電子書檔案或圖片直接 PUT 上傳至專用 Cloudflare R2 儲存槽
- * 並同時回傳 https://1.5208.uk/... 與 https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev/... 雙網址
- */
-async function putObjectToDedicatedR2(
-  r2Key: string,
-  bodyBuffer: Buffer,
-  contentType: string
-): Promise<{ primaryUrl: string; mirrorUrl: string; uploadedToCloud: boolean }> {
-  const cleanKey = r2Key.replace(/^\/+/, '');
-  const primaryUrl = `${R2_PRIMARY_PUBLIC_DOMAIN}/${cleanKey}`;
-  const mirrorUrl = `${R2_DEV_PUBLIC_DOMAIN}/${cleanKey}`;
-
-  const accessKeyId = process.env.CF_R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.CF_R2_SECRET_ACCESS_KEY;
-
-  if (!accessKeyId || !secretAccessKey) {
-    return { primaryUrl, mirrorUrl, uploadedToCloud: false };
-  }
-
-  try {
-    const host = `${CF_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-    const region = 'auto';
-    const service = 's3';
-    const now = new Date();
-    const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const dateStamp = amzDate.slice(0, 8);
-    const payloadHash = crypto.createHash('sha256').update(bodyBuffer).digest('hex');
-
-    const canonicalUri = `/${CF_R2_BUCKET}/${cleanKey}`;
-    const canonicalHeaders =
-      `content-type:${contentType}\n` +
-      `host:${host}\n` +
-      `x-amz-content-sha256:${payloadHash}\n` +
-      `x-amz-date:${amzDate}\n`;
-    const signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-date';
-    const canonicalRequest = [
-      'PUT',
-      canonicalUri,
-      '',
-      canonicalHeaders,
-      signedHeaders,
-      payloadHash
-    ].join('\n');
-
-    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    const stringToSign = [
-      'AWS4-HMAC-SHA256',
-      amzDate,
-      credentialScope,
-      crypto.createHash('sha256').update(canonicalRequest).digest('hex')
-    ].join('\n');
-
-    const hmac = (key: Buffer | string, data: string) =>
-      crypto.createHmac('sha256', key).update(data).digest();
-    const kDate = hmac(`AWS4${secretAccessKey}`, dateStamp);
-    const kRegion = hmac(kDate, region);
-    const kService = hmac(kRegion, service);
-    const kSigning = hmac(kService, 'aws4_request');
-    const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
-
-    const authorizationHeader =
-      `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, ` +
-      `SignedHeaders=${signedHeaders}, Signature=${signature}`;
-
-    const res = await fetch(`https://${host}${canonicalUri}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': contentType,
-        'x-amz-content-sha256': payloadHash,
-        'x-amz-date': amzDate,
-        Authorization: authorizationHeader
-      },
-      body: new Uint8Array(bodyBuffer)
-    });
-
-    return { primaryUrl, mirrorUrl, uploadedToCloud: res.ok };
-  } catch (e) {
-    console.warn('[Dedicated R2 Upload] fallback:', e);
-    return { primaryUrl, mirrorUrl, uploadedToCloud: false };
-  }
 }
 
 const supabase = createClient(
@@ -180,15 +92,15 @@ const DEFAULT_STORE: EBookCloudStore = {
           id: 'ch-1',
           title_zh: '第一章：為什麼知識創作者需要 AI 自動來客系統？',
           title_en: 'Chapter 1: Why Creators Need the AI Auto-Traffic Matrix',
-          content_zh: '傳統寫書與出版最大的痛點，不是寫不出好內容，而是「排版外包昂貴」與「出版後沒有流量」。微享全球電子書 SaaS 結合首年 $990 合作方案，不僅讓您一鍵生成雙語精裝電子書，更直接協作「AI 自動來客系統」每天在全球社群幫您打廣告找客人！\n更重要的是，首年支付的 $990 與次年維護費 $330，皆享有 100% 先收後抵交易 1 成（10%）服務費的零風險保障。',
-          content_en: 'The biggest pain point in traditional publishing is not writing, but expensive typesetting and zero traffic after launch. WeiXiang E-Book SaaS combines our $990 partnership plan with our AI Auto-Traffic Matrix to promote your books globally 24/7.\nEven better, both the first-year $990 fee and second-year $330 maintenance fee are 100% credited back against our 10% platform transaction fee.'
+          content_zh: '傳統寫書與出版最大的痛點，不是寫不出好內容，而是「排版外包昂貴」與「出版後沒有流量」。微享全球電子書 SaaS 結合首年 $990 合作方案，不僅讓您一鍵生成雙語精裝電子書，更直接協作「AI 自動來客系統」每天在全球社群幫您打廣告找客人！\n更重要的是，首年支付的 $990 與次年系統維護費 $450，皆享有 100% 先收後抵交易 1 成（10%）服務費的零風險保障。',
+          content_en: 'The biggest pain point in traditional publishing is not writing, but expensive typesetting and zero traffic after launch. WeiXiang E-Book SaaS combines our $990 partnership plan with our AI Auto-Traffic Matrix to promote your books globally 24/7.\nEven better, both the first-year $990 fee and second-year $450 maintenance fee are 100% credited back against our 10% platform transaction fee.'
         },
         {
           id: 'ch-2',
           title_zh: '第二章：三級管理平台（管理員、加盟商、讀者訂閱）運作全解析',
           title_en: 'Chapter 2: Three-Tier SaaS Architecture (Admin, Franchisee, Reader)',
-          content_zh: '在加盟商創作者工作台（/studio）中，您可以享有首年 3 本電子書免費開發配額（第 4 本起每本開發費 $330）。完成設定後，您可以立即「自行下載高解析 PDF 與網頁母檔」保存，並一鍵送交總管理後台進行 3~7 天書審。\n書審通過後，系統即刻為您開通 VIP 讀者防盜版線上書櫃與 25% 聯盟分潤裂變連結！',
-          content_en: 'Inside the Franchisee Studio (/studio), your $990 plan includes 3 e-book development quotas ($330 per additional book from the 4th book). You can download master PDF/HTML files anytime and submit your book for our 3-7 day compliance review.\nOnce approved, your book goes live in the VIP Reader Bookstore with 25% affiliate viral sharing enabled!'
+          content_zh: '在加盟商創作者工作台（/studio）中，您可以享有首年 3 本電子書免費開發配額（第 4 本起每本開發費 $360）。完成設定後，您可以立即「自行下載高解析 PDF 與網頁母檔」保存，並一鍵送交總管理後台進行 3~7 天書審。\n書審通過後，系統即刻為您開通 VIP 讀者防盜版線上書櫃與 25% 聯盟分潤裂變連結！',
+          content_en: 'Inside the Franchisee Studio (/studio), your $990 plan includes 3 e-book development quotas ($360 per additional book from the 4th book). You can download master PDF/HTML files anytime and submit your book for our 3-7 day compliance review.\nOnce approved, your book goes live in the VIP Reader Bookstore with 25% affiliate viral sharing enabled!'
         }
       ]
     }
@@ -641,7 +553,7 @@ export async function POST(req: Request) {
         );
       }
 
-      // 若是新建書籍，檢查是否超過配額 (首年 $990 可開發 3 本，之後每本 $330)
+      // 若是新建書籍，檢查是否超過配額 (首年 $990 可開發 3 本，之後每本 $360)
       if (existingIdx === -1) {
         const myBooksCount = store.books.filter(
           b => (b.author_wallet || b.author_email || '').toLowerCase() === authorKey
@@ -652,7 +564,7 @@ export async function POST(req: Request) {
             {
               success: false,
               needQuotaUpgrade: true,
-              error: `📚 您的電子書開發配額已滿（目前已使用 ${myBooksCount} / ${profile.book_quota_total} 本）。首年 $990 方案含 3 本電子書開發，第 4 本起每新增開發 1 本電子書需支付 $330 USDT 開發費！`
+              error: `📚 您的電子書開發配額已滿（目前已使用 ${myBooksCount} / ${profile.book_quota_total} 本）。首年 $990 方案含 3 本電子書開發，第 4 本起每新增開發 1 本電子書需支付 $360 USDT 開發費！`
             },
             { status: 402 }
           );
@@ -660,7 +572,7 @@ export async function POST(req: Request) {
         profile.book_created_count = myBooksCount + 1;
       }
 
-      // 若是既有書籍進行修改（包含草稿修改、完稿或上架後再修改），嚴格檢查每本書 30 次修改上限
+      // 若是既有書籍進行修改（包含草稿修改、完稿或上架後再修改），嚴格檢查每本書 30 次免費修改上限（超過後每付 $30 修改費可修改 1 次）
       let currentEditCount = 0;
       let currentEditMax = book.edit_quota_max || 30;
 
@@ -674,7 +586,7 @@ export async function POST(req: Request) {
             {
               success: false,
               needEditFee30: true,
-              error: `✏️ 本書修改次數已達上限（已修改 ${currentEditCount} / ${currentEditMax} 次，含完稿後再修改）。依規範每本電子書免費修改次數為 30 次，請先支付修改費 $30 USDT，即可再解鎖 +30 次修改權限！`
+              error: `✏️ 本書修改次數已達上限（已修改 ${currentEditCount} / ${currentEditMax} 次，含完稿後再修改）。依規範每本電子書免費修改次數為 30 次，超過後需支付修改費 $30 USDT / 次（每支付 $30 可再修改 1 次）！`
             },
             { status: 402 }
           );
@@ -720,7 +632,7 @@ export async function POST(req: Request) {
         profile,
         message: submitForReview
           ? `✅ 已成功上傳至專用 R2 (${updatedBook.r2_published_urls?.primary_url}) 並送交總管理後台進行「書審」（本書累計修改次數：${currentEditCount} / ${currentEditMax} 次）！書審時間為 3~7 個工作天。`
-          : `✅ 電子書修改已儲存並同步上傳至專用 R2 儲存槽（本書累計修改次數：${currentEditCount} / ${currentEditMax} 次，超過 ${currentEditMax} 次需付修改費 $30 再享 30 次）！`
+          : `✅ 電子書修改已儲存並同步上傳至專用 R2 儲存槽（本書累計修改次數：${currentEditCount} / ${currentEditMax} 次，超過 ${currentEditMax} 次後需付修改費 $30 可再修改 1 次）！`
       });
     }
 
@@ -759,7 +671,7 @@ export async function POST(req: Request) {
               {
                 success: false,
                 needEditFee30: true,
-                error: `✏️ 本書修改次數已達上限（已修改 ${currentEditCount} / ${currentEditMax} 次）。自行下載並修改後上傳算 1 次修改額，請先支付修改費 $30 USDT 解鎖 +30 次修改權限！`
+                error: `✏️ 本書修改次數已達上限（已修改 ${currentEditCount} / ${currentEditMax} 次）。自行下載並修改後上傳算 1 次修改額，請先支付修改費 $30 USDT 解鎖 +1 次修改權限！`
               },
               { status: 402 }
             );
@@ -804,7 +716,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. 加購電子書配額 ($330 / 本)、次年續約維護費 ($330 享 100% 倒抵 10% 服務費) 或 單書加購 30 次修改權限 ($30)
+    // 3. 加購電子書配額 ($360 / 本)、次年續約系統服務費 ($450 享 100% 倒抵 10% 服務費) 或 單書加購 1 次修改權限 ($30)
     if (action === 'upgrade_quota_or_renew') {
       const { authorKey, upgradeType, bookId } = body;
       const key = (authorKey || 'demo_author').toLowerCase();
@@ -813,16 +725,16 @@ export async function POST(req: Request) {
       }
       const profile = store.franchisees[key];
 
-      if (upgradeType === 'ADD_1_BOOK_330') {
+      if (upgradeType === 'ADD_1_BOOK_360' || upgradeType === 'ADD_1_BOOK_330') {
         profile.book_quota_total += 1;
-      } else if (upgradeType === 'RENEW_YEAR2_330') {
+      } else if (upgradeType === 'RENEW_YEAR2_450' || upgradeType === 'RENEW_YEAR2_330') {
         profile.plan_status = 'ACTIVE_RENEWED';
-        profile.fee_credit_balance += 330; // 次年 $330 一樣先收費後 100% 抵扣交易 1 成服務費
+        profile.fee_credit_balance += 450; // 次年 $450 一樣先收費後 100% 抵扣交易 1 成服務費
         profile.expires_at = new Date(Date.now() + 365 * 86400000).toISOString();
-      } else if (upgradeType === 'ADD_30_EDITS_30') {
+      } else if (upgradeType === 'ADD_1_EDIT_30' || upgradeType === 'ADD_30_EDITS_30') {
         const bIdx = store.books.findIndex(b => b.id === bookId);
         if (bIdx >= 0) {
-          store.books[bIdx].edit_quota_max = (store.books[bIdx].edit_quota_max ?? 30) + 30;
+          store.books[bIdx].edit_quota_max = (store.books[bIdx].edit_quota_max ?? 30) + 1;
           await saveCloudStore(store);
           return NextResponse.json({
             success: true,
@@ -875,7 +787,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, book: targetBook, store });
     }
 
-    // 4B. 總管理員後台 (/admin/franchise) 刪除機制：針對「次年未續約 ($330)」或違規之加盟商，一鍵刪除單本電子書、下架未續約書籍、或徹底刪除整個加盟商帳號與旗下所有電子書
+    // 4B. 總管理員後台 (/admin/franchise) 刪除機制：針對「次年未續約 ($450)」或違規之加盟商，一鍵刪除單本電子書、下架未續約書籍、或徹底刪除整個加盟商帳號與旗下所有電子書
     if (action === 'admin_delete_or_expire') {
       const { targetType, bookId, authorKey } = body as {
         targetType: 'DELETE_SINGLE_BOOK' | 'EXPIRE_UNRENEWED_FRANCHISEE' | 'PURGE_FRANCHISEE_ALL';
@@ -899,7 +811,7 @@ export async function POST(req: Request) {
             return {
               ...b,
               status: 'DRAFT',
-              review_note: '⚠️ 次年維護費 ($330) 逾期未續約，系統已自動下架並停止 AI 自動來客廣告協作。'
+              review_note: '⚠️ 次年系統維護費 ($450) 逾期未續約，系統已自動下架並停止 AI 自動來客廣告協作。'
             };
           }
           return b;
@@ -916,7 +828,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, store });
     }
 
-    // 5. 模擬讀者購買電子書 ➔ 觸發「10% 系統服務費（含提款與推廣服務費，由 $990/$330 抵用金 100% 倒抵）+ 25% 推廣聯盟服務費支出」結算器
+    // 5. 模擬讀者購買電子書 ➔ 觸發「10% 系統服務費（含提款與推廣服務費，由 $990/$450 抵用金 100% 倒抵）+ 25% 推廣聯盟服務費支出」結算器
     if (action === 'simulate_reader_purchase') {
       const { bookId, amountUsdt, readerEmail, refCode } = body;
       const book = store.books.find(b => b.id === bookId);

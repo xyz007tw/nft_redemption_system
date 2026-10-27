@@ -78,7 +78,7 @@ export default function AdminFranchiseReviewPage() {
     }
   };
 
-  // 管理員刪除單本電子書、處理「次年未續約 ($330)」下架、或徹底刪除整個加盟商與所有書籍
+  // 管理員刪除單本電子書、處理「次年未續約 ($450)」下架、或徹底刪除整個加盟商與所有書籍
   const handleAdminDeleteOrExpire = async (
     targetType: 'DELETE_SINGLE_BOOK' | 'EXPIRE_UNRENEWED_FRANCHISEE' | 'PURGE_FRANCHISEE_ALL',
     bookId?: string,
@@ -88,7 +88,7 @@ export default function AdminFranchiseReviewPage() {
       targetType === 'DELETE_SINGLE_BOOK'
         ? '🗑️ 確定要從雲端資料庫「永久刪除這本電子書」嗎？刪除後不可復原！'
         : targetType === 'EXPIRE_UNRENEWED_FRANCHISEE'
-        ? `⚠️ 確定將加盟商 [${authorKey}] 標記為「次年 ($330) 逾期未續約」？\n系統將自動停止其 AI 自動來客廣告、歸零抵用金，並將其名下所有電子書從書店下架！`
+        ? `⚠️ 確定將加盟商 [${authorKey}] 標記為「次年 ($450) 逾期未續約」？\n系統將自動停止其 AI 自動來客廣告、歸零抵用金，並將其名下所有電子書從書店下架！`
         : `🚨【徹底刪除確認】確定要將未續約加盟商 [${authorKey}] 及其名下「所有電子書」從雲端資料庫永久清除嗎？`;
 
     if (!window.confirm(confirmMsg)) return;
@@ -119,7 +119,7 @@ export default function AdminFranchiseReviewPage() {
         <div>
           <h1 className="text-3xl font-black">📚 加盟商電子書「書審中心 (3~7天)」與配額總控台</h1>
           <p className="text-gray-400 text-sm mt-1">
-            管理首年 $990（含3本書+AI廣告+100%倒抵）、第4本起 $330/本、次年 $330 維護續約，以及 3~7 天書審與 10 大禁書違規封號不退費處分。
+            管理首年 $990（含3本書+AI廣告+100%倒抵）、第4本起 $360/本、次年 $450 系統服務續約，以及 3~7 天書審與 10 大禁書違規封號不退費處分。
           </p>
         </div>
         <button
@@ -250,16 +250,16 @@ export default function AdminFranchiseReviewPage() {
         )}
       </div>
 
-      {/* 加盟商配額與 $990/$330 服務費倒抵水庫總覽 (含未續約一鍵下架與徹底刪除按鈕) */}
+      {/* 加盟商配額與 $990/$450 服務費倒抵水庫總覽 (含未續約一鍵下架與徹底刪除按鈕) */}
       <div className="bg-gray-800/80 border border-gray-700 rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-4">💎 加盟商配額、$990/$330 倒抵金水庫 ＆ 次年未續約刪除管理</h2>
+        <h2 className="text-xl font-bold mb-4">💎 加盟商配額、$990/$450 倒抵金水庫 ＆ 次年未續約刪除管理</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-gray-700 text-gray-400">
                 <th className="p-3">加盟商識別 / 信箱</th>
                 <th className="p-3">合約狀態 / 到期日</th>
-                <th className="p-3">開發配額 (首年3本/加購$330)</th>
+                <th className="p-3">開發配額 (首年3本/加購$360)</th>
                 <th className="p-3">10% 服務費倒抵金餘額</th>
                 <th className="p-3">累積銷售額</th>
                 <th className="p-3">AI 自來客廣告</th>

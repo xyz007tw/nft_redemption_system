@@ -12,11 +12,11 @@ export default function FranchiseEBookSection() {
 
   const [showBannedModal, setShowBannedModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const [checkoutPlan, setCheckoutPlan] = useState<'YEAR1_990' | 'ADD_BOOK_330' | 'YEAR2_RENEW_330'>('YEAR1_990');
+  const [checkoutPlan, setCheckoutPlan] = useState<'YEAR1_990' | 'ADD_BOOK_360' | 'YEAR2_RENEW_450'>('YEAR1_990');
   const [agreedBannedTerms, setAgreedBannedTerms] = useState(false);
   const [agreedReviewDays, setAgreedReviewDays] = useState(false);
 
-  const openJoinModal = (plan: 'YEAR1_990' | 'ADD_BOOK_330' | 'YEAR2_RENEW_330') => {
+  const openJoinModal = (plan: 'YEAR1_990' | 'ADD_BOOK_360' | 'YEAR2_RENEW_450') => {
     setCheckoutPlan(plan);
     setAgreedBannedTerms(false);
     setAgreedReviewDays(false);
@@ -29,15 +29,15 @@ export default function FranchiseEBookSection() {
       name_zh: '全球電子書加盟商・首年 $990 啟動方案 (含 3 本電子書 + AI 自來客打廣告 + $990 服務費 100% 倒抵)',
       name_en: 'Global E-Book Franchisee Year-1 $990 Plan (3 Books + AI Traffic Ads + 100% Fee Credit)'
     },
-    ADD_BOOK_330: {
-      price: 330,
-      name_zh: '電子書額外開發配額加購 ($330 / 1 本電子書模版引擎開發權)',
-      name_en: 'Additional E-Book Development Quota ($330 / 1 Book)'
+    ADD_BOOK_360: {
+      price: 360,
+      name_zh: '電子書額外開發配額加購 ($360 / 1 本電子書模版引擎開發權)',
+      name_en: 'Additional E-Book Development Quota ($360 / 1 Book)'
     },
-    YEAR2_RENEW_330: {
-      price: 330,
-      name_zh: '次年 AI 自來客廣告與電子書系統維護費 ($330 同享 100% 倒抵 10% 服務費)',
-      name_en: 'Year-2 AI Traffic & E-Book Maintenance Renewal ($330 with 100% Fee Credit)'
+    YEAR2_RENEW_450: {
+      price: 450,
+      name_zh: '次年 AI 自來客廣告與電子書系統服務費 ($450 同享 100% 倒抵 10% 服務費)',
+      name_en: 'Year-2 AI Traffic & E-Book System Renewal ($450 with 100% Fee Credit)'
     }
   }[checkoutPlan];
 
@@ -62,8 +62,8 @@ export default function FranchiseEBookSection() {
 
           <p className="text-base sm:text-lg md:text-xl text-pink-200/90 mb-10 max-w-4xl mx-auto leading-relaxed">
             {isZh
-              ? '內建「Google 4 旗艦級圖文專業電子書模版引擎（8大深度篇章・25+ 頁全球暢銷專書規格・支援加盟商自行下載 PDF/網頁母檔）」、三級管理平台（管理員 / 加盟商 / 讀者訂閱），首年 $990 與次年 $330 維護費皆享【先收費、後 100% 倒抵交易 1 成服務費】零風險保障！'
-              : 'Built-in Google 4 Illustrated Authority E-Book Engine (8 Deep Chapters, 25+ Pages Bestselling Masterbook, supports downloading master PDF/HTML files), 3-Tier SaaS Portal (Admin / Franchisee / Reader), with 100% Fee-Credit Rebate on both Year-1 ($990) and Year-2 ($330)!'}
+              ? '內建「Google 4 旗艦級圖文專業電子書模版引擎（8大深度篇章・25+ 頁全球暢銷專書規格・支援加盟商自行下載 PDF/網頁母檔）」、三級管理平台（管理員 / 加盟商 / 讀者訂閱），首年 $990 與次年 $450 系統服務費皆享【先收費、後 100% 倒抵交易 1 成服務費】零風險保障！'
+              : 'Built-in Google 4 Illustrated Authority E-Book Engine (8 Deep Chapters, 25+ Pages Bestselling Masterbook, supports downloading master PDF/HTML files), 3-Tier SaaS Portal (Admin / Franchisee / Reader), with 100% Fee-Credit Rebate on both Year-1 ($990) and Year-2 ($450)!'}
           </p>
         </div>
 
@@ -80,12 +80,12 @@ export default function FranchiseEBookSection() {
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed">
                 {isZh
-                  ? '首年認購 $990 即可免費開發 3 本雙語電子書（可自行下載電子書母檔 + 上架收費），並直接協作「微享 AI 自動來客系統」每日在社群幫您找人打廣告！之後第 4 本起每本電子書開發費僅 $330。'
-                  : 'Includes 3 e-book quotas (download master files & sell online) + WeiXiang AI Auto-Traffic Matrix promoting your books! Additional books from the 4th book are $330/book.'}
+                  ? '首年認購 $990 即可免費開發 3 本雙語電子書（可自行下載電子書母檔 + 上架收費），並直接協作「微享 AI 自動來客系統」每日在社群幫您找人打廣告！之後第 4 本起每本電子書開發費為 $360。'
+                  : 'Includes 3 e-book quotas (download master files & sell online) + WeiXiang AI Auto-Traffic Matrix promoting your books! Additional books from the 4th book are $360/book.'}
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-white/10 text-xs font-bold text-pink-400">
-              {isZh ? '✔ 含 3 本配額(第4本起$330)｜每本30次修改(加購$30/30次)' : '✔ 3 Books ($330/extra) | 30 Edits/Book ($30/+30 edits)'}
+              {isZh ? '✔ 含 3 本配額(第4本起$360)｜每本30次修改(加購$30/1次)' : '✔ 3 Books ($360/extra) | 30 Edits/Book ($30/+1 edit)'}
             </div>
           </div>
 
@@ -109,19 +109,19 @@ export default function FranchiseEBookSection() {
             </div>
           </div>
 
-          {/* 卡片 3: 次年 $330 維護費同享 100% 倒抵 */}
+          {/* 卡片 3: 次年 $450 系統服務費同享 100% 倒抵 */}
           <div className="bg-white/5 border border-cyan-500/30 hover:border-cyan-400 rounded-2xl p-6 flex flex-col justify-between transition-all hover:-translate-y-1">
             <div>
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl mb-4 shadow-lg">
                 🔄
               </div>
               <h3 className="text-lg font-black text-white mb-2">
-                {isZh ? '3. 次年 $330 維護費（同享 100% 倒抵）' : '3. Year-2 $330 Maintenance (100% Rebate)'}
+                {isZh ? '3. 次年 $450 系統服務費（同享 100% 倒抵）' : '3. Year-2 $450 System Fee (100% Rebate)'}
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed">
                 {isZh
-                  ? '次年起每年僅收 $330「AI 自來客廣告協作及電子書雲端維護費」，一樣採取【先收費、後抵扣交易 1 成服務費】！繳交即獲 $330 抵用金，次年賣滿 $3,300 即等同次年維護費全額免費！'
-                  : 'From Year 2, annual AI traffic & cloud maintenance is only $330—and it ALSO converts 100% into 10% transaction fee credit!'}
+                  ? '次年起每年僅收 $450「AI 自來客廣告協作及電子書雲端系統服務費」，一樣採取【先收費、後抵扣交易 1 成服務費】！繳交即獲 $450 抵用金，次年賣滿 $4,500 即等同次年系統服務費全額免費！'
+                  : 'From Year 2, annual AI traffic & cloud system fee is $450—and it ALSO converts 100% into 10% transaction fee credit!'}
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-white/10 text-xs font-bold text-cyan-400">
@@ -263,7 +263,7 @@ export default function FranchiseEBookSection() {
               <strong>⚖️ 違規處理與零退費切結聲明：</strong><br />
               1. 所有電子書設定完成後，均須進入總管理後台進行 <strong>3~7 個工作天之人工與 AI 雙重書審</strong>。<br />
               2. 嚴禁「掛羊頭賣狗肉（審核後偷換違規內容）」、「植入釣魚木馬 QR Code」或「洗錢刷單」。<br />
-              3. 加盟商於付款前須充分知悉上述規範，<strong>一旦付款開通後，若因違反上述禁書條款或遭讀者/第三方檢舉查證屬實，平台將立即強制下架並永久凍結帳號，已支付之 $990 / $330 款項一律不予退費！</strong>
+              3. 加盟商於付款前須充分知悉上述規範，<strong>一旦付款開通後，若因違反上述禁書條款或遭讀者/第三方檢舉查證屬實，平台將立即強制下架並永久凍結帳號，已支付之 $990 / $360 / $450 款項一律不予退費！</strong>
             </div>
 
             <div className="flex justify-end gap-3">
@@ -314,26 +314,26 @@ export default function FranchiseEBookSection() {
                 <span className="text-[11px] font-normal opacity-80">含3本書+AI廣告+100%倒抵</span>
               </button>
               <button
-                onClick={() => setCheckoutPlan('ADD_BOOK_330')}
+                onClick={() => setCheckoutPlan('ADD_BOOK_360')}
                 className={`p-3 rounded-xl border text-left text-xs font-bold transition-all cursor-pointer ${
-                  checkoutPlan === 'ADD_BOOK_330'
+                  checkoutPlan === 'ADD_BOOK_360'
                     ? 'bg-purple-500/20 border-purple-400 text-white'
                     : 'bg-white/5 border-white/10 text-gray-400'
                 }`}
               >
-                ➕ 加購第4本書起 $330<br />
+                ➕ 加購第4本書起 $360<br />
                 <span className="text-[11px] font-normal opacity-80">每增 1 本電子書開發費</span>
               </button>
               <button
-                onClick={() => setCheckoutPlan('YEAR2_RENEW_330')}
+                onClick={() => setCheckoutPlan('YEAR2_RENEW_450')}
                 className={`p-3 rounded-xl border text-left text-xs font-bold transition-all cursor-pointer ${
-                  checkoutPlan === 'YEAR2_RENEW_330'
+                  checkoutPlan === 'YEAR2_RENEW_450'
                     ? 'bg-cyan-500/20 border-cyan-400 text-white'
                     : 'bg-white/5 border-white/10 text-gray-400'
                 }`}
               >
-                🔄 次年維護續約 $330<br />
-                <span className="text-[11px] font-normal opacity-80">AI廣告+維護(同享100%倒抵)</span>
+                🔄 次年系統服務續約 $450<br />
+                <span className="text-[11px] font-normal opacity-80">AI廣告+系統服務(同享100%倒抵)</span>
               </button>
             </div>
 
@@ -359,7 +359,7 @@ export default function FranchiseEBookSection() {
                   className="mt-1 w-4 h-4 accent-pink-500 shrink-0"
                 />
                 <span className="text-gray-200 leading-relaxed">
-                  <strong>【配額、30次修改上限、雙軌服務費（10%系統費+25%推廣聯盟費）與 3~7 天書審認知】</strong>本人了解 $990 方案含開發 3 本電子書（之後每本開發費 $330），<strong>每本電子書免費修改次數為 30 次（含完稿後再修改，超過後需支付修改費 $30 才可再享 30 次修改權限）</strong>，次年 AI 自來客及電子書維護費為 $330；每筆交易除 <strong>1 成 (10%) 系統服務費（含提款服務費及推廣服務費，可由首年 $990 / 次年 $330 抵用金 100% 倒抵）</strong>外，另需支出 <strong>「推廣聯盟服務費 25%」</strong>；且<strong>電子書設定完成後須進入管理後台進行「書審（時間 3~7 天）」</strong>通過後方可正式上架。
+                  <strong>【配額、30次修改上限、雙軌服務費（10%系統費+25%推廣聯盟費）與 3~7 天書審認知】</strong>本人了解 $990 方案含開發 3 本電子書（之後每本開發費 $360），<strong>每本電子書免費修改次數為 30 次（含完稿後再修改，超過後需支付修改費 $30 才可再修改 1 次）</strong>，次年 AI 自來客及電子書系統服務費為 $450；每筆交易除 <strong>1 成 (10%) 系統服務費（含提款服務費及推廣服務費，可由首年 $990 / 次年 $450 抵用金 100% 倒抵）</strong>外，另需支出 <strong>「推廣聯盟服務費 25%」</strong>；且<strong>電子書設定完成後須進入管理後台進行「書審（時間 3~7 天）」</strong>通過後方可正式上架。
                 </span>
               </label>
             </div>

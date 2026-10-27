@@ -50,6 +50,54 @@ export default function AdminNFTPage() {
   const [editingPkgId, setEditingPkgId] = useState<number | null>(null);
   const [activeHtmlLang, setActiveHtmlLang] = useState<'zh' | 'en'>('zh');
   const [showLivePreview, setShowLivePreview] = useState(true);
+  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
+
+  const handleUploadCourseFile = async (file: File, pkgId?: number | string) => {
+    if (!file) return;
+    const targetKey = pkgId !== undefined ? String(pkgId) : 'new';
+    setUploadingTarget(targetKey);
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const fileData = await base64Promise;
+
+      const res = await fetch('/api/admin/packages/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileData,
+          fileName: file.name,
+          fileType: file.type || 'application/pdf',
+          packageId: targetKey
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || '檔案上傳至 R2 失敗');
+      }
+
+      const r2Url = data.primaryUrl; // https://1.5208.uk/courses/...
+      if (pkgId === undefined || targetKey === 'new') {
+        setNewCourseLink(r2Url);
+      } else {
+        const idx = packages.findIndex(p => String(p.id) === String(pkgId));
+        if (idx >= 0) {
+          const newPkgs = [...packages];
+          newPkgs[idx].course_link = r2Url;
+          setPackages(newPkgs);
+        }
+      }
+      alert(`✅ 上傳成功！電子書/教材檔案已直接儲存至微享專用 Cloudflare R2 儲存槽：\n${r2Url}\n\n已自動填入下載連結欄位，點擊「儲存更新」即可生效！`);
+    } catch (err: any) {
+      alert(`❌ 上傳失敗: ${err.message || '請稍後再試'}`);
+    } finally {
+      setUploadingTarget(null);
+    }
+  };
 
   const fetchPackages = async () => {
     try {
@@ -202,13 +250,29 @@ export default function AdminNFTPage() {
             <option value="DIRECT_COURSE">🎓 AI頂配教材 (享25%分潤+教材發貨)</option>
             <option value="SPONSOR">創作者贊助 (純斗內・無分潤)</option>
           </select>
-          <input
-            type="text"
-            placeholder="📥 教材下載/觀看連結 (course_link)"
-            value={newCourseLink}
-            onChange={e => setNewCourseLink(e.target.value)}
-            className="bg-black border border-cyan-500/50 rounded px-3 py-2 text-cyan-200 placeholder-gray-500"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="📥 電子書/教材下載連結 (course_link)"
+              value={newCourseLink}
+              onChange={e => setNewCourseLink(e.target.value)}
+              className="bg-black border border-cyan-500/50 rounded px-3 py-2 text-cyan-200 placeholder-gray-500 flex-1 font-mono text-xs"
+            />
+            <label className="px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded text-xs font-bold whitespace-nowrap cursor-pointer shadow-md flex items-center gap-1 transition-all">
+              <span>{uploadingTarget === 'new' ? '⏳ 上傳R2中...' : '📤 直傳R2'}</span>
+              <input
+                type="file"
+                className="hidden"
+                accept=".pdf,.html,.htm,.epub,.zip,.mp4"
+                onChange={e => {
+                  if (e.target.files?.[0]) {
+                    handleUploadCourseFile(e.target.files[0], 'new');
+                  }
+                }}
+                disabled={uploadingTarget === 'new'}
+              />
+            </label>
+          </div>
         </div>
 
         {/* 新增表單內的宣傳文案 HTML 摺疊編輯器 */}
@@ -365,17 +429,33 @@ export default function AdminNFTPage() {
                       </select>
                     </td>
                     <td className="p-3">
-                      <input
-                        type="text"
-                        placeholder="https://..."
-                        value={pkg.course_link || ''}
-                        onChange={e => {
-                          const newPkgs = [...packages];
-                          newPkgs[idx].course_link = e.target.value;
-                          setPackages(newPkgs);
-                        }}
-                        className="bg-black border border-cyan-500/40 rounded px-2 py-1 w-36 text-cyan-300 text-xs"
-                      />
+                      <div className="flex flex-col gap-1.5 min-w-[190px]">
+                        <input
+                          type="text"
+                          placeholder="https://1.5208.uk/..."
+                          value={pkg.course_link || ''}
+                          onChange={e => {
+                            const newPkgs = [...packages];
+                            newPkgs[idx].course_link = e.target.value;
+                            setPackages(newPkgs);
+                          }}
+                          className="bg-black border border-cyan-500/40 rounded px-2 py-1 w-full text-cyan-300 text-xs font-mono"
+                        />
+                        <label className="px-2 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 rounded text-[11px] font-bold text-center cursor-pointer transition-colors flex items-center justify-center gap-1">
+                          <span>{uploadingTarget === String(pkg.id) ? '⏳ 上傳R2中...' : '📤 直傳電子書至 R2'}</span>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.html,.htm,.epub,.zip,.mp4"
+                            onChange={e => {
+                              if (e.target.files?.[0]) {
+                                handleUploadCourseFile(e.target.files[0], pkg.id);
+                              }
+                            }}
+                            disabled={uploadingTarget === String(pkg.id)}
+                          />
+                        </label>
+                      </div>
                     </td>
                     <td className="p-3">
                       <button

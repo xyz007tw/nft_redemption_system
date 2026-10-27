@@ -38,7 +38,7 @@ export interface EBookProject {
   chapters: EBookChapter[];
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED_PUBLISHED' | 'REJECTED_BANNED';
   edit_count?: number;           // 本書累計已修改次數 (含完稿後再修改)
-  edit_quota_max?: number;       // 本書允許修改上限 (預設 30 次，每付 $30 修改費 +30 次)
+  edit_quota_max?: number;       // 本書允許修改上限 (預設 30 次，之後每付 $30 修改費 +1 次)
   submitted_at?: string;
   reviewed_at?: string;
   review_note?: string;
@@ -51,9 +51,9 @@ export interface FranchiseeProfile {
   email: string;
   plan_status: 'TRIAL' | 'ACTIVE_YEAR_1' | 'ACTIVE_RENEWED' | 'BANNED_NO_REFUND';
   agreed_terms_at?: string;
-  book_quota_total: number;      // 首年 $990 預設 3 本，每加購 $330 +1 本
+  book_quota_total: number;      // 首年 $990 預設 3 本，之後每加購 $360 +1 本
   book_created_count: number;
-  fee_credit_balance: number;    // 首年 $990 倒抵金，次年續約 +$330 倒抵金 (100% 折抵 10% 平台服務費)
+  fee_credit_balance: number;    // 首年 $990 倒抵金，次年續約 +$450 倒抵金 (100% 折抵 10% 平台服務費)
   total_sales_usdt: number;
   ai_traffic_enabled: boolean;
   expires_at: string;
