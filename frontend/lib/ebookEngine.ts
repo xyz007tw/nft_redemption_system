@@ -25,6 +25,8 @@ export interface EBookProject {
   price_monthly_sub_usdt: number;
   chapters: EBookChapter[];
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED_PUBLISHED' | 'REJECTED_BANNED';
+  edit_count?: number;           // 本書累計已修改次數 (含完稿後再修改)
+  edit_quota_max?: number;       // 本書允許修改上限 (預設 30 次，每付 $30 修改費 +30 次)
   submitted_at?: string;
   reviewed_at?: string;
   review_note?: string;

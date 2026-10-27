@@ -240,12 +240,14 @@ export default function FranchiseStudioPage() {
     }
   };
 
-  // 模擬加購第 4 本起配額 ($330/本) 或次年續約 ($330 同享 100% 倒抵)
-  const handleUpgradeAction = async (upgradeType: 'ADD_1_BOOK_330' | 'RENEW_YEAR2_330') => {
+  // 模擬加購第 4 本起配額 ($330/本)、次年續約 ($330 同享 100% 倒抵) 或 單書加購 30 次修改權限 ($30)
+  const handleUpgradeAction = async (upgradeType: 'ADD_1_BOOK_330' | 'RENEW_YEAR2_330' | 'ADD_30_EDITS_30') => {
     const label =
       upgradeType === 'ADD_1_BOOK_330'
         ? '確認支付 $330 USDT 加購「1 本額外電子書開發配額」？'
-        : '確認支付 $330 USDT 續約「次年 AI 自來客廣告與電子書維護費（可 100% 抵扣交易 1 成服務費）」？';
+        : upgradeType === 'RENEW_YEAR2_330'
+        ? '確認支付 $330 USDT 續約「次年 AI 自來客廣告與電子書維護費（可 100% 抵扣交易 1 成服務費）」？'
+        : '確認支付修改費 $30 USDT，為本書再增加「+30 次修改權限」？';
     if (!window.confirm(label)) return;
 
     const res = await fetch('/api/ebook', {
@@ -254,16 +256,21 @@ export default function FranchiseStudioPage() {
       body: JSON.stringify({
         action: 'upgrade_quota_or_renew',
         authorKey: address || 'demo_author',
-        upgradeType
+        upgradeType,
+        bookId: currentBook.id
       })
     });
     const data = await res.json();
-    if (data.success && data.profile) {
-      setProfile(data.profile);
+    if (data.success) {
+      if (data.profile) setProfile(data.profile);
+      if (data.book) setCurrentBook(data.book);
+      fetchStoreData();
       setStatusMessage(
         upgradeType === 'ADD_1_BOOK_330'
           ? '✅ 已成功擴充 +1 本電子書開發配額！'
-          : '✅ 已完成次年 $330 維護續約！您的服務費抵用金水庫已自動增加 +$330 USDT（享 100% 倒抵 10% 交易服務費）！'
+          : upgradeType === 'RENEW_YEAR2_330'
+          ? '✅ 已完成次年 $330 維護續約！您的服務費抵用金水庫已自動增加 +$330 USDT（享 100% 倒抵 10% 交易服務費）！'
+          : '✅ 已支付修改費 $30 USDT，本書已成功擴充 +30 次修改權限！'
       );
     }
   };
@@ -703,9 +710,30 @@ export default function FranchiseStudioPage() {
               <h3 className="text-xl font-black text-white mb-2">
                 STEP 3：📥 加盟商自行下載電子書 ＆ 送交書審
               </h3>
-              <p className="text-xs text-gray-300 leading-relaxed mb-5">
+              <p className="text-xs text-gray-300 leading-relaxed mb-4">
                 您可以隨時將製作好的電子書<strong>直接下載回您的電腦/手機保存或印刷</strong>；若要在微享讀者書櫃上架銷售並啟動 AI 自動來客廣告，請點擊下方「提交總後台書審（審核時間 3~7 天）」。
               </p>
+
+              {/* 單書 30 次修改計數器與 $30 加購修改權限面板 */}
+              <div className="p-3.5 rounded-2xl bg-purple-950/50 border border-purple-500/40 mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-bold text-purple-300">
+                    ✏️ 本書修改次數配額（含完稿後再修改）
+                  </div>
+                  <div className="text-sm font-black text-white mt-0.5">
+                    已修改 {currentBook.edit_count ?? 0} / {currentBook.edit_quota_max ?? 30} 次
+                    <span className="text-[11px] font-normal text-gray-400 ml-2">
+                      (滿30次後需付$30再享30次)
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleUpgradeAction('ADD_30_EDITS_30')}
+                  className="px-3 py-2 rounded-xl bg-purple-600/40 hover:bg-purple-600/60 border border-purple-400 text-purple-200 text-xs font-bold shrink-0 cursor-pointer"
+                >
+                  ➕ 付 $30 加購 30 次修改
+                </button>
+              </div>
 
               {/* 加盟商自行下載雙按鈕 */}
               <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 mb-5 space-y-3">

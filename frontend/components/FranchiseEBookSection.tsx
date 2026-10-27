@@ -85,7 +85,7 @@ export default function FranchiseEBookSection() {
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-white/10 text-xs font-bold text-pink-400">
-              {isZh ? '✔ 首年含 3 本配額｜第 4 本起 $330/本' : '✔ 3 Books Included | $330/Extra Book'}
+              {isZh ? '✔ 含 3 本配額(第4本起$330)｜每本30次修改(加購$30/30次)' : '✔ 3 Books ($330/extra) | 30 Edits/Book ($30/+30 edits)'}
             </div>
           </div>
 
@@ -359,7 +359,7 @@ export default function FranchiseEBookSection() {
                   className="mt-1 w-4 h-4 accent-pink-500 shrink-0"
                 />
                 <span className="text-gray-200 leading-relaxed">
-                  <strong>【配額、雙軌服務費（10%系統費+25%推廣聯盟費）與 3~7 天書審認知】</strong>本人了解 $990 方案含開發 3 本電子書（之後每本開發費 $330），次年 AI 自來客及電子書維護費為 $330；每筆交易除 <strong>1 成 (10%) 系統服務費（含提款服務費及推廣服務費，可由首年 $990 / 次年 $330 抵用金 100% 倒抵）</strong>外，另需支出 <strong>「推廣聯盟服務費 25%」</strong>；且<strong>電子書設定完成後須進入管理後台進行「書審（時間 3~7 天）」</strong>通過後方可正式上架。
+                  <strong>【配額、30次修改上限、雙軌服務費（10%系統費+25%推廣聯盟費）與 3~7 天書審認知】</strong>本人了解 $990 方案含開發 3 本電子書（之後每本開發費 $330），<strong>每本電子書免費修改次數為 30 次（含完稿後再修改，超過後需支付修改費 $30 才可再享 30 次修改權限）</strong>，次年 AI 自來客及電子書維護費為 $330；每筆交易除 <strong>1 成 (10%) 系統服務費（含提款服務費及推廣服務費，可由首年 $990 / 次年 $330 抵用金 100% 倒抵）</strong>外，另需支出 <strong>「推廣聯盟服務費 25%」</strong>；且<strong>電子書設定完成後須進入管理後台進行「書審（時間 3~7 天）」</strong>通過後方可正式上架。
                 </span>
               </label>
             </div>

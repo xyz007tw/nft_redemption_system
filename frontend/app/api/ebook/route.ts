@@ -374,9 +374,33 @@ export async function POST(req: Request) {
         profile.book_created_count = myBooksCount + 1;
       }
 
+      // 若是既有書籍進行修改（包含草稿修改、完稿或上架後再修改），嚴格檢查每本書 30 次修改上限
+      let currentEditCount = 0;
+      let currentEditMax = book.edit_quota_max || 30;
+
+      if (existingIdx >= 0) {
+        const oldBook = store.books[existingIdx];
+        currentEditCount = oldBook.edit_count ?? 0;
+        currentEditMax = oldBook.edit_quota_max ?? 30;
+
+        if (currentEditCount >= currentEditMax) {
+          return NextResponse.json(
+            {
+              success: false,
+              needEditFee30: true,
+              error: `✏️ 本書修改次數已達上限（已修改 ${currentEditCount} / ${currentEditMax} 次，含完稿後再修改）。依規範每本電子書免費修改次數為 30 次，請先支付修改費 $30 USDT，即可再解鎖 +30 次修改權限！`
+            },
+            { status: 402 }
+          );
+        }
+        currentEditCount += 1;
+      }
+
       const now = new Date().toISOString();
       const updatedBook: EBookProject = {
         ...book,
+        edit_count: currentEditCount,
+        edit_quota_max: currentEditMax,
         status: submitForReview ? 'PENDING_REVIEW' : (book.status || 'DRAFT'),
         submitted_at: submitForReview ? now : book.submitted_at,
         updated_at: now,
@@ -395,14 +419,14 @@ export async function POST(req: Request) {
         book: updatedBook,
         profile,
         message: submitForReview
-          ? '✅ 已成功送交總管理後台進行「書審」！書審時間為 3~7 個工作天，審核通過後將自動上架並啟動 AI 自動來客系統幫您打廣告！'
-          : '✅ 電子書草稿與模版設定已儲存！您現在可隨時點擊「自行下載電子書」導出檔案。'
+          ? `✅ 已成功送交總管理後台進行「書審」（本書累計修改次數：${currentEditCount} / ${currentEditMax} 次）！書審時間為 3~7 個工作天，審核通過後將自動上架並啟動 AI 自動來客系統幫您打廣告！`
+          : `✅ 電子書修改已儲存（本書累計修改次數：${currentEditCount} / ${currentEditMax} 次，超過 ${currentEditMax} 次需付修改費 $30 再享 30 次）！您現在可隨時點擊「自行下載電子書」導出檔案。`
       });
     }
 
-    // 3. 加購電子書配額 ($330 / 本) 或 次年續約維護費 ($330 享 100% 倒抵 10% 服務費)
+    // 3. 加購電子書配額 ($330 / 本)、次年續約維護費 ($330 享 100% 倒抵 10% 服務費) 或 單書加購 30 次修改權限 ($30)
     if (action === 'upgrade_quota_or_renew') {
-      const { authorKey, upgradeType } = body;
+      const { authorKey, upgradeType, bookId } = body;
       const key = (authorKey || 'demo_author').toLowerCase();
       if (!store.franchisees[key]) {
         store.franchisees[key] = { ...DEFAULT_STORE.franchisees['demo_author'], wallet_address: key };
@@ -415,6 +439,17 @@ export async function POST(req: Request) {
         profile.plan_status = 'ACTIVE_RENEWED';
         profile.fee_credit_balance += 330; // 次年 $330 一樣先收費後 100% 抵扣交易 1 成服務費
         profile.expires_at = new Date(Date.now() + 365 * 86400000).toISOString();
+      } else if (upgradeType === 'ADD_30_EDITS_30') {
+        const bIdx = store.books.findIndex(b => b.id === bookId);
+        if (bIdx >= 0) {
+          store.books[bIdx].edit_quota_max = (store.books[bIdx].edit_quota_max ?? 30) + 30;
+          await saveCloudStore(store);
+          return NextResponse.json({
+            success: true,
+            profile,
+            book: store.books[bIdx]
+          });
+        }
       }
 
       await saveCloudStore(store);
