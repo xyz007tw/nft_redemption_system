@@ -6,7 +6,12 @@ export interface EBookChapter {
   title_en: string;
   content_zh: string;
   content_en: string;
-  image_url?: string; // 支援章節配圖 (可上傳至專用 R2: https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev 或 https://1.5208.uk)
+  image_url?: string;            // 支援章節配圖 (AI自動製圖或上傳)
+  image_caption?: string;        // 配圖圖說 (中英雙語)
+  references?: Array<{          // 專業來源引用 / 查證參照 (Citations & Sources)
+    title: string;
+    url?: string;
+  }>;
 }
 
 export interface EBookProject {
@@ -245,7 +250,8 @@ export function generateStandaloneEBookHTML(
           ${
             ch.image_url
               ? `<div style="margin: 18px 0 24px 0; text-align: center;">
-                   <img src="${ch.image_url}" alt="${ch.title_zh}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+                   <img src="${ch.image_url}" alt="${ch.title_zh}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);" />
+                   ${ch.image_caption ? `<div style="font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic;">📷 ${ch.image_caption}</div>` : ''}
                  </div>`
               : ''
           }
@@ -269,6 +275,20 @@ export function generateStandaloneEBookHTML(
                     .filter(p => p.trim())
                     .map(p => `<p>${p}</p>`)
                     .join('')}
+                </div>`
+              : ''
+          }
+          ${
+            ch.references && ch.references.length > 0
+              ? `<div style="margin-top: 24px; padding: 14px 18px; background: rgba(0,0,0,0.03); border-radius: 8px; border-left: 3px solid ${theme.primaryColor}; font-size: 12px; color: #64748b;">
+                  <strong style="color: ${theme.primaryColor};">📚 資料來源與權威參照 (References & Citations)：</strong>
+                  <ol style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+                    ${ch.references
+                      .map(
+                        r => `<li>${r.title}${r.url ? ` — <a href="${r.url}" target="_blank" rel="noopener noreferrer" style="color:${theme.primaryColor};text-decoration:underline;">[來源連結]</a>` : ''}</li>`
+                      )
+                      .join('')}
+                  </ol>
                 </div>`
               : ''
           }

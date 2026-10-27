@@ -165,7 +165,7 @@ export default function FranchiseStudioPage() {
           subtitle_en: data.bookMeta?.subtitle_en || prev.subtitle_en,
           chapters: data.chapters || prev.chapters
         }));
-        setStatusMessage('🎉 AI 一鍵全書自動編撰完成！已自動為您生成中英雙語書名與 4 大完整章節，可立即在右側點擊「自行下載電子書」或「提交書審」！');
+        setStatusMessage('🎉 Google 4 旗艦大腦已為您編撰完成 25+ 頁全球權威專書！包含 8 大核心篇章、高質感商業插圖、圖說與權威文獻參照，可立即在右側點擊「自行下載電子書（3版）」或「提交書審」！');
       }
     } catch (e: any) {
       alert('連線錯誤：' + e.message);
@@ -675,19 +675,24 @@ export default function FranchiseStudioPage() {
               </div>
             </div>
 
-            {/* Step 2: AI 自動編撰全書 & 雙語章節生成器 */}
+            {/* Step 2: AI 自動編撰全書 & 雙語章節生成器 (Google 4 Argon 圖文專業版) */}
             <div className="bg-gradient-to-br from-indigo-950/50 to-purple-950/40 border border-purple-500/40 rounded-3xl p-6">
-              <h2 className="text-xl font-black text-white mb-2">
-                STEP 2：🤖 AI 電子書全自動編撰引擎 (Gemini 2.5 Flash)
-              </h2>
-              <p className="text-xs text-purple-200 mb-4">
-                提供兩種智慧編撰模式：【模式 A】只要輸入主題，一鍵自動編撰整本雙語電子書（含 4 大章節）；【模式 B】逐章輸入大綱擴寫與翻譯。
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <h2 className="text-xl font-black text-white">
+                  STEP 2：🤖 Google 4 旗艦級「圖文專業電子書」自動編撰引擎
+                </h2>
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                  ✨ 旗艦大腦 (自動聯網檢索 + 配圖 + 權威來源參照)
+                </span>
+              </div>
+              <p className="text-xs text-purple-200 mb-4 leading-relaxed">
+                全面搭載 Google 4 旗艦大腦！支援兩種智慧模式：【模式 A】輸入全書主題，調用全球頂尖暢銷作家與戰略顧問代理，一次自動完成<strong>「封面圖 ＋ 8 大核心深度篇章（8,000~10,000字・達標 25+ 頁全球權威專書體量）＋ 高質感商業插圖 ＋ 權威數據來源參照」</strong>之全套中英雙語圖文書；【模式 B】單一章節深度擴寫與圖文生成。
               </p>
 
               {/* 模式 A：一鍵全書自動編撰 */}
               <div className="p-4 rounded-2xl bg-pink-950/40 border border-pink-500/40 mb-5 space-y-3">
                 <div className="text-xs font-black text-pink-300">
-                  🚀 【模式 A：AI 一鍵全書自動編撰（輸入主題 ➔ 自動寫完一整本中英雙語書）】
+                  🚀 【模式 A：Google 4 一鍵全書自動編撰（8 大篇章・25+ 頁全球暢銷圖文專書規格）】
                 </div>
                 <textarea
                   rows={2}
@@ -702,15 +707,15 @@ export default function FranchiseStudioPage() {
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 hover:from-pink-400 hover:to-amber-400 text-white font-black text-sm shadow-lg cursor-pointer disabled:opacity-50"
                 >
                   {fullBookLoading
-                    ? '⏳ AI 總編輯正在為您自動編撰全書 4 大雙語章節中（約需 8~15 秒）...'
-                    : '🔥 一鍵由 AI 自動編撰整本中英雙語電子書（含書名 + 4大章節）'}
+                    ? '⏳ Google 4 旗艦大腦（暢銷作家代理）正在聯網檢索、撰寫 8 大篇章雙語內文並配置高解析插圖中（約需 12~20 秒）...'
+                    : '🔥 一鍵由 Google 4 旗艦大腦編撰 25+ 頁全球權威圖文書（8大篇章 + 配圖 + 來源參照）'}
                 </button>
               </div>
 
               {/* 模式 B：單章擴寫 */}
               <div className="space-y-3 pt-3 border-t border-white/10">
                 <div className="text-xs font-bold text-purple-300">
-                  ➕ 【模式 B：AI 單一章節擴寫與雙語翻譯】
+                  ➕ 【模式 B：單一章節深度撰寫（含插圖建議與數據參照）】
                 </div>
                 <input
                   type="text"
@@ -731,7 +736,7 @@ export default function FranchiseStudioPage() {
                   disabled={aiLoading}
                   className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg cursor-pointer disabled:opacity-50"
                 >
-                  {aiLoading ? '⏳ AI 正在撰寫與翻譯雙語章節中...' : '✨ 新增並由 AI 擴寫此章節'}
+                  {aiLoading ? '⏳ Google 4 旗艦大腦撰寫與翻譯章節中...' : '✨ 新增並由 Google 4 擴寫此圖文章節'}
                 </button>
               </div>
 
@@ -776,29 +781,41 @@ export default function FranchiseStudioPage() {
                       }}
                       className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200"
                     />
-                    {/* 章節配圖上傳至專用 R2 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1">
-                      <label className="text-[11px] font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 px-3 py-1.5 rounded-lg cursor-pointer">
-                        🖼️ 上傳本章圖片至專用 R2
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadToDedicatedR2(f, 'CHAPTER_IMAGE', idx);
-                          }}
-                        />
-                      </label>
-                      {ch.image_url && (
-                        <a
-                          href={ch.image_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[11px] text-emerald-300 underline truncate max-w-xs"
-                        >
-                          ✅ 已掛載 R2 圖片：{ch.image_url}
-                        </a>
+                    {/* 章節配圖上傳至專用 R2 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) 與圖說/參照預覽 */}
+                    <div className="flex flex-col gap-2 pt-1 border-t border-white/5">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <label className="text-[11px] font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 px-3 py-1.5 rounded-lg cursor-pointer">
+                          🖼️ 自訂上傳本章圖片至專用 R2
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadToDedicatedR2(f, 'CHAPTER_IMAGE', idx);
+                            }}
+                          />
+                        </label>
+                        {ch.image_url && (
+                          <a
+                            href={ch.image_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[11px] text-emerald-300 underline truncate max-w-xs"
+                          >
+                            ✅ 已配置圖片：{ch.image_url}
+                          </a>
+                        )}
+                      </div>
+                      {ch.image_caption && (
+                        <div className="text-[11px] text-gray-400 italic">
+                          📷 圖說：{ch.image_caption}
+                        </div>
+                      )}
+                      {ch.references && ch.references.length > 0 && (
+                        <div className="text-[11px] text-cyan-400/90">
+                          📚 參照來源：{ch.references.map(r => r.title).join(' ｜ ')}
+                        </div>
                       )}
                     </div>
                   </div>

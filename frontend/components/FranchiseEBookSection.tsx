@@ -62,8 +62,8 @@ export default function FranchiseEBookSection() {
 
           <p className="text-base sm:text-lg md:text-xl text-pink-200/90 mb-10 max-w-4xl mx-auto leading-relaxed">
             {isZh
-              ? '內建「線上雙語電子書模版引擎（支援加盟商自行下載 PDF/網頁母檔）」、三級管理平台（管理員 / 加盟商 / 讀者訂閱），首年 $990 與次年 $330 維護費皆享【先收費、後 100% 倒抵交易 1 成服務費】零風險保障！'
-              : 'Built-in Bilingual E-Book Template Engine (supports downloading master PDF/HTML files), 3-Tier SaaS Portal (Admin / Franchisee / Reader), with 100% Fee-Credit Rebate on both Year-1 ($990) and Year-2 ($330)!'}
+              ? '內建「Google 4 旗艦級圖文專業電子書模版引擎（8大深度篇章・25+ 頁全球暢銷專書規格・支援加盟商自行下載 PDF/網頁母檔）」、三級管理平台（管理員 / 加盟商 / 讀者訂閱），首年 $990 與次年 $330 維護費皆享【先收費、後 100% 倒抵交易 1 成服務費】零風險保障！'
+              : 'Built-in Google 4 Illustrated Authority E-Book Engine (8 Deep Chapters, 25+ Pages Bestselling Masterbook, supports downloading master PDF/HTML files), 3-Tier SaaS Portal (Admin / Franchisee / Reader), with 100% Fee-Credit Rebate on both Year-1 ($990) and Year-2 ($330)!'}
           </p>
         </div>
 
