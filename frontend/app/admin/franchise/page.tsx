@@ -78,6 +78,39 @@ export default function AdminFranchiseReviewPage() {
     }
   };
 
+  // 管理員刪除單本電子書、處理「次年未續約 ($330)」下架、或徹底刪除整個加盟商與所有書籍
+  const handleAdminDeleteOrExpire = async (
+    targetType: 'DELETE_SINGLE_BOOK' | 'EXPIRE_UNRENEWED_FRANCHISEE' | 'PURGE_FRANCHISEE_ALL',
+    bookId?: string,
+    authorKey?: string
+  ) => {
+    const confirmMsg =
+      targetType === 'DELETE_SINGLE_BOOK'
+        ? '🗑️ 確定要從雲端資料庫「永久刪除這本電子書」嗎？刪除後不可復原！'
+        : targetType === 'EXPIRE_UNRENEWED_FRANCHISEE'
+        ? `⚠️ 確定將加盟商 [${authorKey}] 標記為「次年 ($330) 逾期未續約」？\n系統將自動停止其 AI 自動來客廣告、歸零抵用金，並將其名下所有電子書從書店下架！`
+        : `🚨【徹底刪除確認】確定要將未續約加盟商 [${authorKey}] 及其名下「所有電子書」從雲端資料庫永久清除嗎？`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    const res = await fetch('/api/ebook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'admin_delete_or_expire',
+        targetType,
+        bookId,
+        authorKey
+      })
+    });
+    const data = await res.json();
+    if (data.success && data.store) {
+      setBooks(data.store.books || []);
+      setFranchisees(data.store.franchisees || {});
+      alert('✅ 管理員刪除 / 未續約下架操作已執行完畢！');
+    }
+  };
+
   const pendingBooks = books.filter(b => b.status === 'PENDING_REVIEW');
 
   return (
@@ -204,6 +237,12 @@ export default function AdminFranchiseReviewPage() {
                   >
                     🚨 判定禁書違規 (強制封號・一律不退費)
                   </button>
+                  <button
+                    onClick={() => handleAdminDeleteOrExpire('DELETE_SINGLE_BOOK', book.id)}
+                    className="px-4 py-2 rounded-xl bg-gray-800 hover:bg-red-900/60 border border-gray-600 hover:border-red-500 text-gray-300 hover:text-red-200 text-xs font-bold cursor-pointer"
+                  >
+                    🗑️ 永久刪除此本電子書 (未續約/清理)
+                  </button>
                 </div>
               </div>
             ))}
@@ -211,19 +250,20 @@ export default function AdminFranchiseReviewPage() {
         )}
       </div>
 
-      {/* 加盟商配額與 $990/$330 服務費倒抵水庫總覽 */}
+      {/* 加盟商配額與 $990/$330 服務費倒抵水庫總覽 (含未續約一鍵下架與徹底刪除按鈕) */}
       <div className="bg-gray-800/80 border border-gray-700 rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-4">💎 加盟商配額與 $990 / $330 倒抵金水庫監控</h2>
+        <h2 className="text-xl font-bold mb-4">💎 加盟商配額、$990/$330 倒抵金水庫 ＆ 次年未續約刪除管理</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-gray-700 text-gray-400">
                 <th className="p-3">加盟商識別 / 信箱</th>
-                <th className="p-3">合約狀態</th>
+                <th className="p-3">合約狀態 / 到期日</th>
                 <th className="p-3">開發配額 (首年3本/加購$330)</th>
                 <th className="p-3">10% 服務費倒抵金餘額</th>
                 <th className="p-3">累積銷售額</th>
-                <th className="p-3">AI 自來客廣告協作</th>
+                <th className="p-3">AI 自來客廣告</th>
+                <th className="p-3">次年未續約 / 刪除操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
@@ -235,18 +275,37 @@ export default function AdminFranchiseReviewPage() {
                       className={`px-2.5 py-1 rounded-full font-bold ${
                         pf.plan_status === 'BANNED_NO_REFUND'
                           ? 'bg-red-500/30 text-red-300'
+                          : pf.plan_status === 'TRIAL'
+                          ? 'bg-amber-500/20 text-amber-300'
                           : 'bg-emerald-500/20 text-emerald-300'
                       }`}
                     >
-                      {pf.plan_status}
+                      {pf.plan_status === 'TRIAL' ? '⚠️ 未續約已下架' : pf.plan_status}
                     </span>
+                    <div className="text-[11px] text-gray-400 mt-1">
+                      到期：{pf.expires_at ? new Date(pf.expires_at).toLocaleDateString() : '-'}
+                    </div>
                   </td>
                   <td className="p-3 font-bold">
                     {pf.book_created_count} / {pf.book_quota_total} 本
                   </td>
                   <td className="p-3 text-emerald-400 font-black">${pf.fee_credit_balance} USDT</td>
                   <td className="p-3 text-cyan-300 font-bold">${pf.total_sales_usdt} USDT</td>
-                  <td className="p-3">{pf.ai_traffic_enabled ? '🔥 曝光中' : '已停止'}</td>
+                  <td className="p-3">{pf.ai_traffic_enabled ? '🔥 曝光中' : '🛑 已停止'}</td>
+                  <td className="p-3 space-x-2 whitespace-nowrap">
+                    <button
+                      onClick={() => handleAdminDeleteOrExpire('EXPIRE_UNRENEWED_FRANCHISEE', undefined, key)}
+                      className="px-2.5 py-1.5 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 border border-amber-400 text-amber-200 font-bold cursor-pointer"
+                    >
+                      ⚠️ 未續約：一鍵下架全書+停廣告
+                    </button>
+                    <button
+                      onClick={() => handleAdminDeleteOrExpire('PURGE_FRANCHISEE_ALL', undefined, key)}
+                      className="px-2.5 py-1.5 rounded-lg bg-red-600/30 hover:bg-red-600/60 border border-red-400 text-red-200 font-bold cursor-pointer"
+                    >
+                      🗑️ 徹底刪除加盟商與所有書
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

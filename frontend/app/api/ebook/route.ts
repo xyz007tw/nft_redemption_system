@@ -495,6 +495,47 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, book: targetBook, store });
     }
 
+    // 4B. 總管理員後台 (/admin/franchise) 刪除機制：針對「次年未續約 ($330)」或違規之加盟商，一鍵刪除單本電子書、下架未續約書籍、或徹底刪除整個加盟商帳號與旗下所有電子書
+    if (action === 'admin_delete_or_expire') {
+      const { targetType, bookId, authorKey } = body as {
+        targetType: 'DELETE_SINGLE_BOOK' | 'EXPIRE_UNRENEWED_FRANCHISEE' | 'PURGE_FRANCHISEE_ALL';
+        bookId?: string;
+        authorKey?: string;
+      };
+
+      if (targetType === 'DELETE_SINGLE_BOOK' && bookId) {
+        store.books = store.books.filter(b => b.id !== bookId);
+      } else if (targetType === 'EXPIRE_UNRENEWED_FRANCHISEE' && authorKey) {
+        const key = authorKey.toLowerCase();
+        if (store.franchisees[key]) {
+          store.franchisees[key].plan_status = 'TRIAL';
+          store.franchisees[key].ai_traffic_enabled = false;
+          store.franchisees[key].fee_credit_balance = 0;
+        }
+        // 將該未續約加盟商旗下所有已上架電子書強制轉回草稿（從 /ebook-store 書櫃下架停止銷售）
+        store.books = store.books.map(b => {
+          const bKey = (b.author_wallet || b.author_email || '').toLowerCase();
+          if (bKey === key) {
+            return {
+              ...b,
+              status: 'DRAFT',
+              review_note: '⚠️ 次年維護費 ($330) 逾期未續約，系統已自動下架並停止 AI 自動來客廣告協作。'
+            };
+          }
+          return b;
+        });
+      } else if (targetType === 'PURGE_FRANCHISEE_ALL' && authorKey) {
+        const key = authorKey.toLowerCase();
+        delete store.franchisees[key];
+        store.books = store.books.filter(
+          b => (b.author_wallet || b.author_email || '').toLowerCase() !== key
+        );
+      }
+
+      await saveCloudStore(store);
+      return NextResponse.json({ success: true, store });
+    }
+
     // 5. 模擬讀者購買電子書 ➔ 觸發「10% 系統服務費（含提款與推廣服務費，由 $990/$330 抵用金 100% 倒抵）+ 25% 推廣聯盟服務費支出」結算器
     if (action === 'simulate_reader_purchase') {
       const { bookId, amountUsdt } = body;
