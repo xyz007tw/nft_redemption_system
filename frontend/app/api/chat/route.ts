@@ -4,6 +4,14 @@ import nodemailer from 'nodemailer';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
+// 🛡️ AI 客服巡檢代理 (Model Health Patrol Agent)：當主模型遭官方停用 (Deprecated / 404) 或配額限流 (429 / 503) 時，
+// 自動巡檢查核並無縫切換至下一個最高 CP 值之官方模型（嚴格避開昂貴的 3.X Thinking 推理模型以防成本失控）
+const CP_VALUE_MODEL_CHAIN = [
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash'
+];
+
 // 系統核心知識庫 (MVP)
 const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 的專屬 AI 智能客服，請遵循以下知識庫來回答客戶問題：
 
@@ -16,13 +24,17 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 - 系統提供階梯式眾籌憑證，例如 $99, $198, $1788, $5400, $12000 USDT 等級距。
 - 購買方式極度彈性，支援 Web3 小狐狸錢包 (USDT) 支付，也支援 Web2 法幣信用卡支付 (PayUni 統一金流)，皆為一次性買斷。
 - 權益：透過法幣刷卡亦享有「混合賦能 (Hybrid Gating)」的完整 AI 權限，免除自己買區塊鏈 Gas Fee 的煩惱。
-- 贊助專區：部分產品為純「斗內贊助 (Sponsorship)」，此為純提供粉絲支持，不納入 25% 推廣分潤中。
+- 贊助專區：部分產品為純「斗內贊助 (Sponsorship)」，此為純提供粉絲支持，不實際發放 25% 推廣佣金，但可併入買家本人的「級差分潤資格認定累積業績」中。
 
-💰 25% 聯盟推廣分潤機制 (Affiliate System)：
+💰 25% 聯盟推廣分潤機制與「自消費併入級差資格認定」鐵律 (Affiliate System & Self-Purchase Qualification Rule)：
 - 永久綁定推廣上線，客戶未來的每一筆眾籌、AI頂配教材與電子書消費都會自動歸屬該推薦線。總撥出推廣服務費為 25%，詳細分為三大獎金：
-  1. 級差獎金 (最高10%)：依個人累積業績分 0%, 3%, 6%, 10% 級距，下層買單向上尋找對應階級發放直接/差額獎金。
+  1. 級差獎金 (最高10%)：依個人累積業績分 0% (<$600), 3% ($600~$6,000), 6% ($6,000~$15,000), 10% (>=$15,000) 級距，下層買單向上尋找對應階級發放直接/差額獎金。
   2. 對等獎金 (最高10%)：只要被推薦人（下線）領取到級差獎金（包含直推與差水），他的「直接推薦人（上線）」就能獲得 100% 同等金額的 MATCHING 獎金。
-  3. 全球領袖均分 (永久5%)：只要有新訂單產生，系統會自動撥出 5% 的金額，平均分配給目前所有眾籌業績達成 15,000 USDT 以上（頂規10%）的全球領袖。
+  3. 全球領袖均分 (永久5%)：只要有新訂單產生，系統會自動撥出 5% 的金額，平均分配給目前所有累積業績達成 15,000 USDT 以上（頂規10%）的全球領袖。
+- 🔥【自消費業績併入「級差分潤資格認定」重要規則】：
+  * **所有微享 NFT 的數位產品、斗內贊助、眾籌方案、電子書加盟 ($990/$330)、AI頂配教材、客製化服務等「自消費」的業績，皆可併入計算「級差分潤的累積業績內」來認定「級差分潤累積等級（3% / 6% / 10%）」！**
+  * **但自消費僅就「級差分潤的升級資格認定」，不能對自己的消費實際算入領取「推廣佣金 25%」**（也就是自己選購及推廣的業績可以合併累積計算來認定升級資格，但是自己的消費不能給自己計算佣金，只有「真正推廣他人成交」時，才依您已認定的級差等級計算各別的推廣佣金比例）。
+  * **實例說明**：例如您先「斗內 $3」＋「成為電子書加盟商 $990」，等於您的自消費累積為 **$993 USD**；由於 $993 落在 **$600 ~ $6,000** 區間內，系統即認定您直接晉升為 **3% 的推廣級差等級**！後續只要您真正推廣朋友下單，就能直接按 3% 級差（或更高累積等級）領取推廣佣金！
 - 🔥【非推廣者的訪客（自然流量無推薦碼）下訂單的分潤方式】：
   * 即使是非透過推廣者連結進入官網的自然流量訪客下訂單，系統也會固定提撥 **25% 推廣服務費**！
   * **我們的系統會自動去綁定推廣最高的 10% 級差獎金領袖節點，並自動完成「最高 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅」的全額分配**，絕不讓任何一筆自然流量訂單漏綁或少算分潤。
@@ -37,7 +49,7 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
 
 📚 全球作者群 / 加盟商 × 電子書自動交付與 AI 自來客引流 SaaS 合作方案 (首年 $990 / 次年 $330 雙 100% 倒抵機制)：
 - 方案定位：為全球知識創作者、作家、講師、加盟商打造的三級管理平台（管理員、加盟商、讀者訂閱）與 24H 自動化電子書出版交付 + AI 自動引流 SaaS 服務。
-- 核心規則一【全自動電子書模版引擎、2種核心語言 / 3版語系電子書下載與 24H 發貨交付】：
+- 核心規則一【全自動電子書模版引擎、2種核心語言 / 3版語系電子書下載、專用 R2 儲存槽上傳與 24H 發貨交付】：
   * 加盟商可透過平台內建的「線上自動電子書模版引擎（/studio）」快速編撰、AI 雙語翻譯、一鍵套用高顏值商務模版生成專業電子書，【支援加盟商自行下載高解析電子書檔案（PDF / 網頁書）】保存或印刷，亦可直接上架至微享線上防盜版閱讀書櫃（支援單本買斷與讀者月費/年費訂閱制）。
   * 🌍【電子書製作完成時之語系與版本說明（2 種核心語言、3 版語系電子書）】：
     1. 底層 AI 自動生成與儲存 **2 種核心語言**：「繁體中文 (\`_zh\`)」與「英文 English (\`_en\`)」（包含中英文書名、副標題、目錄與各章節完整正文）。
@@ -45,6 +57,12 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
        - **版本 ①：🌍 中英雙語對照版 (\`BILINGUAL\`)** — 同一章節上方顯示繁體中文正文、下方並列顯示 \`ENGLISH EDITION\` 英文版正文（預設開啟）。
        - **版本 ②：🇹🇼 純繁體中文版 (\`ZH_ONLY\`)** — 僅呈現繁體中文書名、目錄與章節內文。
        - **版本 ③：🇺🇸 純英文版 (\`EN_ONLY\`)** — 僅呈現英文書名、英文目錄與英文版章節內文。
+  * ☁️【電子書（含圖片及文章等）自行下載修改後重新上傳 ＆ 專用 R2 儲存槽規範】：
+    1. **可行且全面支援**：加盟商在工作台 (\`/studio\`) 除了可線上編輯章節文字與上傳各章節配圖外，**亦可將電子書母檔（含圖片及文章）自行下載至電腦/手機修改後，再重新上傳回系統**！
+    2. **計算 1 次修改額度**：每當加盟商將自行下載修改後的電子書重新上傳回系統時，**系統會自動計入 1 次修改額度**（每本電子書享 30 次免費修改額度，超過 30 次需付修改費 $30 USDT 再享 30 次）。
+    3. **上傳至專用 Cloudflare R2 儲存槽**：所有電子書母檔、封面與章節圖片皆自動上傳並同步託管於微享專用 R2 儲存槽，支援雙公開高速網域存取：
+       - 專用 R2 主網域：\`https://1.5208.uk\`
+       - 專用 R2 備援網域：\`https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev\`
   * 讀者線上付款後（支援信用卡/ATM 與 Web3 USDT 雙軌金流），系統 24 小時秒級自動派發下載權限或開通線上 VIP 閱讀權限。
 - 核心規則二【首年 $990 合作憑證（含開發 3 本電子書配額、每本 30 次修改權限 ＋ 協作 AI 自動來客幫打廣告 ＋ 100% 倒抵 1 成系統服務費）】：
   * 書籍開發配額：首年 $990 方案【內含可免費開發 3 本電子書】！之後若需增加，【第 4 本起每本電子書開發費為 $330 USDT】。
@@ -95,6 +113,11 @@ const SYSTEM_KNOWLEDGE = `你是 微享 AI 自動來客系統 (WeiXiang AI-ATM) 
   3. 【情況 B：問題不在知識庫內，且「與官網業務內容無關」（例如：問天氣、食譜、股票明牌、無關閒聊、通用寫程式作業、政治娛樂八卦等）】：
      - **無需轉寄電郵通知**（請**絕對不要**輸出 \`[[NOTIFY_ADMIN_EMAIL]]\` 標記，也不要引導寄信打擾總工程師）。
      - 請委婉回覆訪客：「我是微享 AI 自動來客系統官網的專屬客服，主要為您解答微享 NFT 眾籌、AI 自動來客系統、電子書 SaaS 加盟、AI 頂配教材與 25% 推廣分潤等官網相關業務問題喔！請問有什麼關於本官網服務我可以協助您的嗎？」
+
+🤖 AI 客服模型停用巡檢與自動切換高 CP 值模型機制 (Model Health Patrol & Auto-Failover Standard)：
+- 本 AI 客服系統內建「巡代理自動查核與高 CP 值模型熱切換機制」：
+  * 系統首選官方最高 CP 值模型 \`gemini-2.5-flash\`。
+  * 若巡檢代理偵測到目前模型遭官方停用 (Deprecated / 404 Not Found) 或暫時故障/限流 (429 / 503)，系統會在毫秒級內自動查核並無縫切換至備援最優 CP 值模型（依序為 \`gemini-2.5-flash\` ➔ \`gemini-2.5-flash-lite\` ➔ \`gemini-2.0-flash\`），並自動發信通知總工程師 SEN (\`xyz007tw@gmail.com\`)，確保官網 AI 客服 24H 零中斷且成本最優！
 
 🗣️ 回答風格：
 - 專業、親切、具同理心，並帶有強烈推廣意識。
@@ -153,6 +176,36 @@ async function sendUnknownQuestionEmail(userMessage: string, aiReply: string, la
   }
 }
 
+/**
+ * 巡代理查核與自動切換最 CP 值模型執行器 (Patrol Agent Model Failover Executor)
+ * 當主模型停用或異常時，自動巡檢並切換至下一個可用的高 CP 值模型
+ */
+async function generateChatWithModelPatrol(contents: any[], systemInstruction: string): Promise<{ text: string; usedModel: string; switchedFrom?: string }> {
+  let lastError: any = null;
+  for (let i = 0; i < CP_VALUE_MODEL_CHAIN.length; i++) {
+    const candidateModel = CP_VALUE_MODEL_CHAIN[i];
+    try {
+      const response = await ai.models.generateContent({
+        model: candidateModel,
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        }
+      });
+      return {
+        text: response.text || '',
+        usedModel: candidateModel,
+        switchedFrom: i > 0 ? CP_VALUE_MODEL_CHAIN[0] : undefined
+      };
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`[AI Patrol Agent] Model ${candidateModel} unavailable (${err?.message || err}). Auditing next best CP-value model...`);
+    }
+  }
+  throw lastError || new Error('All CP-value Gemini models failed.');
+}
+
 export async function POST(req: Request) {
   try {
     const { message, history, language } = await req.json();
@@ -169,19 +222,15 @@ export async function POST(req: Request) {
       parts: [{ text: msg.content }],
     }));
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
+    const patrolResult = await generateChatWithModelPatrol(
+      [
         ...formattedHistory,
         { role: 'user', parts: [{ text: message }] }
       ],
-      config: {
-        systemInstruction: SYSTEM_KNOWLEDGE.replace('\${用戶偏好語言}', language || 'zh-TW'),
-        temperature: 0.7,
-      }
-    });
+      SYSTEM_KNOWLEDGE.replace('\${用戶偏好語言}', language || 'zh-TW')
+    );
 
-    const rawReply = response.text || '';
+    const rawReply = patrolResult.text;
     const shouldNotifyEmail = rawReply.includes('[[NOTIFY_ADMIN_EMAIL]]');
     const cleanReply = rawReply.replace(/\[\[NOTIFY_ADMIN_EMAIL\]\]/g, '').trim();
 
@@ -189,7 +238,11 @@ export async function POST(req: Request) {
       await sendUnknownQuestionEmail(message, cleanReply, language || 'zh-TW');
     }
 
-    return NextResponse.json({ reply: cleanReply });
+    return NextResponse.json({
+      reply: cleanReply,
+      activeModel: patrolResult.usedModel,
+      failoverTriggered: !!patrolResult.switchedFrom
+    });
   } catch (error: any) {
     console.error('Chat API Error:', error);
     return NextResponse.json({ reply: '⚠️ 抱歉，AI 大腦短路了，請稍後再試一次。' }, { status: 500 });

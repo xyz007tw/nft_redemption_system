@@ -66,6 +66,7 @@ export default function FranchiseStudioPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showBannedRules, setShowBannedRules] = useState(false);
   const [exportLangMode, setExportLangMode] = useState<EBookExportLangMode>('BILINGUAL');
+  const [r2Uploading, setR2Uploading] = useState(false);
 
   const fetchStoreData = async () => {
     try {
@@ -248,6 +249,83 @@ export default function FranchiseStudioPage() {
     }
   };
 
+  // 功能 A2：上傳電子書圖片或「自行下載並修改後之電子書（含圖及文章等）」至專用 R2 儲存槽 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev)，離線修改後重新上傳算 1 次修改額度
+  const handleUploadToDedicatedR2 = async (
+    file: File,
+    targetType: 'COVER_IMAGE' | 'CHAPTER_IMAGE' | 'MODIFIED_BOOK_REUPLOAD',
+    chapterIdx?: number
+  ) => {
+    setR2Uploading(true);
+    setStatusMessage(null);
+    try {
+      const reader = new FileReader();
+      const base64Data: string = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      let parsedBookData: EBookProject | undefined;
+      if (targetType === 'MODIFIED_BOOK_REUPLOAD') {
+        const textContent = await file.text();
+        // 嘗試從母檔內嵌的 #wx-ebook-project-data JSON 還原，或若為 .json 檔直接解析
+        const match = textContent.match(/<script id="wx-ebook-project-data" type="application\/json">([\s\S]*?)<\/script>/);
+        if (match && match[1]) {
+          try {
+            parsedBookData = JSON.parse(match[1]);
+          } catch {
+            // fallback
+          }
+        } else if (file.name.endsWith('.json')) {
+          try {
+            parsedBookData = JSON.parse(textContent);
+          } catch {
+            // fallback
+          }
+        }
+      }
+
+      const res = await fetch('/api/ebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'upload_asset_or_book_to_r2',
+          bookId: currentBook.id,
+          fileName: file.name,
+          contentType: file.type || 'application/octet-stream',
+          base64Data,
+          isModifiedBookUpload: targetType === 'MODIFIED_BOOK_REUPLOAD',
+          parsedBookData
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.error || '上傳至專用 R2 失敗');
+        return;
+      }
+
+      if (targetType === 'COVER_IMAGE') {
+        setCurrentBook(prev => ({ ...prev, cover_image_url: data.primaryUrl }));
+        setStatusMessage(`☁️ 封面圖片已上傳至專用 R2 儲存槽：${data.primaryUrl}（備援：${data.mirrorUrl}）`);
+      } else if (targetType === 'CHAPTER_IMAGE' && typeof chapterIdx === 'number') {
+        const updated = [...currentBook.chapters];
+        updated[chapterIdx].image_url = data.primaryUrl;
+        setCurrentBook(prev => ({ ...prev, chapters: updated }));
+        setStatusMessage(`☁️ 第 ${chapterIdx + 1} 章配圖已上傳至專用 R2 儲存槽：${data.primaryUrl}`);
+      } else if (targetType === 'MODIFIED_BOOK_REUPLOAD') {
+        if (data.book) {
+          setCurrentBook(data.book);
+          fetchStoreData();
+        }
+        setStatusMessage(data.message);
+      }
+    } catch (err: any) {
+      alert('上傳發生錯誤：' + err.message);
+    } finally {
+      setR2Uploading(false);
+    }
+  };
   // 模擬加購第 4 本起配額 ($330/本)、次年續約 ($330 同享 100% 倒抵) 或 單書加購 30 次修改權限 ($30)
   const handleUpgradeAction = async (upgradeType: 'ADD_1_BOOK_330' | 'RENEW_YEAR2_330' | 'ADD_30_EDITS_30') => {
     const label =
@@ -698,6 +776,31 @@ export default function FranchiseStudioPage() {
                       }}
                       className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200"
                     />
+                    {/* 章節配圖上傳至專用 R2 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1">
+                      <label className="text-[11px] font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 px-3 py-1.5 rounded-lg cursor-pointer">
+                        🖼️ 上傳本章圖片至專用 R2
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadToDedicatedR2(f, 'CHAPTER_IMAGE', idx);
+                          }}
+                        />
+                      </label>
+                      {ch.image_url && (
+                        <a
+                          href={ch.image_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] text-emerald-300 underline truncate max-w-xs"
+                        >
+                          ✅ 已掛載 R2 圖片：{ch.image_url}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -795,6 +898,40 @@ export default function FranchiseStudioPage() {
                 >
                   💾 下載「{exportLangMode === 'BILINGUAL' ? '中英雙語對照版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 獨立網頁母檔 (.html)」
                 </button>
+
+                {/* 離線修改後重新上傳至專用 R2 儲存槽（算 1 次修改額度） */}
+                <div className="pt-3 mt-3 border-t border-cyan-500/30 space-y-2">
+                  <div className="text-[11px] font-bold text-emerald-300">
+                    ☁️ 【離線修改後重新上傳（含圖及文章 ➔ 算 1 次修改額度）】
+                  </div>
+                  <p className="text-[11px] text-gray-300 leading-relaxed">
+                    您可先下載上方母檔自行修改圖文，完成後點擊下方按鈕重新上傳至專用 R2 儲存槽（<code className="text-cyan-300">1.5208.uk</code> / <code className="text-cyan-300">pub-2006e181b8544782b8d026affdaa34ab.r2.dev</code>）：
+                  </p>
+                  <label className="w-full py-2.5 px-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400 text-emerald-200 font-black text-xs flex items-center justify-center gap-2 cursor-pointer">
+                    <span>{r2Uploading ? '⏳ 正在上傳至專用 R2 儲存槽...' : '📤 上傳修改後之電子書母檔 (.html / .pdf) ➔ 算 1 次修改額'}</span>
+                    <input
+                      type="file"
+                      accept=".html,.htm,.pdf,.json"
+                      disabled={r2Uploading}
+                      className="hidden"
+                      onChange={e => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUploadToDedicatedR2(f, 'MODIFIED_BOOK_REUPLOAD');
+                      }}
+                    />
+                  </label>
+                  {currentBook.r2_published_urls && (
+                    <div className="p-2.5 rounded-xl bg-black/50 border border-emerald-500/30 text-[11px] space-y-1">
+                      <div className="font-bold text-emerald-300">✅ 專用 R2 儲存槽已同步網址：</div>
+                      <div className="truncate">
+                        1. <a href={currentBook.r2_published_urls.primary_url} target="_blank" rel="noreferrer" className="text-cyan-300 underline">{currentBook.r2_published_urls.primary_url}</a>
+                      </div>
+                      <div className="truncate">
+                        2. <a href={currentBook.r2_published_urls.mirror_url} target="_blank" rel="noreferrer" className="text-cyan-300 underline">{currentBook.r2_published_urls.mirror_url}</a>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 儲存與送交 3~7 天書審按鈕 */}

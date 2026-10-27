@@ -360,6 +360,10 @@ export default function Dashboard() {
               <li>
                 <strong className="text-pink-300">🔥 非推廣者的訪客（自然流量）下訂單分潤方式</strong>：當非透過推廣連結的自然流量訪客下訂單時，系統仍固定提撥 <strong className="text-white">25% 推廣服務費</strong>，並<strong className="text-yellow-300">由系統自動去綁定推廣最高的 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅</strong>！
               </li>
+              <li>
+                <strong className="text-emerald-400">📈 自消費併入「級差分潤資格認定累積業績」規則</strong>：所有微享 NFT 的數位產品、斗內贊助、眾籌、電子書加盟（$990/$330）、AI頂配教材與客製化服務等<strong className="text-white">「自消費」業績，皆可併入計算您的「級差分潤累積業績」來認定晉升等級（3% / 6% / 10%）</strong>；但自消費僅作為「升級資格認定」，不會對自己的消費發放 25% 推廣佣金（只有真正推廣他人成交才依認定等級計算佣金）。<br/>
+                <span className="text-gray-400 text-xs">👉 實例：若您斗內 $3 ＋ 成為電子書加盟商 $990 ＝ 自消費累積 $993（落在 $600~$6,000 區間），即直接認定享有 <strong className="text-cyan-300">3% 推廣級差資格</strong>！</span>
+              </li>
             </ul>
           </div>
         </div>

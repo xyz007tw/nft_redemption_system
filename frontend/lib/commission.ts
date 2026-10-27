@@ -29,8 +29,19 @@ export async function calculateAndDistributeCommissions(
     amount_usd: globalPoolAmount
   });
 
-  // 取得買家的直推上線
-  const { data: buyer } = await supabase.from('nft_users').select('referred_by').eq('wallet_address', buyerWallet).maybeSingle();
+  // 取得買家的直推上線與個人累積業績（自消費一律併入買家本人的級差分潤資格累積業績 total_personal_sales，但買家本人不領取自購佣金）
+  const { data: buyer } = await supabase
+    .from('nft_users')
+    .select('referred_by, total_personal_sales')
+    .eq('wallet_address', buyerWallet)
+    .maybeSingle();
+
+  if (buyer) {
+    await supabase
+      .from('nft_users')
+      .update({ total_personal_sales: Number(buyer.total_personal_sales || 0) + Number(usdAmount || 0) })
+      .eq('wallet_address', buyerWallet);
+  }
   
   if (!buyer || !buyer.referred_by) {
     // 🔥 非推廣者的自然流量訪客下單：系統自動綁定至推廣最高階 (10%) 領袖，並完整撥出 10% 級差獎金 + 10% 對等獎金（加計上方 5% 全球分紅，共 25%）

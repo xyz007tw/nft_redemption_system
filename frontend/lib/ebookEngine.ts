@@ -6,6 +6,7 @@ export interface EBookChapter {
   title_en: string;
   content_zh: string;
   content_en: string;
+  image_url?: string; // 支援章節配圖 (可上傳至專用 R2: https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev 或 https://1.5208.uk)
 }
 
 export interface EBookProject {
@@ -19,6 +20,12 @@ export interface EBookProject {
   title_en: string;
   subtitle_zh: string;
   subtitle_en: string;
+  cover_image_url?: string;      // 支援封面圖片上傳至專用 R2
+  r2_published_urls?: {          // 專用 R2 儲存槽 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) 已發布之電子書網址
+    primary_url: string;
+    mirror_url: string;
+    uploaded_at: string;
+  };
   theme_id: 'tech_blue' | 'royal_gold' | 'minimal_white';
   bilingual_mode: boolean;
   price_single_usdt: number;
@@ -235,6 +242,13 @@ export function generateStandaloneEBookHTML(
           }
         </div>
         <div class="chapter-body">
+          ${
+            ch.image_url
+              ? `<div style="margin: 18px 0 24px 0; text-align: center;">
+                   <img src="${ch.image_url}" alt="${ch.title_zh}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+                 </div>`
+              : ''
+          }
           ${
             showZh
               ? `<div class="lang-block-zh">
@@ -495,6 +509,13 @@ export function generateStandaloneEBookHTML(
                ${showEn && book.title_en ? `<h2 class="cover-title-en">${book.title_en}</h2>` : ''}
                <p class="cover-sub">${book.subtitle_zh}${showEn && book.subtitle_en ? `<br/>${book.subtitle_en}` : ''}</p>`
         }
+        ${
+          book.cover_image_url
+            ? `<div style="margin-top: 28px;">
+                 <img src="${book.cover_image_url}" alt="Cover" style="max-width: 100%; max-height: 360px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.25); object-fit: cover;" />
+               </div>`
+            : ''
+        }
       </div>
       <div class="cover-author-box">
         <div>
@@ -546,6 +567,8 @@ export function generateStandaloneEBookHTML(
           <strong>** 请「總工程師」喝杯珍奶吧 ** 👉 <a href="https://aitutor.vip/waia" target="_blank">https://aitutor.vip/waia</a></strong>
         </div>
       </div>
+      <!-- 內嵌母檔結構化 JSON，支援加盟商離線下載修改後一鍵重新上傳還原所有章節、圖片與雙語內容 (算 1 次修改額度) -->
+      <script id="wx-ebook-project-data" type="application/json">${JSON.stringify(book).replace(/</g, '\\u003c')}</script>
       <div class="page-footer">
         <span>微享全球電子書自動交付 SaaS 系統編譯</span>
         <span>End of Book</span>

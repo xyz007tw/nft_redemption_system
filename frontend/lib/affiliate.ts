@@ -99,7 +99,7 @@ export async function processAffiliateCommissions(
 
   const { data: existingUser } = await supabase
     .from('users')
-    .select('referrer_address')
+    .select('referrer_address, total_sales')
     .eq('wallet_address', walletAddress)
     .maybeSingle();
 
@@ -112,6 +112,13 @@ export async function processAffiliateCommissions(
     finalReferrer = await resolveTopTierLeaderForOrganicVisitor(walletAddress);
   }
 
+  // 🔥 自消費併入「級差分潤資格認定累積業績」規則：
+  // 所有微享 NFT 數位產品、斗內贊助 (SPONSOR)、眾籌、电子書加盟 ($990/$330)、AI頂配教材與客製化服務等「自消費」金額，
+  // 一律累加至買家本人的 total_sales 內，作為認定 3% ($600~$6,000) / 6% ($6,000~$15,000) / 10% (>=$15,000) 級差等級的資格依據！
+  // （例如：斗內 $3 + 成為電子書加盟商 $990 = 自消費 $993，累積業績落在 $600~$6,000，自動晉升 3% 推廣級差等級！）
+  // ⚠️ 注意：自消費僅計入「級差資格認定業績」，絕對不會發放 25% 推廣佣金給買家自己（只有真正推廣他人時才依該等級領取佣金）。
+  const updatedBuyerTotalSales = Number((Number(existingUser?.total_sales || 0) + Number(packagePriceUSDT || 0)).toFixed(2));
+
   const { data: user, error: userError } = await supabase
     .from('users')
     .upsert(
@@ -119,6 +126,7 @@ export async function processAffiliateCommissions(
         wallet_address: walletAddress,
         status: 'ACTIVE',
         has_purchased: true,
+        total_sales: updatedBuyerTotalSales,
         referrer_address: finalReferrer
       },
       { onConflict: 'wallet_address' }
@@ -128,7 +136,7 @@ export async function processAffiliateCommissions(
 
   if (userError) throw userError;
 
-  // 1. 如果是斗內贊助 (SPONSOR)，不啟動任何推廣分潤，但仍完成綁定
+  // 1. 如果是斗內贊助 (SPONSOR) 或買家純自消費資格升級項目，已完成買家本人業績累積與上線綁定；斗內不發放 25% 推廣佣金
   if (productType === 'SPONSOR') {
     return user.referrer_address;
   }
