@@ -15,7 +15,8 @@ export default function LanguageSwitcher() {
     { code: 'en-US', name: 'English' },
     { code: 'ja-JP', name: '日本語' },
     { code: 'ko-KR', name: '한국어' },
-    { code: 'vi-VN', name: 'Tiếng Việt' }
+    { code: 'vi-VN', name: 'Tiếng Việt' },
+    { code: 'id-ID', name: 'Bahasa Indonesia' }
   ];
 
   // 點擊選單外部時自動收合

@@ -7,9 +7,15 @@ export interface EBookChapter {
   title_zh: string;
   title_en: string;
   title_ja?: string;
+  title_zh_cn?: string;
+  title_vi?: string;
+  title_id?: string;
   content_zh: string;
   content_en: string;
   content_ja?: string;
+  content_zh_cn?: string;
+  content_vi?: string;
+  content_id?: string;
   image_url?: string;            // 支援章節配圖 (AI自動製圖或上傳)
   image_caption?: string;        // 配圖圖說 (中英雙語/日英/中日)
   references?: Array<{          // 專業來源引用 / 查證參照 (Citations & Sources)
@@ -28,9 +34,15 @@ export interface EBookProject {
   title_zh: string;
   title_en: string;
   title_ja?: string;
+  title_zh_cn?: string;
+  title_vi?: string;
+  title_id?: string;
   subtitle_zh: string;
   subtitle_en: string;
   subtitle_ja?: string;
+  subtitle_zh_cn?: string;
+  subtitle_vi?: string;
+  subtitle_id?: string;
   lang_pair?: EBookLangPair;     // 支援自選語系對：'ZH_EN' 繁中/英 ｜ 'JA_EN' 日/英 ｜ 'ZH_JA' 繁中/日
   cover_image_url?: string;      // 支援封面圖片上傳至專用 R2
   r2_published_urls?: {          // 專用 R2 儲存槽 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) 已發布之電子書網址
@@ -76,80 +88,100 @@ export const GLOBAL_BANNED_BOOK_CATEGORIES = [
     icon: '🔞',
     title_zh: '1. 色情、猥褻與未成年不當內容（零容忍紅線）',
     title_en: '1. Pornography, Obscenity & CSAM (Zero Tolerance)',
+    title_ja: '1. ポルノ・わいせつ・未成年者不適切コンテンツ（ゼロ容認基準）',
     desc_zh: '嚴禁任何涉及兒童或未成年人之性暗示與剝削內容、露骨色情寫真、成人 AV 劇本、性暴力、偷拍或非自願性行為描寫。',
-    desc_en: 'Strictly no child sexual exploitation/abuse (CSAM), explicit pornography, non-consensual sexual content, or sexual violence.'
+    desc_en: 'Strictly no child sexual exploitation/abuse (CSAM), explicit pornography, non-consensual sexual content, or sexual violence.',
+    desc_ja: '児童買春・児童ポルノ、露骨なわいせつ表現、成人向けコンテンツ、性暴力、盗撮、同意のない性的描写を厳格に禁止します。'
   },
   {
     id: 2,
     icon: '💣',
     title_zh: '2. 恐怖主義、暴力犯罪與危險武器製造',
     title_en: '2. Terrorism, Violent Crime & Weapon Manufacturing',
+    title_ja: '2. テロリズム・凶悪犯罪・危険兵器製造',
     desc_zh: '嚴禁宣揚恐怖組織、極端邪教，或指導製造炸彈、槍枝改造、3D 列印武器、毒藥合成、迷姦藥水與駭客勒索病毒教學。',
-    desc_en: 'No promotion of terrorism, cults, bomb/weapon making, poison synthesis, or ransomware hacking tutorials.'
+    desc_en: 'No promotion of terrorism, cults, bomb/weapon making, poison synthesis, or ransomware hacking tutorials.',
+    desc_ja: 'テロ組織や過激派カルトの宣伝、爆弾・銃器改造・3Dプリント兵器・毒物合成・ランサムウェア開発などの指南を禁止します。'
   },
   {
     id: 3,
     icon: '💊',
     title_zh: '3. 毒品、違禁藥品與非法走私指南',
     title_en: '3. Illicit Drugs, Contraband & Smuggling Guides',
+    title_ja: '3. 違法薬物・規制薬品・密輸ガイド',
     desc_zh: '嚴禁教導種植或提煉各級毒品（如大麻、冰毒、依托咪酯喪屍煙彈等）、管制處方藥非法買賣及暗網交易教學。',
-    desc_en: 'No guides on cultivating/manufacturing illegal drugs, trading controlled substances, or darknet trafficking.'
+    desc_en: 'No guides on cultivating/manufacturing illegal drugs, trading controlled substances, or darknet trafficking.',
+    desc_ja: '各種麻薬の栽培・精製、指定処方薬の不正売買、ダークウェブ取引の手法指南を厳格に禁止します。'
   },
   {
     id: 4,
     icon: '🎰',
     title_zh: '4. 非法賭博、電信詐騙話術與洗錢教學',
     title_en: '4. Illegal Gambling, Telecom Fraud & Money Laundering',
+    title_ja: '4. 違法賭博・特殊詐欺スクリプト・マネーロンダリング',
     desc_zh: '嚴禁上架殺豬盤詐騙劇本、電信詐欺 SOP、地下博弈網站導流、地下匯兌、人頭帳戶買賣或洗錢逃稅實操手冊。',
-    desc_en: 'No pig-butchering scam scripts, telecom fraud SOPs, illegal gambling promotion, or money laundering manuals.'
+    desc_en: 'No pig-butchering scam scripts, telecom fraud SOPs, illegal gambling promotion, or money laundering manuals.',
+    desc_ja: '投資詐欺（豚の屠殺詐欺）の手口、電信詐欺SOP、闇カジノ誘導、地下送金、不正口座売買、資金洗浄の解説を禁止します。'
   },
   {
     id: 5,
     icon: '📈',
     title_zh: '5. 非法金融吸金、保證獲利與傳銷資金盤',
     title_en: '5. Illegal Fundraising, Guaranteed Returns & Ponzi Schemes',
+    title_ja: '5. 無許可金融勧誘・元本保証投資・ポンジスキーム',
     desc_zh: '嚴禁未持牌卻宣稱「100% 穩賺不賠、保證翻倍、代客操盤」之非法集資、龐氏騙局或空氣幣資金盤招募手冊。',
-    desc_en: 'No unlicensed investment solicitation claiming guaranteed profits, Ponzi schemes, or fraudulent money games.'
+    desc_en: 'No unlicensed investment solicitation claiming guaranteed profits, Ponzi schemes, or fraudulent money games.',
+    desc_ja: '無登録での「100%確実・高利回り保証・元本保証」を謳う不正な資金集め、マルチ商法・詐欺的仮想通貨スキームを禁止します。'
   },
   {
     id: 6,
     icon: '🏥',
     title_zh: '6. 誇大醫療療效、偽科學與危害生命之偏方',
     title_en: '6. Fraudulent Medical Claims & Harmful Pseudoscience',
+    title_ja: '6. 誇大医療効果・疑似科学・生命に危険を及ぼす民間療法',
     desc_zh: '嚴禁宣稱食品或偏方能「免就醫治癒癌症/重症」、鼓吹停用正規醫療藥物，或指導自殘、自殺之內容。',
-    desc_en: 'No false claims of curing terminal illnesses without medicine, anti-medical advice, or self-harm/suicide guides.'
+    desc_en: 'No false claims of curing terminal illnesses without medicine, anti-medical advice, or self-harm/suicide guides.',
+    desc_ja: '「医者に行かずにがんが治る」等の虚偽の医療効能主張、正規医療の中止推奨、自傷行為・自殺教唆を厳格に禁止します。'
   },
   {
     id: 7,
     icon: '🏴‍☠️',
     title_zh: '7. 盜版侵權、抄襲洗稿與軟體破解外掛',
     title_en: '7. Piracy, Copyright Infringement & Cracked Software',
+    title_ja: '7. 海賊版・著作権侵害・剽窃・クラックソフト',
     desc_zh: '嚴禁直接盜用他人已出版之書籍、漫畫、小說，或未經授權冒用名人肖像/商標出書，以及散播盜版軟體序號與遊戲外掛。',
-    desc_en: 'No plagiarized/pirated books, unauthorized celebrity impersonation, or cracked software/game cheats.'
+    desc_en: 'No plagiarized/pirated books, unauthorized celebrity impersonation, or cracked software/game cheats.',
+    desc_ja: '他者の書籍・漫画の無断盗用、著名人や商標の無断利用、クラックシリアルコードやゲームチートツールの配布を禁止します。'
   },
   {
     id: 8,
     icon: '🕵️‍♂️',
     title_zh: '8. 侵犯個人隱私、肉搜（Doxxing）與惡意誹謗',
     title_en: '8. Privacy Violation, Doxxing & Malicious Defamation',
+    title_ja: '8. プライバシー侵害・個人特定（Doxxing）・悪質誹謗中傷',
     desc_zh: '嚴禁未經同意公開他人身分證號、住址、電話、私密照片、病歷，或針對特定個人與企業進行無根據之惡意抹黑敲詐。',
-    desc_en: 'No doxxing of personal identifiable information, private photos, medical records, or malicious defamation/extortion.'
+    desc_en: 'No doxxing of personal identifiable information, private photos, medical records, or malicious defamation/extortion.',
+    desc_ja: '同意のない個人情報（身分証・住所・電話・私的画像・病歴）の公開、個人や企業に対する根拠のない中傷・脅迫を禁止します。'
   },
   {
     id: 9,
     icon: '⚔️',
     title_zh: '9. 仇恨言論、種族歧視與煽動顛覆國家安全',
     title_en: '9. Hate Speech, Discrimination & National Security Threats',
+    title_ja: '9. ヘイトスピーチ・人種差別・国家安全保障脅威',
     desc_zh: '嚴禁針對特定種族、宗教、性別或弱勢群體煽動仇恨暴力，或涉及跨國敏感政治顛覆與軍事機密洩露。',
-    desc_en: 'No incitement of hatred/violence against protected groups, political subversion, or leaking classified secrets.'
+    desc_en: 'No incitement of hatred/violence against protected groups, political subversion, or leaking classified secrets.',
+    desc_ja: '特定の人種・宗教・性別に対する憎悪や暴力の煽動、国家転覆や機密情報の漏洩を禁止します。'
   },
   {
     id: 10,
     icon: '🤖',
     title_zh: '10. 惡意木馬釣魚連結與詐欺性空殼垃圾書',
     title_en: '10. Phishing/Malware Links & Fraudulent Empty Spam Books',
+    title_ja: '10. フィッシングマルウェア・悪質ダミー空書籍',
     desc_zh: '嚴禁掛羊頭賣狗肉（審核後偷換違規內容）、在 QR Code 植入釣魚木馬網站，或以亂碼/空白頁湊數欺騙讀者付款。',
-    desc_en: 'No post-review content cloaking, malware/phishing QR codes, or deceptive empty/gibberish spam books.'
+    desc_en: 'No post-review content cloaking, malware/phishing QR codes, or deceptive empty/gibberish spam books.',
+    desc_ja: '審査通過後の違法コンテンツへのすり替え、QRコードを用いたフィッシング誘導、白紙や無意味な文字の空書籍による読者欺罔を禁止します。'
   }
 ];
 
@@ -175,6 +207,7 @@ export const EBOOK_THEMES = {
     id: 'tech_blue',
     name_zh: '🌌 現代科技藍（AI / 商業實戰首選）',
     name_en: '🌌 Modern Tech Blue (AI & Business)',
+    name_ja: '🌌 モダンテックブルー（AI・ビジネス実践）',
     primaryColor: '#0284c7',
     accentColor: '#38bdf8',
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
@@ -187,6 +220,7 @@ export const EBOOK_THEMES = {
     id: 'royal_gold',
     name_zh: '👑 典雅大師金（財商 / 心靈 / 傳記首選）',
     name_en: '👑 Royal Master Gold (Wealth & Mindset)',
+    name_ja: '👑 ロイヤルマスターゴールド（富・マインドセット）',
     primaryColor: '#b45309',
     accentColor: '#f59e0b',
     bgGradient: 'linear-gradient(135deg, #1c1917 0%, #78350f 100%)',
@@ -199,6 +233,7 @@ export const EBOOK_THEMES = {
     id: 'minimal_white',
     name_zh: '🌿 極簡商務白（養生 / 教育 / 指南首選）',
     name_en: '🌿 Minimalist Emerald (Health & Education)',
+    name_ja: '🌿 ミニマルエメラルド（健康・教育・実践ガイド）',
     primaryColor: '#047857',
     accentColor: '#10b981',
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #047857 100%)',
@@ -208,6 +243,79 @@ export const EBOOK_THEMES = {
     calloutBorder: '#059669'
   }
 };
+
+// 繁體中文轉簡體中文輔助對照
+const T2S_MAP: Record<string, string> = {
+  '體': '体', '國': '国', '創': '创', '導': '导', '實': '实', '戰': '战', '獲': '获', '線': '线',
+  '點': '点', '選': '选', '閱': '阅', '覽': '览', '訂': '订', '專': '专', '聯': '联', '盟': '盟',
+  '潤': '润', '費': '费', '買': '买', '斷': '断', '說': '说', '明': '明', '總': '总', '隨': '随',
+  '時': '时', '歡': '欢', '迎': '迎', '書': '书', '審': '审', '門': '门', '檻': '槛', '後': '后',
+  '臺': '台', '台': '台', '開': '开', '發': '发', '權': '权', '產': '产', '業': '业', '務': '务',
+  '經': '经', '濟': '济', '結': '结', '算': '算', '構': '构', '造': '造', '與': '与', '規': '规',
+  '範': '范', '條': '条', '款': '款', '錢': '钱', '包': '包', '網': '网', '址': '址', '階': '阶',
+  '級': '级', '數': '数', '據': '据', '圖': '图', '表': '表', '視': '视', '頻': '频', '影': '影',
+  '音': '音', '優': '优', '化': '化', '設': '设', '計': '计', '銷': '销', '售': '售', '顧': '顾',
+  '客': '客', '來': '来', '萬': '万', '億': '亿', '幣': '币', '證': '证', '認': '认', '購': '购',
+  '項': '项', '目': '目', '標': '标', '題': '题', '篇': '篇', '章': '章', '節': '节', '錄': '录'
+};
+
+export function toSimplifiedChinese(text: string): string {
+  if (!text) return '';
+  return text.split('').map(ch => T2S_MAP[ch] || ch).join('');
+}
+
+// 根據全局語系 (繁中/簡中/英文/日文/越南文/印尼文) 獲取最對應之多語系內容
+export function getEBookLocalizedContent(
+  entity: {
+    title_zh: string;
+    title_zh_cn?: string;
+    title_en: string;
+    title_ja?: string;
+    title_vi?: string;
+    title_id?: string;
+    content_zh?: string;
+    content_zh_cn?: string;
+    content_en?: string;
+    content_ja?: string;
+    content_vi?: string;
+    content_id?: string;
+    subtitle_zh?: string;
+    subtitle_zh_cn?: string;
+    subtitle_en?: string;
+    subtitle_ja?: string;
+    subtitle_vi?: string;
+    subtitle_id?: string;
+  },
+  lang: string
+): { title: string; content: string; subtitle: string } {
+  let title = entity.title_zh || entity.title_en || '';
+  let content = entity.content_zh || entity.content_en || '';
+  let subtitle = entity.subtitle_zh || entity.subtitle_en || '';
+
+  if (lang === 'zh-CN') {
+    title = entity.title_zh_cn || toSimplifiedChinese(entity.title_zh || '');
+    content = entity.content_zh_cn || toSimplifiedChinese(entity.content_zh || '');
+    subtitle = entity.subtitle_zh_cn || toSimplifiedChinese(entity.subtitle_zh || '');
+  } else if (lang === 'en-US') {
+    title = entity.title_en || entity.title_zh;
+    content = entity.content_en || entity.content_zh || '';
+    subtitle = entity.subtitle_en || entity.subtitle_zh || '';
+  } else if (lang === 'ja-JP') {
+    title = entity.title_ja || entity.title_en || entity.title_zh;
+    content = entity.content_ja || entity.content_en || entity.content_zh || '';
+    subtitle = entity.subtitle_ja || entity.subtitle_en || entity.subtitle_zh || '';
+  } else if (lang === 'vi-VN') {
+    title = entity.title_vi || entity.title_en || entity.title_zh;
+    content = entity.content_vi || entity.content_en || entity.content_zh || '';
+    subtitle = entity.subtitle_vi || entity.subtitle_en || entity.subtitle_zh || '';
+  } else if (lang === 'id-ID') {
+    title = entity.title_id || entity.title_en || entity.title_zh;
+    content = entity.content_id || entity.content_en || entity.content_zh || '';
+    subtitle = entity.subtitle_id || entity.subtitle_en || entity.subtitle_zh || '';
+  }
+
+  return { title, content, subtitle };
+}
 
 export type EBookExportLangMode = 'BILINGUAL' | 'ZH_ONLY' | 'EN_ONLY' | 'JA_ONLY';
 
