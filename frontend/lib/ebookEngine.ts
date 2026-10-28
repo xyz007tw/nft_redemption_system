@@ -1,13 +1,17 @@
 // 全球電子書加盟商 SaaS 與自動模版引擎核心庫 (Zero-Regression Sandbox Module)
 
+export type EBookLangPair = 'ZH_EN' | 'JA_EN' | 'ZH_JA';
+
 export interface EBookChapter {
   id: string;
   title_zh: string;
   title_en: string;
+  title_ja?: string;
   content_zh: string;
   content_en: string;
+  content_ja?: string;
   image_url?: string;            // 支援章節配圖 (AI自動製圖或上傳)
-  image_caption?: string;        // 配圖圖說 (中英雙語)
+  image_caption?: string;        // 配圖圖說 (中英雙語/日英/中日)
   references?: Array<{          // 專業來源引用 / 查證參照 (Citations & Sources)
     title: string;
     url?: string;
@@ -23,8 +27,11 @@ export interface EBookProject {
   author_line_id: string;
   title_zh: string;
   title_en: string;
+  title_ja?: string;
   subtitle_zh: string;
   subtitle_en: string;
+  subtitle_ja?: string;
+  lang_pair?: EBookLangPair;     // 支援自選語系對：'ZH_EN' 繁中/英 ｜ 'JA_EN' 日/英 ｜ 'ZH_JA' 繁中/日
   cover_image_url?: string;      // 支援封面圖片上傳至專用 R2
   r2_published_urls?: {          // 專用 R2 儲存槽 (1.5208.uk / pub-2006e181b8544782b8d026affdaa34ab.r2.dev) 已發布之電子書網址
     primary_url: string;
@@ -55,6 +62,9 @@ export interface FranchiseeProfile {
   book_created_count: number;
   fee_credit_balance: number;    // 首年 $990 倒抵金，次年續約 +$450 倒抵金 (100% 折抵 10% 平台服務費)
   total_sales_usdt: number;
+  payout_wallet?: string;        // 加盟商指定 Polygon USDT 提現收款錢包地址
+  payout_bank?: string;          // 加盟商指定銀行或戶名/PayPal 收款資訊
+  payout_requested_usdt?: number;// 待出金/結算金額
   ai_traffic_enabled: boolean;
   expires_at: string;
 }
@@ -199,9 +209,9 @@ export const EBOOK_THEMES = {
   }
 };
 
-export type EBookExportLangMode = 'BILINGUAL' | 'ZH_ONLY' | 'EN_ONLY';
+export type EBookExportLangMode = 'BILINGUAL' | 'ZH_ONLY' | 'EN_ONLY' | 'JA_ONLY';
 
-// 生成可獨立下載與列印為精美 PDF 的完整獨立電子書 HTML (支援 3 種語系版面模式：BILINGUAL 中英雙語對照版 / ZH_ONLY 純繁體中文版 / EN_ONLY 純英文版)
+// 生成可獨立下載與列印為精美 PDF 的完整獨立電子書 HTML (支援多種語系版面模式：BILINGUAL 雙語對照版 / ZH_ONLY 純繁中 / EN_ONLY 純英文 / JA_ONLY 純日文)
 export function generateStandaloneEBookHTML(
   book: EBookProject,
   buyerWatermark?: string,
@@ -209,20 +219,48 @@ export function generateStandaloneEBookHTML(
 ): string {
   const effectiveMode: EBookExportLangMode =
     langMode || (book.bilingual_mode ? 'BILINGUAL' : 'ZH_ONLY');
-  const showZh = effectiveMode === 'BILINGUAL' || effectiveMode === 'ZH_ONLY';
-  const showEn = effectiveMode === 'BILINGUAL' || effectiveMode === 'EN_ONLY';
+  const langPair: EBookLangPair = book.lang_pair || 'ZH_EN';
+
+  // 判斷主語系與次語系
+  const isJaEn = langPair === 'JA_EN';
+  const isZhJa = langPair === 'ZH_JA';
+
+  const showPrimary =
+    effectiveMode === 'BILINGUAL' ||
+    (isJaEn ? effectiveMode === 'JA_ONLY' : effectiveMode === 'ZH_ONLY');
+  const showSecondary =
+    effectiveMode === 'BILINGUAL' ||
+    (isZhJa ? effectiveMode === 'JA_ONLY' : effectiveMode === 'EN_ONLY');
 
   const theme = EBOOK_THEMES[book.theme_id] || EBOOK_THEMES.tech_blue;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(book.author_cta_url || 'https://aitutor.vip/waia')}`;
 
+  const getPrimaryTitle = (ch: EBookChapter) =>
+    isJaEn ? (ch.title_ja || ch.title_zh) : ch.title_zh;
+  const getSecondaryTitle = (ch: EBookChapter) =>
+    isZhJa ? (ch.title_ja || ch.title_en) : ch.title_en;
+
+  const getPrimaryContent = (ch: EBookChapter) =>
+    isJaEn ? (ch.content_ja || ch.content_zh) : ch.content_zh;
+  const getSecondaryContent = (ch: EBookChapter) =>
+    isZhJa ? (ch.content_ja || ch.content_en) : ch.content_en;
+
+  const secondaryLabel = isZhJa
+    ? 'JAPANESE EDITION (日本語版)'
+    : 'ENGLISH EDITION';
+
   const tocHtml = book.chapters
     .map((ch, idx) => {
+      const pTitle = getPrimaryTitle(ch);
+      const sTitle = getSecondaryTitle(ch);
       const tocLabel =
         effectiveMode === 'EN_ONLY'
-          ? ch.title_en || ch.title_zh
+          ? sTitle || pTitle
+          : effectiveMode === 'JA_ONLY'
+          ? (ch.title_ja || pTitle)
           : effectiveMode === 'ZH_ONLY'
           ? ch.title_zh
-          : `${ch.title_zh}${ch.title_en ? ` / ${ch.title_en}` : ''}`;
+          : `${pTitle}${sTitle ? ` / ${sTitle}` : ''}`;
       return `
       <li class="toc-item">
         <a href="#chapter-${idx + 1}">
@@ -235,30 +273,38 @@ export function generateStandaloneEBookHTML(
 
   const chaptersHtml = book.chapters
     .map(
-      (ch, idx) => `
+      (ch, idx) => {
+        const pTitle = getPrimaryTitle(ch);
+        const sTitle = getSecondaryTitle(ch);
+        const pContent = getPrimaryContent(ch);
+        const sContent = getSecondaryContent(ch);
+
+        return `
       <section class="chapter-page" id="chapter-${idx + 1}">
         <div class="chapter-header">
           <div class="chapter-badge">CHAPTER 0${idx + 1}</div>
           ${
             effectiveMode === 'EN_ONLY'
-              ? `<h2 class="chapter-title-zh">${ch.title_en || ch.title_zh}</h2>`
-              : `<h2 class="chapter-title-zh">${ch.title_zh}</h2>
-                 ${showEn && ch.title_en ? `<h3 class="chapter-title-en">${ch.title_en}</h3>` : ''}`
+              ? `<h2 class="chapter-title-zh">${sTitle || pTitle}</h2>`
+              : effectiveMode === 'JA_ONLY'
+              ? `<h2 class="chapter-title-zh">${ch.title_ja || pTitle}</h2>`
+              : `<h2 class="chapter-title-zh">${pTitle}</h2>
+                 ${showSecondary && sTitle ? `<h3 class="chapter-title-en">${sTitle}</h3>` : ''}`
           }
         </div>
         <div class="chapter-body">
           ${
             ch.image_url
               ? `<div style="margin: 18px 0 24px 0; text-align: center;">
-                   <img src="${ch.image_url}" alt="${ch.title_zh}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);" />
+                   <img src="${ch.image_url}" alt="${pTitle}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);" />
                    ${ch.image_caption ? `<div style="font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic;">📷 ${ch.image_caption}</div>` : ''}
                  </div>`
               : ''
           }
           ${
-            showZh
+            showPrimary
               ? `<div class="lang-block-zh">
-                  ${(ch.content_zh || '')
+                  ${(pContent || '')
                     .split('\n')
                     .filter(p => p.trim())
                     .map(p => `<p>${p}</p>`)
@@ -267,10 +313,10 @@ export function generateStandaloneEBookHTML(
               : ''
           }
           ${
-            showEn && (ch.content_en || ch.content_zh)
-              ? `<div class="${effectiveMode === 'EN_ONLY' ? 'lang-block-zh' : 'lang-block-en'}">
-                  ${effectiveMode === 'BILINGUAL' ? '<div class="en-label">ENGLISH EDITION</div>' : ''}
-                  ${(ch.content_en || ch.content_zh)
+            showSecondary && (sContent || pContent)
+              ? `<div class="${effectiveMode === 'EN_ONLY' || effectiveMode === 'JA_ONLY' ? 'lang-block-zh' : 'lang-block-en'}">
+                  ${effectiveMode === 'BILINGUAL' ? `<div class="en-label">${secondaryLabel}</div>` : ''}
+                  ${(sContent || pContent)
                     .split('\n')
                     .filter(p => p.trim())
                     .map(p => `<p>${p}</p>`)
@@ -294,18 +340,25 @@ export function generateStandaloneEBookHTML(
           }
         </div>
         <div class="page-footer">
-          <span>${effectiveMode === 'EN_ONLY' ? `"${book.title_en || book.title_zh}" — by ${book.author_name}` : `《${book.title_zh}》 — ${book.author_name} 著`}</span>
+          <span>${effectiveMode === 'EN_ONLY' ? `"${book.title_en || book.title_zh}" — by ${book.author_name}` : `《${isJaEn ? (book.title_ja || book.title_zh) : book.title_zh}》 — ${book.author_name} 著`}</span>
           <span>${effectiveMode === 'EN_ONLY' ? `Chapter ${idx + 1}` : `第 ${idx + 1} 章`} ${buyerWatermark ? `｜授權讀者：${buyerWatermark}` : ''}</span>
         </div>
-      </section>`
+      </section>`;
+      }
     )
     .join('');
 
   const modeBadgeLabel =
     effectiveMode === 'BILINGUAL'
-      ? '🌍 中/英雙語對照版 (Bilingual Edition)'
+      ? isJaEn
+        ? '🇯🇵/🇺🇸 日/英雙語對照版 (Japanese & English Edition)'
+        : isZhJa
+        ? '🇹🇼/🇯🇵 繁中/日雙語對照版 (Chinese & Japanese Edition)'
+        : '🇹🇼/🇺🇸 中/英雙語對照版 (Bilingual Edition)'
       : effectiveMode === 'ZH_ONLY'
       ? '🇹🇼 純繁體中文版 (Traditional Chinese Edition)'
+      : effectiveMode === 'JA_ONLY'
+      ? '🇯🇵 純日文版 (Japanese Edition)'
       : '🇺🇸 純英文版 (English Edition)';
 
   return `<!DOCTYPE html>
@@ -525,9 +578,12 @@ export function generateStandaloneEBookHTML(
           effectiveMode === 'EN_ONLY'
             ? `<h1 class="cover-title-zh">${book.title_en || book.title_zh}</h1>
                <p class="cover-sub">${book.subtitle_en || book.subtitle_zh}</p>`
-            : `<h1 class="cover-title-zh">${book.title_zh}</h1>
-               ${showEn && book.title_en ? `<h2 class="cover-title-en">${book.title_en}</h2>` : ''}
-               <p class="cover-sub">${book.subtitle_zh}${showEn && book.subtitle_en ? `<br/>${book.subtitle_en}` : ''}</p>`
+            : effectiveMode === 'JA_ONLY'
+            ? `<h1 class="cover-title-zh">${book.title_ja || book.title_zh}</h1>
+               <p class="cover-sub">${book.subtitle_ja || book.subtitle_zh}</p>`
+            : `<h1 class="cover-title-zh">${isJaEn ? (book.title_ja || book.title_zh) : book.title_zh}</h1>
+               ${showSecondary && (isZhJa ? book.title_ja : book.title_en) ? `<h2 class="cover-title-en">${isZhJa ? book.title_ja : book.title_en}</h2>` : ''}
+               <p class="cover-sub">${isJaEn ? (book.subtitle_ja || book.subtitle_zh) : book.subtitle_zh}${showSecondary && (isZhJa ? book.subtitle_ja : book.subtitle_en) ? `<br/>${isZhJa ? book.subtitle_ja : book.subtitle_en}` : ''}</p>`
         }
         ${
           book.cover_image_url

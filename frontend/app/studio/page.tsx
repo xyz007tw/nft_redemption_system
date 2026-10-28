@@ -6,6 +6,7 @@ import { useAccount } from 'wagmi';
 import {
   EBookProject,
   EBookExportLangMode,
+  EBookLangPair,
   FranchiseeProfile,
   EBOOK_THEMES,
   GLOBAL_BANNED_BOOK_CATEGORIES,
@@ -23,6 +24,9 @@ export default function FranchiseStudioPage() {
     book_created_count: 1,
     fee_credit_balance: 990,
     total_sales_usdt: 0,
+    payout_wallet: '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc',
+    payout_bank: '808 玉山銀行 / 戶名：微享智能科技 / 帳號：0123-4567-8901',
+    payout_requested_usdt: 0,
     ai_traffic_enabled: true,
     expires_at: '2027-10-27T08:00:00Z'
   });
@@ -37,8 +41,11 @@ export default function FranchiseStudioPage() {
     author_line_id: 'xyz007tw',
     title_zh: 'AI 自動化獲客與知識變現聖經',
     title_en: 'The Bible of AI Automated Traffic & Knowledge Monetization',
+    title_ja: 'AI自動化集客と知識マネタイズバイブル',
     subtitle_zh: '打造 24 小時不眠不休的數位資產印鈔機',
     subtitle_en: 'Build Your 24/7 Automated Digital Asset Printing Machine',
+    subtitle_ja: '24時間眠らないデジタル資産構築の極意',
+    lang_pair: 'ZH_EN',
     theme_id: 'tech_blue',
     bilingual_mode: true,
     price_single_usdt: 39,
@@ -51,8 +58,10 @@ export default function FranchiseStudioPage() {
         id: 'ch-1',
         title_zh: '第一章：AI 時代的個人自動化出版社革命',
         title_en: 'Chapter 1: The Personal Automated Publishing Revolution in the AI Era',
+        title_ja: '第一章：AI時代の個人自動化出版革命',
         content_zh: '過去出版一本書需要耗費數個月與高昂的外包排版費，現在透過微享自動電子書模版引擎，您只需專注於核心洞見，系統即自動為您生成中英雙語專業排版，並結合 AI 自動來客系統在全球幫您引流獲客。',
-        content_en: 'Publishing a book used to take months and expensive outsourcing. Now, with the WeiXiang Automated E-Book Template Engine, you focus on core insights while the system generates bilingual layouts and drives global traffic via our AI Auto-Traffic Matrix.'
+        content_en: 'Publishing a book used to take months and expensive outsourcing. Now, with the WeiXiang Automated E-Book Template Engine, you focus on core insights while the system generates bilingual layouts and drives global traffic via our AI Auto-Traffic Matrix.',
+        content_ja: 'かつて出版には数ヶ月の歳月と高額な組版費用を要しました。WeiXiang自動電子書籍エンジンにより、コアな洞見に集中するだけで多言語の本格レイアウトが瞬時に完成します。'
       }
     ]
   });
@@ -68,6 +77,13 @@ export default function FranchiseStudioPage() {
   const [exportLangMode, setExportLangMode] = useState<EBookExportLangMode>('BILINGUAL');
   const [r2Uploading, setR2Uploading] = useState(false);
 
+  // 加盟商收款提現狀態
+  const [payoutWallet, setPayoutWallet] = useState(profile.payout_wallet || '');
+  const [payoutBank, setPayoutBank] = useState(profile.payout_bank || '');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [payoutLoading, setPayoutLoading] = useState(false);
+  const [payoutStatusMsg, setPayoutStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   const fetchStoreData = async () => {
     try {
       const res = await fetch('/api/ebook');
@@ -76,7 +92,11 @@ export default function FranchiseStudioPage() {
         setBooks(data.store.books || []);
         const key = (address || 'demo_author').toLowerCase();
         const pf = data.store.franchisees?.[key] || data.store.franchisees?.['demo_author'];
-        if (pf) setProfile(pf);
+        if (pf) {
+          setProfile(pf);
+          if (pf.payout_wallet) setPayoutWallet(pf.payout_wallet);
+          if (pf.payout_bank) setPayoutBank(pf.payout_bank);
+        }
       }
     } catch (e) {
       console.error('Failed to load studio store', e);
@@ -87,7 +107,75 @@ export default function FranchiseStudioPage() {
     fetchStoreData();
   }, [address]);
 
-  // AI 自動撰寫與雙語翻譯新章節
+  // 儲存加盟商提現資訊
+  const handleSavePayoutSettings = async () => {
+    setPayoutLoading(true);
+    setPayoutStatusMsg(null);
+    try {
+      const res = await fetch('/api/ebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_payout_settings',
+          authorKey: address || 'demo_author',
+          payoutWallet,
+          payoutBank
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.profile) setProfile(data.profile);
+        setPayoutStatusMsg({ type: 'success', text: '✅ 收款與提現設定已成功儲存！' });
+      } else {
+        setPayoutStatusMsg({ type: 'error', text: data.error || '儲存失敗' });
+      }
+    } catch (e: any) {
+      setPayoutStatusMsg({ type: 'error', text: e.message || '連線錯誤' });
+    } finally {
+      setPayoutLoading(false);
+    }
+  };
+
+  // 申請出金提現
+  const handleRequestPayout = async () => {
+    const amt = Number(withdrawAmount);
+    if (!amt || amt <= 0) {
+      setPayoutStatusMsg({ type: 'error', text: '請輸入有效的提現金額！' });
+      return;
+    }
+    if (!payoutWallet && !payoutBank) {
+      setPayoutStatusMsg({ type: 'error', text: '請先填寫並儲存 Polygon USDT 錢包地址或銀行帳號！' });
+      return;
+    }
+
+    setPayoutLoading(true);
+    setPayoutStatusMsg(null);
+    try {
+      const res = await fetch('/api/ebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'request_payout',
+          authorKey: address || 'demo_author',
+          amountUsdt: amt
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.profile) setProfile(data.profile);
+        setWithdrawAmount('');
+        setPayoutStatusMsg({ type: 'success', text: data.message || '✅ 提現申請已成功送出！' });
+      } else {
+        setPayoutStatusMsg({ type: 'error', text: data.error || '提現申請失敗' });
+      }
+    } catch (e: any) {
+      setPayoutStatusMsg({ type: 'error', text: e.message || '連線錯誤' });
+    } finally {
+      setPayoutLoading(false);
+    }
+  };
+
+  // AI 自動撰寫與多語系翻譯新章節
   const handleAiGenerateChapter = async () => {
     if (!newChapterTitle.trim() && !outlinePrompt.trim()) {
       alert('請先輸入「本章標題」或「大綱要點」，AI 才能為您擴寫與翻譯！');
@@ -103,7 +191,8 @@ export default function FranchiseStudioPage() {
           action: 'ai_generate_chapter',
           bookTitle: currentBook.title_zh,
           chapterTitle: newChapterTitle || '核心實戰章節',
-          outlineNotes: outlinePrompt || newChapterTitle
+          outlineNotes: outlinePrompt || newChapterTitle,
+          langPair: currentBook.lang_pair || 'ZH_EN'
         })
       });
       const data = await res.json();
@@ -118,14 +207,19 @@ export default function FranchiseStudioPage() {
               id: `ch-${Date.now()}`,
               title_zh: data.chapter.title_zh,
               title_en: data.chapter.title_en,
+              title_ja: data.chapter.title_ja,
               content_zh: data.chapter.content_zh,
-              content_en: data.chapter.content_en
+              content_en: data.chapter.content_en,
+              content_ja: data.chapter.content_ja,
+              image_url: data.chapter.image_url,
+              image_caption: data.chapter.image_caption,
+              references: data.chapter.references
             }
           ]
         }));
         setNewChapterTitle('');
         setOutlinePrompt('');
-        setStatusMessage('✨ AI 雙語章節擴寫完成！已自動加入下方章節列表。');
+        setStatusMessage('✨ AI 多語系章節擴寫完成！已自動加入下方章節列表。');
       }
     } catch (err: any) {
       alert('連線錯誤：' + err.message);
@@ -134,10 +228,10 @@ export default function FranchiseStudioPage() {
     }
   };
 
-  // AI 一鍵全書自動編撰 (自動產生雙語書名、副標與 4 大核心章節完整內文)
+  // AI 一鍵全書自動編撰 (自動產生多語系書名、副標與 8 大核心章節完整圖文)
   const handleAiGenerateFullBook = async () => {
     if (!currentBook.title_zh.trim() && !fullBookTopic.trim()) {
-      alert('請先在上方輸入「中文書名」或下方輸入「全書主題描述」，AI 即可一鍵為您自動編撰整本雙語電子書！');
+      alert('請先在上方輸入「中文書名」或下方輸入「全書主題描述」，AI 即可一鍵為您自動編撰整本多語系專業電子書！');
       return;
     }
     setFullBookLoading(true);
@@ -150,7 +244,8 @@ export default function FranchiseStudioPage() {
           action: 'ai_generate_full_book',
           bookTitle: currentBook.title_zh,
           bookSubtitle: currentBook.subtitle_zh,
-          topicSummary: fullBookTopic || currentBook.title_zh
+          topicSummary: fullBookTopic || currentBook.title_zh,
+          langPair: currentBook.lang_pair || 'ZH_EN'
         })
       });
       const data = await res.json();
@@ -161,8 +256,12 @@ export default function FranchiseStudioPage() {
           ...prev,
           title_zh: data.bookMeta?.title_zh || prev.title_zh,
           title_en: data.bookMeta?.title_en || prev.title_en,
+          title_ja: data.bookMeta?.title_ja || prev.title_ja,
           subtitle_zh: data.bookMeta?.subtitle_zh || prev.subtitle_zh,
           subtitle_en: data.bookMeta?.subtitle_en || prev.subtitle_en,
+          subtitle_ja: data.bookMeta?.subtitle_ja || prev.subtitle_ja,
+          lang_pair: data.bookMeta?.lang_pair || prev.lang_pair,
+          cover_image_url: data.bookMeta?.cover_image_url || prev.cover_image_url,
           chapters: data.chapters || prev.chapters
         }));
         setStatusMessage('🎉 Google 4 旗艦大腦已為您編撰完成 25+ 頁全球權威專書！包含 8 大核心篇章、高質感商業插圖、圖說與權威文獻參照，可立即在右側點擊「自行下載電子書（3版）」或「提交書審」！');
@@ -545,6 +644,127 @@ export default function FranchiseStudioPage() {
           </div>
         )}
 
+        {/* 💰 加盟商收款方式設定 ＆ 一鍵出金提現中心 (Payout Settings & Withdrawals) */}
+        <div className="bg-gradient-to-br from-indigo-950/70 via-slate-900/90 to-purple-950/70 border-2 border-indigo-400/40 rounded-3xl p-6 mb-8 shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                PAYOUT SETTINGS & AUTOMATED WITHDRAWALS
+              </span>
+              <h2 className="text-lg sm:text-2xl font-black text-white mt-0.5 flex items-center gap-2">
+                <span>💰</span> 加盟商收款方式設定 ＆ 一鍵出金提現中心
+              </h2>
+            </div>
+            <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold w-fit">
+              ⚡ 支援 Polygon USDT 錢包 ＋ 銀行直匯雙軌出金
+            </span>
+          </div>
+
+          {/* 出金提現數據統計卡 */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 text-xs">
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10">
+              <span className="text-gray-400 block mb-1">累積銷售總額</span>
+              <span className="text-lg sm:text-xl font-black text-white">${profile.total_sales_usdt.toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">USDT</span></span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-emerald-500/30">
+              <span className="text-emerald-300 block mb-1">10% 服務費倒抵金</span>
+              <span className="text-lg sm:text-xl font-black text-emerald-400">${profile.fee_credit_balance.toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">USDT</span></span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-cyan-500/30">
+              <span className="text-cyan-300 block mb-1">已申請提現累計</span>
+              <span className="text-lg sm:text-xl font-black text-cyan-400">${(profile.payout_requested_usdt || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">USDT</span></span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-amber-500/40">
+              <span className="text-amber-300 block mb-1">目前最高可提現</span>
+              <span className="text-lg sm:text-xl font-black text-amber-400">
+                ${Math.max(0, Number(((profile.total_sales_usdt * 0.65) - (profile.payout_requested_usdt || 0)).toFixed(2))).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">USDT</span>
+              </span>
+            </div>
+          </div>
+
+          {/* 收款設定與提現表單 */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* 收款方式設定 (7 欄) */}
+            <div className="lg:col-span-7 space-y-3 bg-black/30 p-4 rounded-2xl border border-white/10">
+              <div className="text-xs font-bold text-indigo-300 flex items-center justify-between">
+                <span>1️⃣ 設定您的提現收款帳戶 (錢包或銀行)：</span>
+                <span className="text-[11px] text-gray-400">系統打款唯一依據</span>
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-400 mb-1">Polygon (MATIC) USDT 收款錢包地址 (0x...)</label>
+                <input
+                  type="text"
+                  placeholder="例如：0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc"
+                  value={payoutWallet}
+                  onChange={e => setPayoutWallet(e.target.value)}
+                  className="w-full bg-gray-900 border border-indigo-500/40 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-cyan-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-400 mb-1">法幣收款：銀行代碼、銀行名稱、戶名與帳號 (或 PayPal)</label>
+                <input
+                  type="text"
+                  placeholder="例如：808 玉山銀行 / 戶名：王小明 / 帳號：0123-4567-8901"
+                  value={payoutBank}
+                  onChange={e => setPayoutBank(e.target.value)}
+                  className="w-full bg-gray-900 border border-indigo-500/40 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+              <button
+                onClick={handleSavePayoutSettings}
+                disabled={payoutLoading}
+                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all cursor-pointer"
+              >
+                💾 儲存收款提現設定
+              </button>
+            </div>
+
+            {/* 申請出金提現 (5 欄) */}
+            <div className="lg:col-span-5 space-y-3 bg-black/30 p-4 rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-bold text-amber-300 mb-2">
+                  2️⃣ 申請出金提現 (USDT)：
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="輸入提現金額"
+                    value={withdrawAmount}
+                    onChange={e => setWithdrawAmount(e.target.value)}
+                    className="flex-1 bg-gray-900 border border-amber-500/40 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-amber-300 font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                  <button
+                    onClick={() => {
+                      const max = Math.max(0, Number(((profile.total_sales_usdt * 0.65) - (profile.payout_requested_usdt || 0)).toFixed(2)));
+                      setWithdrawAmount(String(max));
+                    }}
+                    className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-300 shrink-0 cursor-pointer"
+                  >
+                    全部
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
+                  💡 每筆訂單撥出 25% 推廣聯盟費與 10% 服務費（倒抵期間享 0% 抽成）；加盟商實收淨額約為 65%~75%，送出申請後 24 小時內核驗打款。
+                </p>
+              </div>
+
+              <button
+                onClick={handleRequestPayout}
+                disabled={payoutLoading}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)] cursor-pointer"
+              >
+                🚀 立即申請出金提現
+              </button>
+            </div>
+          </div>
+
+          {payoutStatusMsg && (
+            <div className={`mt-3 p-3 rounded-xl text-xs font-bold ${payoutStatusMsg.type === 'success' ? 'bg-emerald-950/70 border border-emerald-500/50 text-emerald-200' : 'bg-red-950/70 border border-red-500/50 text-red-200'}`}>
+              {payoutStatusMsg.text}
+            </div>
+          )}
+        </div>
+
         {/* 主工作區：左側編輯與 AI 模版設定 ｜ 右側即時預覽與自行下載 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* 左側：設定與 AI 撰稿 (7 欄) */}
@@ -570,34 +790,166 @@ export default function FranchiseStudioPage() {
                 </button>
               </div>
 
+              <div className="mb-4 p-4 rounded-2xl bg-black/40 border border-indigo-500/30">
+                <label className="block text-xs font-black text-indigo-300 uppercase tracking-wider mb-2">
+                  🌐 選擇電子書自選語系對 (Language Pair) *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentBook({ ...currentBook, lang_pair: 'ZH_EN' })}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      (currentBook.lang_pair || 'ZH_EN') === 'ZH_EN'
+                        ? 'bg-indigo-600 border-indigo-300 text-white shadow'
+                        : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'
+                    }`}
+                  >
+                    🇹🇼/🇺🇸 繁體中文 ＋ 專業英文
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentBook({ ...currentBook, lang_pair: 'JA_EN' })}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      currentBook.lang_pair === 'JA_EN'
+                        ? 'bg-indigo-600 border-indigo-300 text-white shadow'
+                        : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'
+                    }`}
+                  >
+                    🇯🇵/🇺🇸 日文敬語 ＋ 專業英文
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentBook({ ...currentBook, lang_pair: 'ZH_JA' })}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      currentBook.lang_pair === 'ZH_JA'
+                        ? 'bg-indigo-600 border-indigo-300 text-white shadow'
+                        : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'
+                    }`}
+                  >
+                    🇹🇼/🇯🇵 繁體中文 ＋ 日文敬語
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">中文書名 *</label>
-                  <input
-                    type="text"
-                    value={currentBook.title_zh}
-                    onChange={e => setCurrentBook({ ...currentBook, title_zh: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">英文書名 (雙語對照版自動顯示)</label>
-                  <input
-                    type="text"
-                    value={currentBook.title_en}
-                    onChange={e => setCurrentBook({ ...currentBook, title_en: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">中文副標題</label>
-                  <input
-                    type="text"
-                    value={currentBook.subtitle_zh}
-                    onChange={e => setCurrentBook({ ...currentBook, subtitle_zh: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
-                  />
-                </div>
+                {currentBook.lang_pair === 'JA_EN' ? (
+                  <>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">日文書名 (日本語メインタイトル) *</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_ja || currentBook.title_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, title_ja: e.target.value, title_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">英文書名 (English Main Title) *</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_en}
+                        onChange={e => setCurrentBook({ ...currentBook, title_en: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">日文副標題 (日本語サブタイトル)</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_ja || currentBook.subtitle_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_ja: e.target.value, subtitle_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">英文副標題 (English Subtitle)</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_en}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_en: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                  </>
+                ) : currentBook.lang_pair === 'ZH_JA' ? (
+                  <>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">繁體中文書名 *</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, title_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">日文書名 (日本語メインタイトル)</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_ja || ''}
+                        onChange={e => setCurrentBook({ ...currentBook, title_ja: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">繁體中文副標題</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">日文副標題 (日本語サブタイトル)</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_ja || ''}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_ja: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">中文書名 *</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, title_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">英文書名 (雙語對照版自動顯示)</label>
+                      <input
+                        type="text"
+                        value={currentBook.title_en}
+                        onChange={e => setCurrentBook({ ...currentBook, title_en: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">中文副標題</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_zh}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_zh: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">英文副標題</label>
+                      <input
+                        type="text"
+                        value={currentBook.subtitle_en}
+                        onChange={e => setCurrentBook({ ...currentBook, subtitle_en: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                      />
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="block text-xs text-gray-400 mb-1">作者 / 加盟商品牌署名</label>
                   <input
@@ -863,7 +1215,7 @@ export default function FranchiseStudioPage() {
                 </button>
               </div>
 
-              {/* 加盟商自行下載雙按鈕（含 3 版語系選擇：中英雙語對照版 / 純繁體中文版 / 純英文版） */}
+              {/* 加盟商自行下載雙按鈕（含 3 版語系選擇：雙語對照版 / 第一語系純版 / 第二語系純版） */}
               <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 mb-5 space-y-3">
                 <div className="text-xs font-bold text-cyan-300">
                   📥 【功能 A：加盟商自行下載電子書母檔（共 3 版語系，免等書審立即可下）】
@@ -878,42 +1230,42 @@ export default function FranchiseStudioPage() {
                         : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
                     }`}
                   >
-                    🌍 中英雙語版
+                    {currentBook.lang_pair === 'JA_EN' ? '🇯🇵/🇺🇸 日英雙語' : currentBook.lang_pair === 'ZH_JA' ? '🇹🇼/🇯🇵 中日雙語' : '🇹🇼/🇺🇸 中英雙語'}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setExportLangMode('ZH_ONLY')}
+                    onClick={() => setExportLangMode(currentBook.lang_pair === 'JA_EN' ? 'JA_ONLY' : 'ZH_ONLY')}
                     className={`py-2 px-1.5 rounded-lg text-[11px] font-black border transition-all cursor-pointer ${
-                      exportLangMode === 'ZH_ONLY'
+                      (currentBook.lang_pair === 'JA_EN' ? exportLangMode === 'JA_ONLY' : exportLangMode === 'ZH_ONLY')
                         ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-md'
                         : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
                     }`}
                   >
-                    🇹🇼 純繁體中文版
+                    {currentBook.lang_pair === 'JA_EN' ? '🇯🇵 純日文版' : '🇹🇼 純繁中文版'}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setExportLangMode('EN_ONLY')}
+                    onClick={() => setExportLangMode(currentBook.lang_pair === 'ZH_JA' ? 'JA_ONLY' : 'EN_ONLY')}
                     className={`py-2 px-1.5 rounded-lg text-[11px] font-black border transition-all cursor-pointer ${
-                      exportLangMode === 'EN_ONLY'
+                      (currentBook.lang_pair === 'ZH_JA' ? exportLangMode === 'JA_ONLY' : exportLangMode === 'EN_ONLY')
                         ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-md'
                         : 'bg-black/40 text-gray-300 border-white/15 hover:border-cyan-400/50'
                     }`}
                   >
-                    🇺🇸 純英文版
+                    {currentBook.lang_pair === 'ZH_JA' ? '🇯🇵 純日文版' : '🇺🇸 純英文版'}
                   </button>
                 </div>
                 <button
                   onClick={() => handleDownloadMasterBook(currentBook, true, exportLangMode)}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm shadow-lg cursor-pointer"
                 >
-                  🖨️ 一鍵導出 / 下載「{exportLangMode === 'BILINGUAL' ? '中英雙語對照版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 精裝 PDF」
+                  🖨️ 一鍵導出 / 下載「{exportLangMode === 'BILINGUAL' ? (currentBook.lang_pair === 'JA_EN' ? '日/英雙語對照版' : currentBook.lang_pair === 'ZH_JA' ? '繁中/日雙語對照版' : '中/英雙語對照版') : exportLangMode === 'JA_ONLY' ? '純日文版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 精裝 PDF」
                 </button>
                 <button
                   onClick={() => handleDownloadMasterBook(currentBook, false, exportLangMode)}
                   className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer"
                 >
-                  💾 下載「{exportLangMode === 'BILINGUAL' ? '中英雙語對照版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 獨立網頁母檔 (.html)」
+                  💾 下載「{exportLangMode === 'BILINGUAL' ? (currentBook.lang_pair === 'JA_EN' ? '日/英雙語對照版' : currentBook.lang_pair === 'ZH_JA' ? '繁中/日雙語對照版' : '中/英雙語對照版') : exportLangMode === 'JA_ONLY' ? '純日文版' : exportLangMode === 'ZH_ONLY' ? '純繁體中文版' : '純英文版'} 獨立網頁母檔 (.html)」
                 </button>
 
                 {/* 離線修改後重新上傳至專用 R2 儲存槽（算 1 次修改額度） */}

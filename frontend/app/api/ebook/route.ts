@@ -61,6 +61,9 @@ const DEFAULT_STORE: EBookCloudStore = {
       book_created_count: 1,
       fee_credit_balance: 990,
       total_sales_usdt: 0,
+      payout_wallet: '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc',
+      payout_bank: '808 玉山銀行 / 戶名：微享智能科技 / 帳號：0123-4567-8901',
+      payout_requested_usdt: 0,
       ai_traffic_enabled: true,
       expires_at: '2027-10-27T08:00:00Z'
     }
@@ -75,8 +78,11 @@ const DEFAULT_STORE: EBookCloudStore = {
       author_line_id: 'xyz007tw',
       title_zh: 'Antigravity × Remotion 全自動印鈔級影音與電子書實戰指南',
       title_en: 'Antigravity × Remotion Automated Video & E-Book Practical Guide',
+      title_ja: 'Antigravity × Remotion 全自動動画＆電子書籍実践バイブル',
       subtitle_zh: '掌握 AI 自動來客矩陣與 100% 倒抵零風險變現核心秘密',
       subtitle_en: 'Master the AI Traffic Matrix and 100% Fee-Credit Monetization System',
+      subtitle_ja: 'AI自動集客マトリクスと100%相殺ノーリスク収益化の極意',
+      lang_pair: 'ZH_EN',
       theme_id: 'tech_blue',
       bilingual_mode: true,
       price_single_usdt: 39,
@@ -156,9 +162,9 @@ export async function POST(req: Request) {
     const { action } = body;
     const store = await loadCloudStore();
 
-    // 1. AI 智慧擴寫與中英雙語自動翻譯 (圖文型專業電子書升級：含配圖建議與權威來源參照)
+    // 1. AI 智慧擴寫與多語系自動翻譯 (支援自選語系對：繁中/英 ZH_EN、日/英 JA_EN、繁中/日 ZH_JA)
     if (action === 'ai_generate_chapter') {
-      const { bookTitle, chapterTitle, outlineNotes } = body;
+      const { bookTitle, chapterTitle, outlineNotes, langPair = 'ZH_EN' } = body;
 
       const scanRes = scanBannedContent(`${bookTitle} ${chapterTitle} ${outlineNotes}`);
       if (!scanRes.passed) {
@@ -177,8 +183,10 @@ export async function POST(req: Request) {
           chapter: {
             title_zh: chapterTitle || 'AI 實戰章節',
             title_en: 'AI Practical Chapter',
+            title_ja: 'AI実践チャプター',
             content_zh: `【系統展示生成】針對「${outlineNotes || chapterTitle}」的深度解析：\n透過微享自動電子書模版引擎，創作者能夠將核心知識迅速結構化，並自動轉化為高價值數位資產。`,
             content_en: `[System Generated] In-depth analysis on "${outlineNotes || chapterTitle}":\nWith the WeiXiang Automated E-Book Template Engine, creators can rapidly structure core knowledge into high-value digital assets.`,
+            content_ja: `【自動生成サンプル】「${outlineNotes || chapterTitle}」の徹底解説：\nWeiXiang自動電子書籍エンジンにより、コアな知見を迅速に体系化し、高価値なデジタル資産へと自動変換します。`,
             image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
             image_caption: 'AI 數位資產與自動化獲客流程視覺圖解',
             references: [
@@ -188,22 +196,32 @@ export async function POST(req: Request) {
         });
       }
 
+      const langRuleDesc =
+        langPair === 'JA_EN'
+          ? '請產出「高水準商務日文（敬語體，約 600~900 字）」與「專業地道英文」雙語對照版，回傳包含 title_ja, title_en, content_ja, content_en。'
+          : langPair === 'ZH_JA'
+          ? '請產出「繁體中文」與「高水準商務日文」雙語對照版，回傳包含 title_zh, title_ja, content_zh, content_ja。'
+          : '請產出「繁體中文」與「專業英文」雙語對照版，回傳包含 title_zh, title_en, content_zh, content_en。';
+
       const prompt = `你是一位頂級國際商業出版總編輯。請使用最新旗艦智能模型，根據以下主題，撰寫一個具備「圖文專業型」高水準的電子書章節。
+語系設定：${langRuleDesc}
 要求：
 1. 內容嚴謹、富含行業乾貨與權威數據。
-2. 同時提供「繁體中文」與「在地化地道專業英文」雙語對照版本。
+2. 同時提供兩語系專業對照版本，段落間以 \\n 分隔。
 3. 提供符合本章主題的高質感商業插圖建議圖說 (image_caption)，以及 1~2 個權威參考資料來源 (references)。
 書名：${bookTitle}
 本章標題：${chapterTitle}
 本章核心大綱與要點：${outlineNotes}
 
-請嚴格以 JSON 格式回傳（不要加上 markdown code block），欄位如下：
+請嚴格以 JSON 格式回傳（不要加上 markdown code block），欄位格式：
 {
-  "title_zh": "潤色後的繁體中文章節標題",
+  "title_zh": "繁體中文章節標題",
   "title_en": "Professional English Chapter Title",
-  "content_zh": "繁體中文章節正文（約 400~600 字，分成 3~4 個自然段落，以換行符號 \\n 分隔）",
-  "content_en": "Professional English chapter body corresponding to the Chinese content (3-4 paragraphs separated by \\n)",
-  "image_caption": "章節專業圖說（例如：2026 全球 AI 流量裂變模型架構示意圖）",
+  "title_ja": "プロフェッショナルな日本語章タイトル",
+  "content_zh": "繁體中文章節正文",
+  "content_en": "English chapter body",
+  "content_ja": "日本語章本文（ビジネス敬語）",
+  "image_caption": "章節專業圖說",
   "references": [
     { "title": "權威報告或文獻名稱", "url": "可選參考網址" }
   ]
@@ -220,8 +238,10 @@ export async function POST(req: Request) {
         parsed = {
           title_zh: chapterTitle,
           title_en: chapterTitle,
+          title_ja: chapterTitle,
           content_zh: `【自動生成】針對 ${chapterTitle} 的深度觀點解析。\n本章探討核心商業架構與實操落地方法。`,
           content_en: `[Auto-generated] In-depth analysis for ${chapterTitle}. Exploring core frameworks and implementation methods.`,
+          content_ja: `【自動生成】${chapterTitle}に関する徹底考察。\n本章ではコアなビジネス構造と実装手順を詳解します。`,
           image_caption: '商業圖解架構示意圖'
         };
       }
@@ -240,9 +260,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, chapter: parsed });
     }
 
-    // 1B. AI 一鍵全書自動編撰引擎 (Google 4 旗艦圖文型專業電子書：8大深度篇章、8,000~10,000字、25頁以上全球權威暢銷書規格)
+    // 1B. AI 一鍵全書自動編撰引擎 (Google 4 旗艦圖文型專業電子書：8大深度篇章、8,000~10,000字、25頁以上全球權威暢銷書規格，支援多語系自選對：繁中/英 ZH_EN、日/英 JA_EN、繁中/日 ZH_JA)
     if (action === 'ai_generate_full_book') {
-      const { bookTitle, bookSubtitle, topicSummary } = body;
+      const { bookTitle, bookSubtitle, topicSummary, langPair = 'ZH_EN' } = body;
 
       const scanRes = scanBannedContent(`${bookTitle} ${bookSubtitle} ${topicSummary}`);
       if (!scanRes.passed) {
@@ -267,15 +287,18 @@ export async function POST(req: Request) {
         'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80'
       ];
 
-      // 若未配置 API Key，提供達標 25+ 頁規格的 8 大章節全球頂級暢銷示範書
+      // 若未配置 API Key，提供達標 25+ 頁規格的 8 大章節全球頂級暢銷示範書 (自動根據 langPair 帶入對應語系)
       if (!process.env.GEMINI_API_KEY) {
         return NextResponse.json({
           success: true,
           bookMeta: {
             title_zh: bookTitle || 'AI 自動化來客實戰聖經：打造全天候自動化數位資產',
             title_en: 'The AI Automated Traffic Bible: Building 24/7 Digital Assets & Scalable Revenue',
+            title_ja: 'AI自動化集客実践バイブル：24時間稼働型デジタル資産構築論',
             subtitle_zh: bookSubtitle || '全球頂級暢銷作家與麥肯錫顧問實戰心法・25頁深度權威專書',
             subtitle_en: 'Authority Playbook by Global Bestselling Authors & Strategic Consultants',
+            subtitle_ja: '世界的ベストセラー作家と戦略コンサルタント直伝・25ページ超の権威的専門書',
+            lang_pair: langPair,
             cover_image_url: sampleImages[0]
           },
           chapters: [
@@ -283,8 +306,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-1`,
               title_zh: '第一章：全球產業範式轉移與破局心智',
               title_en: 'Chapter 1: Global Paradigm Shift & Core Breakthrough Mindset',
+              title_ja: '第一章：グローバルパラダイムシフトとブレークスルー思考',
               content_zh: `在人工智慧與演算法重塑全球經濟的時代，針對「${topicSummary || bookTitle}」，傳統的勞力投入已遭遇邊際報酬遞減的嚴峻瓶頸。\n\n本章深入拆解全球最新商業動能，剖析企業與個人創作者如何擺脫低效競爭，從底層邏輯重構數位價值鏈。透過高維度認知躍遷，讀者將能精確鎖定利基市場，將每一次互動轉化為長期數位品牌資產。`,
               content_en: `In the era of AI and algorithmic disruption, focusing on "${topicSummary || bookTitle}", traditional labor input faces diminishing returns.\n\nThis chapter dissects modern commercial dynamics, revealing how creators break through low-efficiency competition to rebuild scalable digital assets.`,
+              content_ja: `AIとアルゴリズムが世界経済を再構築する現代において、「${topicSummary || bookTitle}」を軸とした従来の労働投下モデルは急速に限界を迎えています。\n\n本章では最新の国際ビジネス潮流を解剖し、個人クリエイターや企業が消耗戦を脱却し、デジタル価値の連鎖を再構築するための根本的アプローチを明かします。`,
               image_url: sampleImages[1],
               image_caption: '圖1-1：全球產業範式躍遷與指數級成長破局曲線',
               references: [{ title: 'Gartner Emerging Tech & AI Trends Report', url: 'https://www.gartner.com' }]
@@ -293,8 +318,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-2`,
               title_zh: '第二章：底層架構心法與價值主張設計',
               title_en: 'Chapter 2: Foundational Principles & High-Value Proposition Design',
+              title_ja: '第二章：基盤アーキテクチャと思考法・提供価値の設計',
               content_zh: '任何成功的自動化系統，其核心都在於不可替代的價值主張。\n\n我們引入麥肯錫 MECE 原則與全球暢銷書結構化寫作模型，帶領讀者提煉個人專業與品牌精華，建構具有高轉化率的產品磁鐵 (Lead Magnet) 與自動化引流鉤子。',
               content_en: 'At the heart of every sustainable automated system lies an irreplaceable value proposition.\n\nLeveraging McKinsey MECE frameworks, this chapter guides you in crafting high-conversion lead magnets and evergreen authority positioning.',
+              content_ja: 'あらゆる自動化システムの成否は、代替不可能な提供価値の定義にかかっています。\n\nマッキンゼーのMECE原則を応用し、自身の知見を凝縮した高成約率のリードマグネットと自動集客の動線設計手法を伝授します。',
               image_url: sampleImages[2],
               image_caption: '圖2-1：麥肯錫 MECE 價值主張架構矩陣',
               references: [{ title: 'Harvard Business Review: The Elements of Value', url: 'https://hbr.org' }]
@@ -303,8 +330,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-3`,
               title_zh: '第三章：標準化執行 SOP 與核心落地路徑',
               title_en: 'Chapter 3: Standard Operating Procedures (SOP) & Execution Path',
+              title_ja: '第三章：標準業務手順（SOP）と確実な実装ロードマップ',
               content_zh: '將宏觀戰略拆解為模組化、可標準化複製的微小日常動作。\n\n本章詳細提供「從零建構數位電子書與自動發貨通道」的四步落地法，涵蓋選題驗證、內容生長、排版美化到金流自動交付，讓專業知識化為永動的被動營收機器。',
               content_en: 'Transforming macro strategies into modular, replicable daily actions.\n\nHere is a 4-step SOP for digital e-book creation and automated fulfillment, ensuring passive value generation around the clock.',
+              content_ja: '大局的な戦略を標準化・再現可能な日々のタスクへと分解します。\n\n電子書籍の企画からコンテンツ生成、デザイン、自動決済・納品までの4ステップを体系化し、知識の自動収益化基盤を構築します。',
               image_url: sampleImages[3],
               image_caption: '圖3-1：數位資產端到端標準化 SOP 交付鏈路',
               references: [{ title: 'MIT Technology Review: Enterprise AI Implementations', url: 'https://www.technologyreview.com' }]
@@ -313,8 +342,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-4`,
               title_zh: '第四章：AI 與自動化矩陣的槓桿賦能',
               title_en: 'Chapter 4: AI Matrix Leverage & Multi-Channel Traffic Flywheel',
+              title_ja: '第四章：AIと自動化マトリクスによるレバレッジ最大化',
               content_zh: '單打獨鬥的時代已經過去，一人公司也能具備跨國媒體集團的產能。\n\n本章揭秘微享 24H AI 自動來客系統的運作架構：如何透過短影音矩陣 (t6/t7/t8)、社群長文案池以及 24 小時在線的智能客服代理，將全網注意力全天候導流至電子書專屬下單頁面。',
               content_en: 'Solo creators can now possess the productive leverage of a media conglomerate.\n\nExplore how WeiXiang AI Traffic Matrix activates continuous multi-channel exposure and routes qualified traffic to your e-book funnels.',
+              content_ja: '個人でもメディア企業に匹敵する生産力を持つ時代です。\n\nショート動画マトリクス（t6/t7/t8）やSNS記事プール、24時間稼働のAI接客エージェントを活用し、全自動で集客と販売を完結させる仕組みを解説します。',
               image_url: sampleImages[4],
               image_caption: '圖4-1：24H AI 短影音與社群多渠道流量飛輪架構',
               references: [{ title: 'Stanford AI Index: Annual Performance & Multi-Modal Leverage', url: 'https://aiindex.stanford.edu' }]
@@ -323,8 +354,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-5`,
               title_zh: '第五章：實戰案例拆解與數據實證分析',
               title_en: 'Chapter 5: Real-World Case Studies & Empirical Data Verification',
+              title_ja: '第五章：実践事例の徹底解剖と実証データ分析',
               content_zh: '數字說真話。我們挑選三個真實成功案例（知識顧問、電商培訓師、身心靈創作者），詳解他們如何自首日啟動，在 30 天內完成超過 500 筆自動訂單交付。\n\n從點擊率、閱讀完成度到推薦人轉化率，各維度數據巨細靡遺公諸於世。',
               content_en: 'Numbers tell the truth. We dissect three empirical case studies achieving over 500 automated orders within 30 days.\n\nFrom CTR to reader retention and referral conversions, every metric is thoroughly analyzed.',
+              content_ja: '実績データに基づき、コンサルタントや教育事業者が導入初月から500件超の自動販売を達成したプロセスを分析。\n\nクリック率や読了率、紹介コンバージョン率など実数値を完全公開します。',
               image_url: sampleImages[5],
               image_caption: '圖5-1：30天獲客轉化率與讀者留存漏斗數據圖',
               references: [{ title: 'Statista Global E-Book & Digital Education Growth Report', url: 'https://www.statista.com' }]
@@ -333,8 +366,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-6`,
               title_zh: '第六章：常見陷阱避坑指南與風險防控',
               title_en: 'Chapter 6: Critical Pitfalls, Anti-Fragility & Risk Mitigation',
+              title_ja: '第六章：陥りがちな罠の回避とリスクヘッジ防壁',
               content_zh: '在追逐自動化紅利的同時，絕不可忽視版權合規與內容風控。\n\n本章深入解析全球 10 大禁書紅線與平台審核規則，教導創作者如何建立反脆弱防線，避免帳號封鎖、被惡意投訴或遭遇退款紛爭，確保資產安全與長青經營。',
               content_en: 'While pursuing automation dividends, compliance and risk control remain non-negotiable.\n\nThis chapter outlines global content safety standards, helping you build anti-fragile operations free from platform suspensions.',
+              content_ja: '収益化を進める上で、著作権遵守とリスク管理は必須です。\n\n禁止コンテンツの基準や審査基準を網羅し、アカウント停止やトラブルを未然に防ぐ堅牢な運用基盤の作り方を提示します。',
               image_url: sampleImages[6],
               image_caption: '圖6-1：合規防護與反脆弱長青運維防線圖',
               references: [{ title: 'WIPO: Intellectual Property & Digital Copyright Guidelines', url: 'https://www.wipo.int' }]
@@ -343,8 +378,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-7`,
               title_zh: '第七章：25% 聯盟裂變與長期商業變現閉環',
               title_en: 'Chapter 7: 25% Affiliate Viral Engine & Exponential Monetization',
+              title_ja: '第七章：25%アフィリエイト連動とバイラル成長モデル',
               content_zh: '好的作品不該默默無聞。微享電子書系統獨創 25% 聯盟推廣分潤架構（10% 級差 + 10% 對等 + 5% 全球領袖均分）與 10% 系統服務費 100% 倒抵機制。\n\n每一位購買並受惠的讀者，都能無縫化身為您的利益共同體，推動裂變指數級擴散。',
               content_en: 'Great works deserve exponential reach. Discover how the 25% affiliate commission structure and 100% credit rebate align reader incentives with your scalable growth.',
+              content_ja: '優れた知見を広く届けるための25%アフィリエイト分配設計（10%差額＋10%マッチング＋5%プール）と100%手数料相殺モデルのシナジーを詳解。\n\n読者が自然と推奨者へと変わる循環を生み出します。',
               image_url: sampleImages[7],
               image_caption: '圖7-1：微享 25% 聯盟推廣與 100% 倒抵閉環模型',
               references: [{ title: 'Journal of Marketing Research: Viral Incentive Mechanisms', url: 'https://journals.sagepub.com' }]
@@ -353,8 +390,10 @@ export async function POST(req: Request) {
               id: `ch-${Date.now()}-8`,
               title_zh: '第八章：未來藍圖展望與 30 天大師行動清單',
               title_en: 'Chapter 8: Future Horizon & 30-Day Master Action Checklist',
+              title_ja: '第八章：次世代の展望と30日マスターアクションプラン',
               content_zh: '行動是通往成功的唯一橋樑。本章總結全書智慧，為讀者制定專屬的 30 天每日落實行動清單。\n\n只要依照步驟穩健推進，下一個月，您將親自見證第一筆全自動被動收入通知響起的感動瞬間。',
               content_en: 'Action is the foundational key to all success. We summarize the master principles into a concrete 30-day implementation calendar.\n\nExecute day by day, and witness your first automated passive revenue notification within weeks.',
+              content_ja: '知見を実行に移すための30日間デイリーアクションリスト。\n\nステップバイステップで確実に進めることで、翌月には完全自動の収益通知を受け取る感動を実感できます。',
               image_url: sampleImages[8],
               image_caption: '圖8-1：30天自動化數位資產落地執行時間軸',
               references: [{ title: 'McKinsey Global Institute: The Future of Automation and Work', url: 'https://www.mckinsey.com' }]
@@ -363,16 +402,23 @@ export async function POST(req: Request) {
         });
       }
 
+      const langRuleDesc =
+        langPair === 'JA_EN'
+          ? '請編撰「高水準商務日文（敬語體，每章 800~1,200 字，content_ja）」與「專業地道英文（content_en）」雙語對照版，回傳包含 title_ja, title_en, subtitle_ja, subtitle_en 以及各章節的 title_ja, title_en, content_ja, content_en。'
+          : langPair === 'ZH_JA'
+          ? '請編撰「繁體中文（每章 800~1,200 字，content_zh）」與「高水準商務日文（content_ja）」雙語對照版，回傳包含 title_zh, title_ja, subtitle_zh, subtitle_ja 以及各章節的 title_zh, title_ja, content_zh, content_ja。'
+          : '請編撰「繁體中文（每章 800~1,200 字，content_zh）」與「專業地道英文（每章 500~800 字，content_en）」雙語對照版，回傳包含 title_zh, title_en, subtitle_zh, subtitle_en 以及各章節的 title_zh, title_en, content_zh, content_en。';
+
       const fullPrompt = `你是由全球頂級暢銷書作者（如《Atomic Habits》《Zero to One》暢銷榜作家）與麥肯錫全球資深顧問合體之【Google 4 旗艦級全球出版總編纂 AI 代理】。
 你的最高任務是根據作者指定的主題，撰寫一本具備全球權威、頂尖暢銷力、商業轉化力與【25 頁以上專業體量】的「圖文型專業電子書」。
+語系要求：${langRuleDesc}
 
 嚴格寫作規格要求：
 1. 必須嚴格編撰【8 個核心深度篇章】（Chapter 1 至 Chapter 8），結構完整嚴密，層層遞進。
-2. 每個章節必須包含繁體中文正文（content_zh，每章 800~1,200 字，內涵豐富、數據詳實、金句頻出、論證嚴密，段落間以 \\n\\n 分隔）。
-3. 每個章節必須同步產出地道專業的英文正文（content_en，每章 500~800 英文單字，符合紐約時報暢銷書標準英文）。
-4. 每個章節必須指定 1 個精準具體的專業圖表/圖解說明（image_caption，例如「圖1-1：...」）。
-5. 每個章節必須提供 1~2 個真實且權威的文獻出處或國際權威機構參照（references，含 title 與 url）。
-6. 全書需達到 8,000 ~ 10,000 中文字（或對應 5,000 ~ 7,000 英文單字），排版後穩定達到 25~35 頁權威專書體量。
+2. 章節內涵豐富、數據詳實、金句頻出、論證嚴密，段落間以 \\n\\n 分隔。
+3. 每個章節必須指定 1 個精準具體的專業圖表/圖解說明（image_caption，例如「圖1-1：...」）。
+4. 每個章節必須提供 1~2 個真實且權威的文獻出處或國際權威機構參照（references，含 title 與 url）。
+5. 全書需達到 8,000 ~ 10,000 字體量，排版後穩定達到 25~35 頁權威專書體量。
 
 作者指定書名：${bookTitle}
 作者指定副標或方向：${bookSubtitle || ''}
@@ -380,74 +426,22 @@ export async function POST(req: Request) {
 
 請嚴格以純 JSON 格式回傳（嚴禁在最外層包含任何 markdown 標籤如 \`\`\`json 或任何其他文字說明），JSON 結構如下：
 {
-  "title_zh": "極具暢銷力與權威感的繁體中文主書名",
+  "title_zh": "繁體中文主書名",
   "title_en": "Professional Bestselling English Main Title",
-  "subtitle_zh": "極具吸引力與商業價值的繁體中文副標題",
+  "title_ja": "日本語メインタイトル",
+  "subtitle_zh": "繁體中文副標題",
   "subtitle_en": "Compelling High-Converting English Subtitle",
+  "subtitle_ja": "日本語サブタイトル",
   "chapters": [
     {
       "title_zh": "第一章：產業痛點與全球宏觀趨勢破局",
       "title_en": "Chapter 1: Global Paradigm Shift & Industry Pain Points",
-      "content_zh": "第一章繁體中文正文（800~1,200字，以 \\n\\n 分段，深刻拆解現況痛點與革命性契機）",
+      "title_ja": "第一章：世界的パラダイムシフトと課題解決",
+      "content_zh": "第一章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
       "content_en": "Chapter 1 complete English content (500~800 words, separated by \\n\\n)",
+      "content_ja": "第一章日本語本文（ビジネス敬語）",
       "image_caption": "圖1-1：產業演進與破局成長曲線圖解",
       "references": [{ "title": "Gartner Emerging Trends Report", "url": "https://www.gartner.com" }]
-    },
-    {
-      "title_zh": "第二章：高維認知與底層心智架構",
-      "title_en": "Chapter 2: Foundational Principles & Mindset Architecture",
-      "content_zh": "第二章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 2 complete English content (500~800 words)",
-      "image_caption": "圖2-1：核心認知躍遷架構圖解",
-      "references": [{ "title": "Harvard Business Review Strategic Insights", "url": "https://hbr.org" }]
-    },
-    {
-      "title_zh": "第三章：標準作業流程 SOP 與關鍵落地路徑",
-      "title_en": "Chapter 3: Standard Operating Procedures & Execution Path",
-      "content_zh": "第三章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 3 complete English content (500~800 words)",
-      "image_caption": "圖3-1：端到端標準化 SOP 實施流程圖",
-      "references": [{ "title": "MIT Technology Review Systems Guide", "url": "https://www.technologyreview.com" }]
-    },
-    {
-      "title_zh": "第四章：AI 與自動化賦能槓桿倍增",
-      "title_en": "Chapter 4: AI Matrix Leverage & Multi-Channel Traffic Flywheel",
-      "content_zh": "第四章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 4 complete English content (500~800 words)",
-      "image_caption": "圖4-1：24H AI 全通路獲客與轉化飛輪架構",
-      "references": [{ "title": "Stanford AI Index Report", "url": "https://aiindex.stanford.edu" }]
-    },
-    {
-      "title_zh": "第五章：實戰案例深度剖析與數據驗證",
-      "title_en": "Chapter 5: Deep-Dive Case Studies & Empirical Data Verification",
-      "content_zh": "第五章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 5 complete English content (500~800 words)",
-      "image_caption": "圖5-1：實戰轉化數據與留存漏斗對照圖",
-      "references": [{ "title": "Statista Global Industry Benchmarks", "url": "https://www.statista.com" }]
-    },
-    {
-      "title_zh": "第六章：常見陷阱避坑指南與風控策略",
-      "title_en": "Chapter 6: Critical Pitfalls & Anti-Fragility Risk Control",
-      "content_zh": "第六章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 6 complete English content (500~800 words)",
-      "image_caption": "圖6-1：合規防護與反脆弱運維防禦圖解",
-      "references": [{ "title": "WIPO Intellectual Property & Compliance Guide", "url": "https://www.wipo.int" }]
-    },
-    {
-      "title_zh": "第七章：25% 聯盟裂變與長期商業變現閉環",
-      "title_en": "Chapter 7: 25% Affiliate Viral Engine & Long-Term Monetization",
-      "content_zh": "第七章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 7 complete English content (500~800 words)",
-      "image_caption": "圖7-1：微享 25% 聯盟推廣與 100% 倒抵閉環模型",
-      "references": [{ "title": "Journal of Marketing Research Viral Models", "url": "https://journals.sagepub.com" }]
-    },
-    {
-      "title_zh": "第八章：未來進化藍圖與 30 天大師行動清單",
-      "title_en": "Chapter 8: Future Horizon & 30-Day Master Action Checklist",
-      "content_zh": "第八章繁體中文正文（800~1,200字，以 \\n\\n 分段）",
-      "content_en": "Chapter 8 complete English content (500~800 words)",
-      "image_caption": "圖8-1：30天數位資產落地時間軸路線圖",
-      "references": [{ "title": "McKinsey Global Institute Future of Work", "url": "https://www.mckinsey.com" }]
     }
   ]
 }`;
@@ -463,14 +457,18 @@ export async function POST(req: Request) {
         parsed = {
           title_zh: bookTitle,
           title_en: bookTitle,
+          title_ja: bookTitle,
           subtitle_zh: bookSubtitle || 'Google 4 旗艦圖文專業指南',
           subtitle_en: 'Google 4 Illustrated Professional Authority Guide',
+          subtitle_ja: 'Google 4 専門電子書籍ガイド',
           chapters: [
             {
               title_zh: '第一章：破局思維與趨勢',
               title_en: 'Chapter 1: Trends & Mindset',
+              title_ja: '第一章：突破思考と潮流',
               content_zh: `針對 ${bookTitle} 的全面解析。\n\n建立自動化獲客資產與專業品牌聲望。`,
               content_en: `Comprehensive analysis for ${bookTitle}.\n\nBuilding automated traffic assets and brand prestige.`,
+              content_ja: `${bookTitle}に関する包括的考察。\n\n自動集客資産とブランド価値を構築します。`,
               image_caption: '圖1-1：商業破局架構圖',
               references: [{ title: 'Gartner Tech Report', url: 'https://www.gartner.com' }]
             }
@@ -480,10 +478,12 @@ export async function POST(req: Request) {
 
       const chapters = (parsed.chapters || []).map((c: any, i: number) => ({
         id: `ch-${Date.now()}-${i + 1}`,
-        title_zh: c.title_zh,
-        title_en: c.title_en,
-        content_zh: c.content_zh,
-        content_en: c.content_en,
+        title_zh: c.title_zh || c.title_ja || c.title_en || `第 ${i + 1} 章`,
+        title_en: c.title_en || c.title_zh || `Chapter ${i + 1}`,
+        title_ja: c.title_ja || c.title_zh || `第 ${i + 1} 章`,
+        content_zh: c.content_zh || '',
+        content_en: c.content_en || '',
+        content_ja: c.content_ja || '',
         image_url: sampleImages[(i + 1) % sampleImages.length],
         image_caption: c.image_caption || `圖${i + 1}-1：專業商務架構解析圖`,
         references: c.references || [
@@ -496,8 +496,11 @@ export async function POST(req: Request) {
         bookMeta: {
           title_zh: parsed.title_zh || bookTitle,
           title_en: parsed.title_en || '',
+          title_ja: parsed.title_ja || '',
           subtitle_zh: parsed.subtitle_zh || bookSubtitle,
           subtitle_en: parsed.subtitle_en || '',
+          subtitle_ja: parsed.subtitle_ja || '',
+          lang_pair: langPair,
           cover_image_url: sampleImages[0]
         },
         chapters
@@ -894,6 +897,55 @@ export async function POST(req: Request) {
           remainingCreditBalance: profile.fee_credit_balance
         },
         profile
+      });
+    }
+
+    // 6. 加盟商設定提現資訊 (Polygon USDT 錢包地址 / 銀行帳號)
+    if (action === 'save_payout_settings') {
+      const { authorKey, payoutWallet, payoutBank } = body;
+      const key = (authorKey || 'demo_author').toLowerCase();
+      if (!store.franchisees[key]) {
+        store.franchisees[key] = { ...DEFAULT_STORE.franchisees['demo_author'], wallet_address: key };
+      }
+      const profile = store.franchisees[key];
+      if (payoutWallet !== undefined) profile.payout_wallet = payoutWallet;
+      if (payoutBank !== undefined) profile.payout_bank = payoutBank;
+      await saveCloudStore(store);
+      return NextResponse.json({ success: true, profile, message: '✅ 收款與提現設定已成功更新！' });
+    }
+
+    // 7. 加盟商申請出金提現 (扣抵累計收益並進入審核/出金排程)
+    if (action === 'request_payout') {
+      const { authorKey, amountUsdt } = body;
+      const key = (authorKey || 'demo_author').toLowerCase();
+      const profile = store.franchisees[key];
+      if (!profile) {
+        return NextResponse.json({ success: false, error: '找不到加盟商資料' }, { status: 404 });
+      }
+
+      const reqAmt = Number(amountUsdt);
+      if (!reqAmt || reqAmt <= 0) {
+        return NextResponse.json({ success: false, error: '請輸入有效的提現金額！' }, { status: 400 });
+      }
+
+      const alreadyWithdrawn = profile.payout_requested_usdt || 0;
+      const estimatedNetEarned = Number((profile.total_sales_usdt * 0.65).toFixed(2));
+      const availableBalance = Math.max(0, Number((estimatedNetEarned - alreadyWithdrawn).toFixed(2)));
+
+      if (reqAmt > availableBalance && availableBalance > 0) {
+        return NextResponse.json({
+          success: false,
+          error: `提現金額超出目前可提現餘額！目前最高可提現：$${availableBalance} USDT`
+        }, { status: 400 });
+      }
+
+      profile.payout_requested_usdt = alreadyWithdrawn + reqAmt;
+      await saveCloudStore(store);
+
+      return NextResponse.json({
+        success: true,
+        profile,
+        message: `✅ 已成功提交提現申請（$${reqAmt} USDT）！平台將於 24 小時內核驗，並依您設定之收款方式（Polygon USDT 錢包或銀行）完成打款。`
       });
     }
 

@@ -183,6 +183,107 @@ export default function FranchiseEBookSection() {
           </div>
         </div>
 
+        {/* 企業名家・AI 電子書一條龍客製化委託專區 (Enterprise Bespoke High-Ticket Service) */}
+        <div className="bg-gradient-to-br from-amber-950/40 via-slate-900/90 to-indigo-950/50 border-2 border-amber-400/50 rounded-3xl p-6 sm:p-8 md:p-10 mb-10 text-left shadow-[0_0_50px_rgba(251,191,36,0.15)] relative overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
+          
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-3 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                <span>🛠️</span>
+                {isZh ? '企業名家 × 頂級高客單專案委託 (Enterprise VIP Bespoke Publishing)' : 'Enterprise VIP Bespoke E-Book Publishing Service'}
+              </div>
+              <h3 className="text-xl sm:text-3xl font-black text-white tracking-tight">
+                {isZh
+                  ? '沒時間自己寫？「AI 電子書一條龍全代工客製化服務」由總工程師團隊親自操刀！'
+                  : 'No Time to Write? Full-Turnkey "AI E-Book Custom Service" Delivered by CTO SEN!'}
+              </h3>
+              <p className="text-xs sm:text-base text-amber-100/80 mt-2 max-w-4xl leading-relaxed">
+                {isZh
+                  ? '專為跨國企業、高階名師、品牌創辦人量身打造：從專業深度訪談提煉、Google 4 旗艦圖文編撰、品牌專屬 CIS 視覺排版，到 4K 雙主播短影音矩陣協播與金流交付，全包式零負擔落地！（專案費用 $2,000~$5,000 USD，完工結案亦全額納入 25% 聯盟分潤！）'
+                  : 'Tailored for enterprises, industry authorities, and founders: From AI voice interview structuring to 25+ page masterbook compilation, brand CIS design, 4K dual-anchor video promotion, and automated payment delivery! ($2,000~$5,000 USD, 25% affiliate eligible)'}
+              </p>
+            </div>
+            <div className="shrink-0 bg-amber-500/10 border border-amber-400/40 rounded-2xl p-4 text-center">
+              <span className="text-xs text-amber-300 font-bold block">{isZh ? '專案委託預算區間' : 'Budget Range'}</span>
+              <span className="text-2xl sm:text-3xl font-black text-amber-400 block">$2,000 ~ $5,000</span>
+              <span className="text-[11px] text-gray-400 block mt-0.5">{isZh ? 'USDT / 信用卡・依規模簽約議價' : 'USDT / Card · Contracted'}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="text-amber-400 font-black text-sm mb-1.5 flex items-center gap-2">
+                <span>🎙️</span> {isZh ? '1對1 深度訪談代撰' : '1-on-1 AI Interview'}
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                {isZh ? '由專人訪談錄音或提供零碎素材，AI 旗艦總編纂代理自動擴編成 25+ 頁麥肯錫架構權威專書。' : 'Turn voice recordings and raw notes into a 25+ page structured authority book.'}
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="text-amber-400 font-black text-sm mb-1.5 flex items-center gap-2">
+                <span>🎨</span> {isZh ? '品牌專屬 CIS 排版' : 'Custom CIS Typography'}
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                {isZh ? '精美商業圖解、權威來源文獻、專屬導流 QR Code 與高解析 HTML/PDF 雙格式精裝封裝。' : 'Premium business diagrams, citation references, custom QR funnels, and dual PDF/HTML assets.'}
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="text-amber-400 font-black text-sm mb-1.5 flex items-center gap-2">
+                <span>🌐</span> {isZh ? '多語系全球佈署' : 'Multilingual Deploy'}
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                {isZh ? '支援繁中/英、日/英、繁中/日自選語系對，獨立上傳至 Cloudflare R2 雙鏡像高速節點。' : 'Deploy in Traditional Chinese, English, or Japanese to dedicated high-speed Cloudflare R2.'}
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="text-amber-400 font-black text-sm mb-1.5 flex items-center gap-2">
+                <span>🎬</span> {isZh ? '4K 雙主播短影音協播' : '4K Dual-Anchor Ads'}
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                {isZh ? '無縫接軌 t6/t7/t8 短影音矩陣產線，每日在 TikTok/YouTube 等社群幫您專書打廣告找客人！' : 'Integrate directly with t6/t7/t8 short video pipeline to promote your book daily.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-amber-400/20">
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(
+                    new CustomEvent('open-ai-chat', {
+                      detail: {
+                        query: isZh
+                          ? '您好，我想諮詢「企業名家・AI 電子書一條龍客製化委託」方案（$2,000~$5,000 USD），請為我說明服務內容與流程！'
+                          : 'Hello, I would like to inquire about the Enterprise VIP Bespoke E-Book Custom Service ($2,000~$5,000 USD).'
+                      }
+                    })
+                  );
+                }
+              }}
+              className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:scale-105 cursor-pointer"
+            >
+              💬 {isZh ? '一鍵喚起 AI 客服洽詢客製方案' : 'Consult AI Support for Bespoke Plan'}
+            </button>
+
+            <a
+              href="https://line.me/ti/p/~xyz007tw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400 text-emerald-200 font-bold text-sm transition-all hover:scale-105"
+            >
+              📱 {isZh ? '直接聯繫總工程師 CTO SEN (Line: xyz007tw)' : 'Contact CTO SEN Directly (Line: xyz007tw)'}
+            </a>
+
+            <a
+              href="mailto:xyz007tw@gmail.com?subject=諮詢企業名家AI電子書一條龍客製委託"
+              className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition-all"
+            >
+              ✉️ {isZh ? 'Email 來信諮詢 (xyz007tw@gmail.com)' : 'Email Us (xyz007tw@gmail.com)'}
+            </a>
+          </div>
+        </div>
+
         {/* 四大功能快速入口與加盟結帳按鈕 */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-4">
           <button

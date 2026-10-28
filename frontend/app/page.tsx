@@ -9,6 +9,7 @@ import PayUniButton from '@/components/PayUniButton';
 import TutorCourseSection from '@/components/TutorCourseSection';
 import VideoShoppableSection from '@/components/VideoShoppableSection';
 import FranchiseEBookSection from '@/components/FranchiseEBookSection';
+import FeaturedEBookShowcaseSection from '@/components/FeaturedEBookShowcaseSection';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -58,6 +59,14 @@ export default function Home() {
     lang === 'ko-KR' ? '🛠️ AI 맞춤 서비스' :
     lang === 'vi-VN' ? '🛠️ Dịch vụ AI Tùy chỉnh' :
     '🛠️ AI Custom Services';
+
+  const navEbookText =
+    lang === 'zh-TW' ? '📚 讀者書櫃' :
+    lang === 'zh-CN' ? '📚 读者书柜' :
+    lang === 'ja-JP' ? '📚 電子書籍' :
+    lang === 'ko-KR' ? '📚 전자책' :
+    lang === 'vi-VN' ? '📚 Sách điện tử' :
+    '📚 E-Books';
 
   const heroBadgeText =
     lang === 'zh-TW' ? 'DePIN × Enterprise AI Agent 基礎設施' :
@@ -185,6 +194,12 @@ export default function Home() {
               {navCourseText}
             </a>
             <a
+              href="#featured-ebooks"
+              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/35 hover:to-pink-500/35 border border-indigo-400/50 text-indigo-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:scale-105 whitespace-nowrap"
+            >
+              {navEbookText}
+            </a>
+            <a
               href="#video-shoppable-service"
               className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 whitespace-nowrap"
             >
@@ -301,6 +316,9 @@ export default function Home() {
 
       {/* 全球作者群 / 加盟商 × 電子書自動交付與 AI 自來客引流 SaaS 合作計畫 (外掛獨立模組) */}
       <FranchiseEBookSection />
+
+      {/* 全球名家電子書精選・VIP 專欄訂閱書櫃 (依附圖 UX 打造) */}
+      <FeaturedEBookShowcaseSection />
 
       {/* 眾籌認購區塊 */}
 
