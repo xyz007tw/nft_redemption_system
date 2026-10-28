@@ -4,12 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useLanguage, Lang } from '@/lib/LanguageContext';
 import { LIVEGOOD_PROMO_HTML } from '@/lib/livegoodPromoHtml';
 import { AI_FREE365_PROMO_HTML } from '@/lib/aiFree365PromoHtml';
+import CustomArchitectureSection from './CustomArchitectureSection';
 
 export default function VideoShoppableSection() {
   const { lang, setLang } = useLanguage();
   const isZh = lang.includes('zh');
   const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [activeServiceTab, setActiveServiceTab] = useState<'shoppable' | 'livegood' | 'free365'>('shoppable');
+  const [activeServiceTab, setActiveServiceTab] = useState<'architecture' | 'shoppable' | 'livegood' | 'free365'>('architecture');
   const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
   const free365ContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -17,7 +18,7 @@ export default function VideoShoppableSection() {
     if (typeof window === 'undefined') return;
     const handleSwitchTab = (e: any) => {
       const targetTab = e?.detail?.tab;
-      if (targetTab === 'shoppable' || targetTab === 'livegood' || targetTab === 'free365') {
+      if (targetTab === 'architecture' || targetTab === 'shoppable' || targetTab === 'livegood' || targetTab === 'free365') {
         setActiveServiceTab(targetTab);
       }
     };
@@ -31,6 +32,8 @@ export default function VideoShoppableSection() {
       setActiveServiceTab('free365');
     } else if (hash.includes('tab=shoppable')) {
       setActiveServiceTab('shoppable');
+    } else if (hash.includes('tab=architecture') || hash.includes('intake') || hash.includes('architecture')) {
+      setActiveServiceTab('architecture');
     }
 
     return () => window.removeEventListener('weixiang-switch-service-tab', handleSwitchTab);
@@ -87,7 +90,7 @@ export default function VideoShoppableSection() {
           </span>
           <div className="flex items-center gap-3">
             <a
-              href="#shoppable-contact-hub"
+              href="#custom-intake-form"
               className="px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-sky-600 text-white text-xs font-extrabold shadow-md hover:opacity-95 transition-all"
             >
               {lang === 'zh-TW' ? '💬 立即接洽規劃' :
@@ -133,7 +136,47 @@ export default function VideoShoppableSection() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Tab 0: 👑 20年首席架構師 · AI-ATM 自動商業變現系統客製接案 */}
+              <button
+                type="button"
+                onClick={() => setActiveServiceTab('architecture')}
+                className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
+                  activeServiceTab === 'architecture'
+                    ? 'bg-gradient-to-r from-sky-950 via-indigo-950 to-purple-950 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.45)]'
+                    : 'bg-slate-800/70 border-slate-700 hover:border-sky-400/50'
+                }`}
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                      activeServiceTab === 'architecture' ? 'bg-gradient-to-r from-sky-400 to-indigo-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {isZh ? '👑 20年首席架構師' : '👑 Chief Architect'}
+                    </span>
+                    <span className="text-[11px] font-bold text-sky-300">
+                      {isZh ? 'AI-ATM 變現接案' : 'AI-ATM Bespoke'}
+                    </span>
+                  </div>
+                  <div className="font-black text-white text-sm md:text-base leading-snug">
+                    {lang === 'zh-TW' ? 'AI-ATM 自動商業變現系統客製接案' :
+                     lang === 'zh-CN' ? 'AI-ATM 自动商业变现系统客制接案' :
+                     lang === 'ja-JP' ? 'AI-ATM 自動収益化システム構築・受託開発' :
+                     lang === 'ko-KR' ? 'AI-ATM 자동 수익화 시스템 맞춤형 수주 개발' :
+                     lang === 'vi-VN' ? 'Kiến Trúc Tự Động AI-ATM & Nhận Dự Án Tùy Chỉnh' :
+                     'AI-ATM Bespoke Monetization System & Custom Development'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm md:text-base font-black text-amber-300">
+                    {isZh ? '專案客製' : 'Bespoke'}
+                  </div>
+                  <div className="text-[11px] text-sky-300 font-bold">
+                    {activeServiceTab === 'architecture' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
+                  </div>
+                </div>
+              </button>
+
               {/* Tab 1: AI 影片導購系統 */}
               <button
                 type="button"
@@ -256,6 +299,13 @@ export default function VideoShoppableSection() {
             </div>
           </div>
         </div>
+
+        {/* 👑 旗艦服務：20年首席架構師 · AI-ATM 自動商業變現系統客製接案專區 */}
+        {activeServiceTab === 'architecture' && (
+          <div className="p-4 sm:p-8 bg-slate-100/90">
+            <CustomArchitectureSection />
+          </div>
+        )}
 
         {/* 主標題區 (客製化服務定位 - 僅在選擇服務 01 時顯示) */}
         {activeServiceTab === 'shoppable' && (
