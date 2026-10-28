@@ -52,7 +52,7 @@ export default function ChatWidget() {
   const handleJumpToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
     sectionId: string,
-    serviceTab?: 'shoppable' | 'livegood' | 'free365'
+    serviceTab?: 'architecture' | 'shoppable' | 'livegood' | 'free365'
   ) => {
     setMobileMenuOpen(false);
     setIsOpen(false);
@@ -106,8 +106,27 @@ export default function ChatWidget() {
         {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
         {!isOpen && (
           <div className="relative group flex flex-col items-end">
-            {/* 懸浮展開之三服務快速跳轉氣泡 */}
+            {/* 懸浮展開之四服務快速跳轉氣泡 */}
             <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+              {/* 👑 旗艦首選：總工程師20年資歷 · AI-ATM變現接案 */}
+              <a
+                href="/#video-shoppable-service"
+                onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'architecture')}
+                className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-950 via-indigo-950 to-purple-950 hover:from-sky-800 hover:to-indigo-700 text-amber-300 hover:text-white border-2 border-amber-400/80 text-xs font-black shadow-[0_0_18px_rgba(250,204,21,0.45)] whitespace-nowrap transition-all flex items-center gap-1.5 hover:scale-105"
+              >
+                <span>👑</span>
+                <span>
+                  {lang === 'zh-TW' ? '總工程師20年資歷｜AI-ATM變現接案' :
+                   lang === 'zh-CN' ? '总工程师20年资历｜AI-ATM变现接案' :
+                   lang === 'ja-JP' ? '20年の実績｜AI-ATM受託開発' :
+                   lang === 'ko-KR' ? '20년 경력｜AI-ATM 맞춤개발' :
+                   lang === 'vi-VN' ? '20 Năm Kinh Nghiệm｜AI-ATM' :
+                   '20-Yr Architect | AI-ATM Bespoke'}
+                </span>
+                <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full font-black animate-pulse">
+                  NEW
+                </span>
+              </a>
               <a
                 href="/#video-shoppable-service"
                 onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'shoppable')}
@@ -216,12 +235,14 @@ export default function ChatWidget() {
 
       {/* 2. 手機版 (md 以下) 專屬「底部橫向置底快捷列 (Bottom Bar)」：完全不遮擋右側主畫面閱讀空間 */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        {/* 若點擊「AI客製」展開上方三合一快選抽屜 */}
+        {/* 若點擊「AI客製」展開上方四合一快選抽屜 */}
         {mobileMenuOpen && !isOpen && (
-          <div className="mx-3 mb-2 p-2.5 rounded-2xl bg-slate-950/95 border border-sky-400/50 shadow-[0_-8px_30px_rgba(0,0,0,0.75)] backdrop-blur-xl flex flex-col gap-1.5">
+          <div className="mx-3 mb-2 p-2.5 rounded-2xl bg-slate-950/95 border border-sky-400/50 shadow-[0_-8px_30px_rgba(0,0,0,0.75)] backdrop-blur-xl flex flex-col gap-1.5 max-h-[75vh] overflow-y-auto">
             <div className="flex items-center justify-between px-2 pb-1 border-b border-white/10">
               <span className="text-[11px] font-black text-sky-300">
-                {lang.includes('zh') ? '🛠️ 選擇欲前往的 AI 客製與協辦方案：' : '🛠️ Select AI Custom / Concierge Plan:'}
+                {lang.includes('zh') ? '🛠️ 選擇欲前往的 AI 客製與協辦方案：' :
+                 lang === 'ja-JP' ? '🛠️ ご希望のAIカスタム＆協播プランを選択：' :
+                 '🛠️ Select AI Custom / Concierge Plan:'}
               </span>
               <button
                 type="button"
@@ -231,29 +252,74 @@ export default function ChatWidget() {
                 ✕
               </button>
             </div>
+            {/* 👑 旗艦首選：總工程師20年資歷 · AI-ATM變現接案 */}
+            <a
+              href="/#video-shoppable-service"
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'architecture')}
+              className="px-3 py-2 rounded-xl bg-gradient-to-r from-sky-950 via-indigo-950 to-purple-950 hover:bg-sky-800 text-amber-300 border-2 border-amber-400/80 text-xs font-black flex items-center justify-between shadow-md"
+            >
+              <div className="flex items-center gap-1.5">
+                <span>👑</span>
+                <span>
+                  {lang === 'zh-TW' ? '總工程師20年資歷｜AI-ATM變現接案' :
+                   lang === 'zh-CN' ? '总工程师20年资历｜AI-ATM变现接案' :
+                   lang === 'ja-JP' ? '20年の実績｜AI-ATM受託開発' :
+                   lang === 'ko-KR' ? '20년 경력｜AI-ATM 맞춤개발' :
+                   lang === 'vi-VN' ? '20 Năm Kinh Nghiệm｜AI-ATM' :
+                   '20-Yr Architect | AI-ATM Bespoke'}
+                </span>
+                <span className="text-[9px] bg-amber-400 text-slate-950 px-1 rounded font-black">NEW</span>
+              </div>
+              <span className="text-sky-300 font-black text-[11px]">
+                {lang.includes('zh') ? '專案客製 →' :
+                 lang === 'ja-JP' ? '詳細 →' :
+                 'Bespoke →'}
+              </span>
+            </a>
             <a
               href="/#video-shoppable-service"
               onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'shoppable')}
               className="px-3 py-2 rounded-xl bg-sky-950/80 hover:bg-sky-600 text-sky-200 border border-sky-400/40 text-xs font-extrabold flex items-center justify-between"
             >
-              <span>{lang.includes('zh') ? '🛒 01｜AI影片導購系統' : '🛒 01 | AI Video Shoppable'}</span>
-              <span className="text-amber-300 font-black">$300 起 →</span>
+              <span>
+                {lang === 'zh-TW' ? '🛒 01｜AI影片導購系統' :
+                 lang === 'zh-CN' ? '🛒 01｜AI影片导购系统' :
+                 lang === 'ja-JP' ? '🛒 01｜AI動画コマース構築' :
+                 lang === 'ko-KR' ? '🛒 01｜AI 영상 쇼핑 시스템' :
+                 lang === 'vi-VN' ? '🛒 01｜Video Mua sắm AI' :
+                 '🛒 01 | AI Video Shoppable'}
+              </span>
+              <span className="text-amber-300 font-black text-[11px]">$300 起 →</span>
             </a>
             <a
               href="/#video-shoppable-service"
               onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'livegood')}
               className="px-3 py-2 rounded-xl bg-purple-950/80 hover:bg-purple-600 text-purple-200 border border-purple-400/40 text-xs font-extrabold flex items-center justify-between"
             >
-              <span>{lang.includes('zh') ? '⚡ 02｜LiveGood 協辦與 AI協播' : '⚡ 02 | LiveGood & AI'}</span>
-              <span className="text-amber-300 font-black">$139.95 / $180 →</span>
+              <span>
+                {lang === 'zh-TW' ? '⚡ 02｜LiveGood 協辦與 AI協播' :
+                 lang === 'zh-CN' ? '⚡ 02｜LiveGood 协办与 AI协播' :
+                 lang === 'ja-JP' ? '⚡ 02｜LiveGood 代行＆AI協播' :
+                 lang === 'ko-KR' ? '⚡ 02｜LiveGood 대행 & AI홍보' :
+                 lang === 'vi-VN' ? '⚡ 02｜LiveGood & AI Tự động' :
+                 '⚡ 02 | LiveGood & AI'}
+              </span>
+              <span className="text-amber-300 font-black text-[11px]">$139.95 / $180 →</span>
             </a>
             <a
               href="/#video-shoppable-service"
               onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'free365')}
               className="px-3 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 border border-emerald-400/40 text-xs font-extrabold flex items-center justify-between"
             >
-              <span>{lang.includes('zh') ? '🚀 03｜AI尋客365天免錢' : '🚀 03 | AI 365-Day Free'}</span>
-              <span className="text-amber-300 font-black">$660 USD →</span>
+              <span>
+                {lang === 'zh-TW' ? '🚀 03｜AI尋客365天免錢' :
+                 lang === 'zh-CN' ? '🚀 03｜AI寻客365天免钱' :
+                 lang === 'ja-JP' ? '🚀 03｜AI集客365日無料' :
+                 lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료' :
+                 lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày' :
+                 '🚀 03 | AI 365-Day Free'}
+              </span>
+              <span className="text-amber-300 font-black text-[11px]">$660 USD →</span>
             </a>
           </div>
         )}
