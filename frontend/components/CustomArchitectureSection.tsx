@@ -283,8 +283,8 @@ export default function CustomArchitectureSection() {
                   </div>
 
                   <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200">
-                    <span className="text-xs font-black px-2 py-0.5 rounded bg-purple-200 text-purple-800">軌道三 ★ 頂級最佳寫法</span>
-                    <h5 className="font-extrabold text-purple-950 text-sm my-1.5">25% 聯盟分潤人脈裂變網絡 (人推人脈複利)</h5>
+                    <span className="text-xs font-black px-2 py-0.5 rounded bg-purple-200 text-purple-800">軌道三【人推人脈複利】</span>
+                    <h5 className="font-extrabold text-purple-950 text-sm my-1.5">25% 聯盟分潤人脈裂變網絡</h5>
                     <p className="text-xs text-purple-900 leading-relaxed font-medium">
                       運用智能推薦鏈路與 25% 聯盟分潤協議（10%級差 + 10%對等 + 5%全球領袖均分），讓每個學員與夥伴自動轉化為你的全球業務合夥人；透過人脈與利潤共享的指數級裂變，將單向流量昇華為自我造血、滾雪球般的「人推人脈複利網絡」！
                     </p>
