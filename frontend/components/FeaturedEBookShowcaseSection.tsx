@@ -461,13 +461,13 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
       'id-ID': '📚 Lihat Semua Buku VIP'
     } as Record<string, string>)[lang] || '📚 Browse All VIP Books',
     bottomJoinBtn: ({
-      'zh-TW': '✍️ 您也是知識名家？立即 $990 加盟，上架您的專屬電子書！',
-      'zh-CN': '✍️ 您也是知识名家？立即 $990 加盟，上架您的专属电子书！',
-      'en-US': '✍️ Authority Creator? Join for $990 & Publish Your E-Book!',
-      'ja-JP': '✍️ 著者・専門家の方へ：今すぐ$990で提携し、あなたの電子書籍を出版！',
-      'vi-VN': '✍️ Bạn là tác giả? Tham gia $990 để xuất bản sách ngay!',
-      'id-ID': '✍️ Anda penulis ahli? Bergabung $990 untuk menerbitkan e-book Anda!'
-    } as Record<string, string>)[lang] || '✍️ Authority Creator? Join for $990 & Publish Your E-Book!',
+      'zh-TW': '🏪 誠邀全球創作者體驗！首年 $990 開設你的「知識自動販賣機 AI-ATM」➔',
+      'zh-CN': '🏪 诚邀全球创作者体验！首年 $990 开设您的“知识自动贩卖机 AI-ATM”➔',
+      'en-US': '🏪 Experience the Knowledge Vending Machine AI-ATM for $990 ➔',
+      'ja-JP': '🏪 クリエイター体験招待！初年度$990で「知識の自販機 AI-ATM」を開設 ➔',
+      'vi-VN': '🏪 Mời tác giả trải nghiệm! Khởi tạo "Máy Bán Tri Thức AI-ATM" với $990 ➔',
+      'id-ID': '🏪 Undangan Kreator! Buka "Mesin Penjual Pengetahuan AI-ATM" $990 ➔'
+    } as Record<string, string>)[lang] || '🏪 Experience the Knowledge Vending Machine AI-ATM for $990 ➔',
     bottomBrowseBtn: ({
       'zh-TW': '📚 瀏覽全部 VIP 讀者書櫃 (/ebook-store)',
       'zh-CN': '📚 浏览全部 VIP 读者书柜 (/ebook-store)',
@@ -561,6 +561,42 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
           <p className="text-sm sm:text-base md:text-lg text-indigo-100/85 max-w-4xl mx-auto leading-relaxed">
             {t.desc}
           </p>
+
+          {/* 🌟 知識自動販賣機 AI-ATM 跨專區行銷導流橫幅 */}
+          <div className="mt-6 max-w-3xl mx-auto p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-pink-950/70 via-purple-950/70 to-indigo-950/70 border border-pink-500/50 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_25px_rgba(236,72,153,0.3)]">
+            <div className="flex items-center gap-2.5 text-center sm:text-left">
+              <span className="text-2xl">🏪</span>
+              <div>
+                <span className="text-xs sm:text-sm font-black text-pink-300 block">
+                  {lang === 'ja-JP' ? '自分の電子書籍を自動販売したいですか？' :
+                   lang === 'zh-CN' ? '想拥有自己的专属“知识自动贩卖机 AI-ATM”？' :
+                   lang === 'vi-VN' ? 'Bạn muốn sở hữu "Máy Bán Tri Thức AI-ATM" của riêng mình?' :
+                   lang === 'id-ID' ? 'Ingin memiliki "Mesin Penjual Pengetahuan AI-ATM" Anda sendiri?' :
+                   lang === 'en-US' ? 'Want to launch your own Knowledge Vending Machine AI-ATM?' :
+                   '想擁有自己的專屬「知識自動販賣機 AI-ATM」？'}
+                </span>
+                <span className="text-[11px] sm:text-xs text-gray-300">
+                  {lang === 'ja-JP' ? '専門知識ゼロ・初年度$990で自販機3台＋24H AI自動集客！' :
+                   lang === 'zh-CN' ? '零技术！首年 $990 打造3台专书自贩机＋AI 24H 睡觉帮您打广告！' :
+                   lang === 'vi-VN' ? 'Không cần kỹ thuật! Chỉ $990 mở 3 máy bán + AI tìm khách 24/7!' :
+                   lang === 'id-ID' ? 'Tanpa keahlian teknis! Hanya $990 miliki 3 mesin + iklan AI 24/7!' :
+                   lang === 'en-US' ? 'Zero tech skills! Launch 3 machines for $990 with 24/7 automated AI ads!' :
+                   '零技術！首年 $990 打造 3 台專書自販機＋AI 24H 睡覺幫你打廣告！'}
+                </span>
+              </div>
+            </div>
+            <a
+              href="#author-coop"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 text-white font-black text-xs shadow-md hover:scale-105 transition-all whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              {lang === 'ja-JP' ? '自販機を開設する →' :
+               lang === 'zh-CN' ? '前往开设贩卖机 →' :
+               lang === 'vi-VN' ? 'Khởi tạo ngay →' :
+               lang === 'id-ID' ? 'Buka Mesin Sekarang →' :
+               lang === 'en-US' ? 'Launch Machine →' :
+               '前往開設販賣機 →'}
+            </a>
+          </div>
         </div>
 
         {/* 2. 書籍橫向切換頁籤 ＋ 語系預覽選擇鈕 */}
@@ -943,12 +979,12 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
 
         {/* 4. 底部引導至創作者加盟工作室 */}
         <div className="mt-8 text-center relative z-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/studio"
+          <a
+            href="#author-coop"
             className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-black text-sm shadow-[0_0_25px_rgba(236,72,153,0.4)] transition-all hover:scale-105"
           >
             {t.bottomJoinBtn}
-          </Link>
+          </a>
           <Link
             href="/ebook-store"
             className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition-all"

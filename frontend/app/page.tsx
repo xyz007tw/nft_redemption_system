@@ -68,6 +68,22 @@ export default function Home() {
     lang === 'vi-VN' ? '📚 Sách điện tử' :
     '📚 E-Books';
 
+  const navVendingText =
+    lang === 'zh-TW' ? '🏪 知識販賣機' :
+    lang === 'zh-CN' ? '🏪 知识贩卖机' :
+    lang === 'ja-JP' ? '🏪 知識の自販機' :
+    lang === 'ko-KR' ? '🏪 지식 자판기' :
+    lang === 'vi-VN' ? '🏪 Máy Bán Tri Thức' :
+    '🏪 Knowledge Vending';
+
+  const heroVendingBadgeText =
+    lang === 'zh-TW' ? '🏪 誠邀全球創作者體驗「知識自動販賣機 AI-ATM」連鎖店 →' :
+    lang === 'zh-CN' ? '🏪 诚邀全球创作者体验“知识自动贩卖机 AI-ATM”连锁店 →' :
+    lang === 'ja-JP' ? '🏪 世界のクリエイターへ「知識の自動販売機 AI-ATM」体験招待 →' :
+    lang === 'ko-KR' ? '🏪 글로벌 크리에이터 초대 "지식 자판기 AI-ATM" 체험 →' :
+    lang === 'vi-VN' ? '🏪 Mời Tác giả Toàn cầu Trải nghiệm "Máy Bán Tri Thức AI-ATM" →' :
+    '🏪 Inviting Global Creators to Experience "Knowledge Vending Machine AI-ATM" →';
+
   const heroBadgeText =
     lang === 'zh-TW' ? 'DePIN × Enterprise AI Agent 基礎設施' :
     lang === 'zh-CN' ? 'DePIN × Enterprise AI Agent 基础设施' :
@@ -157,6 +173,7 @@ export default function Home() {
 
   const [packages, setPackages] = useState<any[]>(defaultPackages);
   const [selectedPackageId, setSelectedPackageId] = useState(1);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -180,34 +197,44 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen w-full max-w-[100vw] overflow-x-hidden flex-col items-center bg-[#0a0a0f] text-white font-sans selection:bg-purple-500/30">
-      {/* 頂部導覽列 */}
-      <nav className="fixed top-0 left-0 right-0 w-full flex justify-center z-50 bg-[#0a0a0f]/85 backdrop-blur-lg border-b border-white/5">
-        <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center gap-2.5 md:gap-6 px-3 py-2.5 md:p-6">
-          <h1 className="text-xl md:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
-            WeiXiang AI
-          </h1>
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 md:gap-3">
+      {/* 頂部導覽列：手機版高度收納 56px，點擊展開主題抽屜；電腦版優雅橫向一體化 */}
+      <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10 transition-all">
+        {/* 電腦版 (md+)：優雅橫向排版 */}
+        <div className="hidden md:flex w-full max-w-7xl mx-auto justify-between items-center px-6 py-3.5">
+          <Link href="/" className="flex items-center gap-2">
+            <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+              WeiXiang AI
+            </h1>
+          </Link>
+          <div className="flex items-center gap-2 lg:gap-3">
+            <a
+              href="#author-coop"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-500/25 via-purple-500/25 to-indigo-500/25 hover:from-pink-500/40 hover:to-indigo-500/40 border border-pink-400/60 text-pink-200 font-black text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(236,72,153,0.35)] hover:scale-105 whitespace-nowrap flex items-center gap-1.5"
+            >
+              <span>{navVendingText}</span>
+              <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.2 rounded-full font-black animate-pulse">NEW</span>
+            </a>
             <a
               href="#tutor-courses"
-              className="px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 border border-emerald-400/50 text-emerald-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105 whitespace-nowrap"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 border border-emerald-400/50 text-emerald-300 font-bold text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] hover:scale-105 whitespace-nowrap"
             >
               {navCourseText}
             </a>
             <a
               href="#featured-ebooks"
-              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/35 hover:to-pink-500/35 border border-indigo-400/50 text-indigo-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:scale-105 whitespace-nowrap"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/35 hover:to-pink-500/35 border border-indigo-400/50 text-indigo-300 font-bold text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(99,102,241,0.25)] hover:scale-105 whitespace-nowrap"
             >
               {navEbookText}
             </a>
             <a
               href="#video-shoppable-service"
-              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 whitespace-nowrap"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-amber-500/20 hover:from-sky-500/35 hover:to-amber-500/35 border border-sky-400/50 text-sky-300 font-bold text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.25)] hover:scale-105 whitespace-nowrap"
             >
               {navShoppableText}
             </a>
             <Link
               href="/sponsor"
-              className="px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-xs md:text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:scale-105 whitespace-nowrap"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:scale-105 whitespace-nowrap"
             >
               {navSponsorText}
             </Link>
@@ -215,10 +242,86 @@ export default function Home() {
             <ConnectButton label={connectLabel} />
           </div>
         </div>
+
+        {/* 手機版 (< md)：緊湊單行 54px 高度，絕不遮擋主畫面 */}
+        <div className="md:hidden w-full flex items-center justify-between px-3 py-2.5">
+          <Link href="/" className="flex items-center gap-1.5">
+            <h1 className="text-lg font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+              WeiXiang AI
+            </h1>
+          </Link>
+          <div className="flex items-center gap-1.5">
+            <LanguageSwitcher />
+            <div className="scale-90 origin-right">
+              <ConnectButton label={connectLabel} />
+            </div>
+            {/* 主題項目收納展開按鈕 */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(prev => !prev)}
+              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-500/25 via-purple-500/25 to-indigo-500/25 border border-pink-400/50 text-pink-200 font-extrabold text-xs flex items-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
+              aria-label="Toggle Theme Navigation Menu"
+            >
+              <span className="text-sm">{mobileNavOpen ? '✕' : '☰'}</span>
+              <span className="text-[11px] font-black">{lang.includes('zh') ? '主題導覽' : 'Topics'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 手機版主題項目收納折疊抽屜 (點擊後自動滑出/收起) */}
+        {mobileNavOpen && (
+          <div className="md:hidden w-full bg-[#0a0a0f]/95 backdrop-blur-2xl border-b border-white/10 px-4 py-3 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+            <a
+              href="#author-coop"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500/25 via-purple-500/25 to-indigo-500/25 border border-pink-400/60 text-pink-200 font-black text-xs shadow-md"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-base">🏪</span>
+                <span>{navVendingText}</span>
+              </span>
+              <span className="text-[10px] bg-pink-500 text-white px-2 py-0.5 rounded-full font-black animate-pulse">
+                NEW 推薦
+              </span>
+            </a>
+            <a
+              href="#tutor-courses"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-emerald-300 font-bold text-xs"
+            >
+              <span>🎓</span>
+              <span>{navCourseText}</span>
+            </a>
+            <a
+              href="#featured-ebooks"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-indigo-300 font-bold text-xs"
+            >
+              <span>📚</span>
+              <span>{navEbookText}</span>
+            </a>
+            <a
+              href="#video-shoppable-service"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sky-300 font-bold text-xs"
+            >
+              <span>🛠️</span>
+              <span>{navShoppableText}</span>
+            </a>
+            <Link
+              href="/sponsor"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-purple-200 font-bold text-xs"
+            >
+              <span>💎</span>
+              <span>{navSponsorText}</span>
+            </Link>
+          </div>
+        )}
       </nav>
 
-      {/* Hero Section */}
-      <section className="w-full max-w-7xl px-4 sm:px-6 pt-36 pb-14 md:py-24 md:mt-20 flex flex-col items-center text-center relative overflow-hidden">
+      {/* Hero Section (手機版釋放空間，pt-24 大幅降低頂部遮擋) */}
+      <section className="w-full max-w-7xl px-4 sm:px-6 pt-24 sm:pt-28 pb-14 md:py-24 md:mt-16 flex flex-col items-center text-center relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] md:w-[800px] md:h-[800px] bg-purple-600/20 rounded-full blur-[90px] md:blur-[120px] pointer-events-none -z-10" />
         
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 md:px-4 md:py-2 rounded-full bg-white/5 border border-white/10 mb-6 md:mb-8 text-xs sm:text-sm md:text-base font-medium text-purple-300 max-w-full">
@@ -237,9 +340,20 @@ export default function Home() {
           </span>
         </h1>
         
-        <p className="text-base sm:text-xl md:text-2xl text-gray-400 mb-10 md:mb-12 max-w-3xl leading-relaxed px-2">
+        <p className="text-base sm:text-xl md:text-2xl text-gray-400 mb-8 md:mb-10 max-w-3xl leading-relaxed px-2">
           {t.heroSub}
         </p>
+
+        {/* 🌟 核心行銷引導專區：直通知識自動販賣機 AI-ATM */}
+        <div className="mb-8">
+          <a
+            href="#author-coop"
+            className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-pink-500/25 via-purple-500/25 to-indigo-500/25 hover:from-pink-500/40 hover:to-indigo-500/40 border border-pink-400/60 text-pink-200 font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(236,72,153,0.35)] hover:scale-105 transition-all"
+          >
+            <span>🏪</span>
+            <span>{heroVendingBadgeText}</span>
+          </a>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <a href="#crowdfund" className="px-8 py-4 bg-white text-black hover:bg-gray-200 rounded-xl text-lg font-bold transition-all transform hover:scale-105">

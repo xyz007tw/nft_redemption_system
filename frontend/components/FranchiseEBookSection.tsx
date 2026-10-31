@@ -24,28 +24,28 @@ export default function FranchiseEBookSection() {
 
   const getPlanName = (plan: 'YEAR1_990' | 'ADD_BOOK_360' | 'YEAR2_RENEW_450') => {
     if (plan === 'YEAR1_990') {
-      if (lang === 'ja-JP') return 'グローバル電子書籍加盟店・初年度$990スタートプラン (電子書籍3冊 + AI自動集客広告 + 手数料100%相殺)';
-      if (lang === 'zh-CN') return '全球电子书加盟商・首年 $990 启动方案 (含 3 本电子书 + AI 自来客打广告 + $990 服务费 100% 倒抵)';
-      if (lang === 'vi-VN') return 'Gói Nhượng quyền E-Book Toàn cầu Năm 1 - 990$ (3 Sách + Quảng cáo AI + Cấn trừ Phí 100%)';
-      if (lang === 'id-ID') return 'Paket Kemitraan E-Book Global Tahun ke-1 - $990 (3 Buku + Trafik Iklan AI + Pengurangan 100%)';
-      if (lang === 'en-US') return 'Global E-Book Franchisee Year-1 $990 Plan (3 Books + AI Traffic Ads + 100% Fee Credit)';
-      return '全球電子書加盟商・首年 $990 啟動方案 (含 3 本電子書 + AI 自來客打廣告 + $990 服務費 100% 倒抵)';
+      if (lang === 'ja-JP') return '知識の自動販売機 AI-ATM・初年度$990スタートプラン (電子書籍3冊 + AI自動集客広告 + 手数料100%相殺)';
+      if (lang === 'zh-CN') return '知识自动贩卖机 AI-ATM・首年 $990 启动方案 (含 3 本书 + AI 自来客打广告 + $990 服务费 100% 倒抵)';
+      if (lang === 'vi-VN') return 'Máy Bán Tri thức AI-ATM Gói Năm 1 - 990$ (3 Sách + Quảng cáo AI + Cấn trừ Phí 100%)';
+      if (lang === 'id-ID') return 'Mesin Penjual Pengetahuan AI-ATM Tahun ke-1 - $990 (3 Buku + Trafik Iklan AI + Pengurangan 100%)';
+      if (lang === 'en-US') return 'Knowledge Vending Machine AI-ATM Year-1 $990 Plan (3 Books + AI Traffic Ads + 100% Fee Credit)';
+      return '知識自動販賣機 AI-ATM・首年 $990 啟動方案 (含 3 本書 + AI 自來客打廣告 + $990 服務費 100% 倒抵)';
     }
     if (plan === 'ADD_BOOK_360') {
-      if (lang === 'ja-JP') return '電子書籍追加開発枠 ($360 / 1冊テンプレートエンジン開発権)';
-      if (lang === 'zh-CN') return '电子书额外开发配额加购 ($360 / 1 本电子书模版引擎开发权)';
-      if (lang === 'vi-VN') return 'Hạn mức Xuất bản E-Book Bổ sung ($360 / 1 Sách)';
-      if (lang === 'id-ID') return 'Kuota Pengembangan E-Book Tambahan ($360 / 1 Buku)';
-      if (lang === 'en-US') return 'Additional E-Book Development Quota ($360 / 1 Book)';
-      return '電子書額外開發配額加購 ($360 / 1 本電子書模版引擎開發權)';
+      if (lang === 'ja-JP') return '知識の自販機追加枠 ($360 / 1冊分自動販売機開発権)';
+      if (lang === 'zh-CN') return '知识自动贩卖机追加配额 ($360 / 1 本专书贩卖机开发权)';
+      if (lang === 'vi-VN') return 'Hạn mức Máy Bán Sách Bổ sung ($360 / 1 Sách)';
+      if (lang === 'id-ID') return 'Kuota Tambahan Mesin Penjual ($360 / 1 Buku)';
+      if (lang === 'en-US') return 'Additional Knowledge Vending Machine ($360 / 1 Book)';
+      return '知識自動販賣機額外追加配額 ($360 / 1 本專書販賣機開發權)';
     }
     // YEAR2_RENEW_450
-    if (lang === 'ja-JP') return '次年度 AI自動集客広告＆電子書籍システム保守費 ($450 手数料100%相殺特典付)';
-    if (lang === 'zh-CN') return '次年 AI 自来客广告与电子书系统服务费 ($450 同享 100% 倒抵 10% 服务费)';
-    if (lang === 'vi-VN') return 'Phí Duy trì Hệ thống & Lưu lượng AI Năm 2 ($450 Hoàn phí 100%)';
-    if (lang === 'id-ID') return 'Perpanjangan Sistem & Iklan AI Tahun ke-2 ($450 Pengurangan 100%)';
-    if (lang === 'en-US') return 'Year-2 AI Traffic & E-Book System Renewal ($450 with 100% Fee Credit)';
-    return '次年 AI 自來客廣告與電子書系統服務費 ($450 同享 100% 倒抵 10% 服務費)';
+    if (lang === 'ja-JP') return '次年度 AI自動集客広告＆自販機クラウドシステム保守費 ($450 手数料100%相殺特典付)';
+    if (lang === 'zh-CN') return '次年 AI 自来客广告与贩卖机云端服务费 ($450 同享 100% 倒抵 10% 服务费)';
+    if (lang === 'vi-VN') return 'Phí Duy trì Máy Bán & Lưu lượng AI Năm 2 ($450 Hoàn phí 100%)';
+    if (lang === 'id-ID') return 'Perpanjangan Mesin Penjual & Iklan AI Tahun ke-2 ($450 Pengurangan 100%)';
+    if (lang === 'en-US') return 'Year-2 AI Traffic & Vending Machine Renewal ($450 with 100% Fee Credit)';
+    return '次年 AI 自來客廣告與販賣機雲端服務費 ($450 同享 100% 倒抵 10% 服務費)';
   };
 
   const planPrice = checkoutPlan === 'YEAR1_990' ? 990 : checkoutPlan === 'ADD_BOOK_360' ? 360 : 450;
@@ -53,130 +53,130 @@ export default function FranchiseEBookSection() {
   // 多語系介面字典
   const t = {
     topBadge: ({
-      'zh-TW': '📚 全球作者 / 加盟商 × 自動電子書模版引擎 SaaS 帝國',
-      'zh-CN': '📚 全球作者 / 加盟商 × 自动电子书模版引擎 SaaS 帝国',
-      'en-US': '📚 Global Author & Franchisee Automated E-Book SaaS Platform',
-      'ja-JP': '📚 グローバル著者・加盟店 × 自動電子書籍SaaSプラットフォーム',
-      'vi-VN': '📚 Tác giả Toàn cầu & Đối tác × Đế chế SaaS E-Book Tự động',
-      'id-ID': '📚 Penulis Global & Mitra × Platform SaaS E-Book Otomatis'
-    } as Record<string, string>)[lang] || '📚 Global Author & Franchisee Automated E-Book SaaS Platform',
+      'zh-TW': '📚 誠邀全球創作者體驗 ×「知識自動販賣機 AI-ATM」連鎖店',
+      'zh-CN': '📚 诚邀全球创作者体验 ×“知识自动贩卖机 AI-ATM”连锁店',
+      'en-US': '📚 Inviting Global Creators × "Knowledge Vending Machine AI-ATM" Network',
+      'ja-JP': '📚 世界のクリエイターへ体験招待 ×「知識の自動販売機 AI-ATM」チェーン店',
+      'vi-VN': '📚 Mời Tác giả Toàn cầu Trải nghiệm × Chuỗi "Máy Bán Tri thức Tự động AI-ATM"',
+      'id-ID': '📚 Mengundang Kreator Global × Jaringan "Mesin Penjual Pengetahuan Otomatis AI-ATM"'
+    } as Record<string, string>)[lang] || '📚 Inviting Global Creators × "Knowledge Vending Machine AI-ATM" Network',
     heroTitle: ({
-      'zh-TW': '首年 $990 打造專屬電子書出版社 ＋ 協作 AI 自動來客幫您打廣告！',
-      'zh-CN': '首年 $990 打造专属电子书出版社 ＋ 协作 AI 自动来客帮您打广告！',
-      'en-US': 'Launch Your AI E-Book Empire for $990 + Automated Global AI Ad Traffic!',
-      'ja-JP': '初年度$990で専用の電子書籍出版社を構築 ＋ AI自動集客が24時間あなたの本を宣伝！',
-      'vi-VN': 'Khởi tạo Nhà xuất bản E-Book chỉ với $990 + Lưu lượng AI Tự động Quảng bá!',
-      'id-ID': 'Bangun Penerbit E-Book Anda Sendiri Seharga $990 + Trafik Iklan AI Otomatis!'
-    } as Record<string, string>)[lang] || 'Launch Your AI E-Book Empire for $990 + Automated Global AI Ad Traffic!',
+      'zh-TW': '零技術！首年 $990 開設你的「知識自動販賣機 AI-ATM」＋ AI 24H 睡覺都在幫你打廣告找客人！',
+      'zh-CN': '零技术！首年 $990 开设你的“知识自动贩卖机 AI-ATM”＋ AI 24H 睡觉都在帮您打广告找客人！',
+      'en-US': 'Zero Tech Skills! Launch Your "Knowledge Vending Machine AI-ATM" for $990 + 24/7 AI Ad Traffic While You Sleep!',
+      'ja-JP': '専門知識ゼロ！初年度$990で「知識の自動販売機 AI-ATM」を開設 ＋ AIが24時間寝ている間も自動集客！',
+      'vi-VN': 'Không cần Kỹ thuật! Khởi tạo "Máy Bán Tri thức AI-ATM" chỉ $990 + AI Tự động Tìm khách 24/7 kể cả khi bạn ngủ!',
+      'id-ID': 'Tanpa Keterampilan Teknis! Buka "Mesin Penjual Pengetahuan AI-ATM" Seharga $990 + Iklan AI Otomatis 24/7 Saat Anda Tidur!'
+    } as Record<string, string>)[lang] || 'Zero Tech Skills! Launch Your "Knowledge Vending Machine AI-ATM" for $990 + 24/7 AI Ad Traffic While You Sleep!',
     heroSub: ({
-      'zh-TW': '內建「Google 4 旗艦級圖文專業電子書模版引擎（8大深度篇章・25+ 頁全球暢銷專書規格・支援加盟商自行下載 PDF/網頁母檔）」、三級管理平台（管理員 / 加盟商 / 讀者訂閱），首年 $990 與次年 $450 系統服務費皆享【先收費、後 100% 倒抵交易 1 成服務費】零風險保障！',
-      'zh-CN': '内置“Google 4 旗舰级图文专业电子书模版引擎（8大深度篇章・25+ 页全球畅销专书规格・支援加盟商自行下载 PDF/网页母档）”、三级管理平台（管理员 / 加盟商 / 读者订阅），首年 $990 与次年 $450 系统服务费皆享【先收费、后 100% 倒抵交易 1 成服务费】零风险保障！',
-      'en-US': 'Built-in Google 4 Illustrated Authority E-Book Engine (8 Deep Chapters, 25+ Pages Bestselling Masterbook, supports downloading master PDF/HTML files), 3-Tier SaaS Portal (Admin / Franchisee / Reader), with 100% Fee-Credit Rebate on both Year-1 ($990) and Year-2 ($450)!',
-      'ja-JP': '「Google 4 旗艦グラフィカル専門電子書籍エンジン（8大深度章節・25ページ超のベストセラー仕様・PDF/HTMLマスターファイル即時ダウンロード対応）」、3層管理プラットフォーム（管理者・加盟店・読者購読）を標準装備。初年度$990および次年度$450のシステム費はすべて【10%販売手数料から100%相殺】される完全ノーリスク保証！',
-      'vi-VN': 'Tích hợp Động cơ E-Book Trực quan Google 4 (8 Chương sâu sắc, 25+ Trang Bán chạy, tải file PDF/HTML), Nền tảng SaaS 3 Cấp độ, cấn trừ 100% phí nền tảng 10% cho cả Năm 1 ($990) và Năm 2 ($450)!',
-      'id-ID': 'Dilengkapi Mesin E-Book Ilustrasi Google 4 (8 Bab Mendalam, 25+ Halaman Buku Otoritas, unduh file PDF/HTML), Portal SaaS 3 Tingkat, dengan Pengurangan 100% Biaya Layanan 10% untuk Tahun ke-1 ($990) dan Tahun ke-2 ($450)!'
-    } as Record<string, string>)[lang] || 'Built-in Google 4 Illustrated Authority E-Book Engine with 100% Fee-Credit Rebate!',
+      'zh-TW': '不懂程式、沒時間寫書也能當作家！內建 Google 4 旗艦大腦，一鍵自動產出 25+ 頁圖文並茂全球暢銷專書（可自行下載母檔＋定價開賣）。首年 $990 與次年 $450 系統費全享【100% 倒抵手續費】零風險返還，連鎖店 24 小時睡覺自動收錢！',
+      'zh-CN': '不懂编程、没时间写书也能当作家！内置 Google 4 旗舰大脑，一键自动产出 25+ 页图文并茂全球畅销专书（可自行下载母档＋定价开卖）。首年 $990 与次年 $450 系统费全享【100% 倒抵手续费】零风险返还，连锁店 24 小时睡觉自动收钱！',
+      'en-US': 'No coding or writing needed! Powered by Google 4 AI, automatically create 25+ page illustrated authority books (download master files + sell online). Both Year-1 ($990) and Year-2 ($450) fees are 100% offset by transaction fee credits—100% risk-free passive income!',
+      'ja-JP': 'プログラミングも執筆時間も不要！Google 4 旗艦AIが、25ページ超の図解ベストセラー書籍を自動生成（マスター保存＆即時オンライン販売対応）。初年度$990・次年度$450のシステム費はすべて【10%販売手数料から100%相殺】され、ノーリスクで24時間寝ている間も不労所得を獲得！',
+      'vi-VN': 'Không cần biết lập trình hay dành hàng tháng viết sách! Tích hợp Google 4 AI tự động tạo sách bán chạy 25+ trang có hình minh họa (tải file master & bán ngay). Hoàn phí 100% cho cả Năm 1 ($990) và Năm 2 ($450)—tạo dòng tiền thụ động 24/7 không rủi ro!',
+      'id-ID': 'Tidak perlu coding atau menulis berbulan-bulan! Didukung Google 4 AI untuk otomatis menghasilkan buku otoritas 25+ halaman berilustrasi (unduh file master + jual online). Biaya tahun ke-1 ($990) dan ke-2 ($450) dikurangi 100% dari biaya transaksi—penghasilan pasif bebas risiko 24/7!'
+    } as Record<string, string>)[lang] || 'Powered by Google 4 AI: Launch your Knowledge Vending Machine with 100% Fee Credit Rebate!',
 
     // 4 Core Cards
     c1Title: ({
-      'zh-TW': '1. 首年 $990 含 3 本書 ＋ AI 幫打廣告',
-      'zh-CN': '1. 首年 $990 含 3 本书 ＋ AI 帮打广告',
-      'en-US': '1. Year-1 $990: 3 Books + AI Ad Traffic',
-      'ja-JP': '1. 初年度$990で3冊分枠 ＋ AIが広告宣伝',
-      'vi-VN': '1. Năm 1: $990 Gồm 3 Sách + AI Chạy Quảng Cáo',
-      'id-ID': '1. Tahun ke-1: $990 untuk 3 Buku + Iklan AI'
-    } as Record<string, string>)[lang] || '1. Year-1 $990: 3 Books + AI Ad Traffic',
+      'zh-TW': '1. 首年 $990 送 3 台知識自動販賣機 ＋ AI 24H 幫打廣告',
+      'zh-CN': '1. 首年 $990 送 3 台知识自动贩卖机 ＋ AI 24H 帮打广告',
+      'en-US': '1. Year-1 $990: 3 Vending Machines (3 Books) + 24/7 AI Ads',
+      'ja-JP': '1. 初年度$990で自動販売機3台(書籍3冊分) ＋ AIが24時間集客広告',
+      'vi-VN': '1. Năm 1: $990 Tặng 3 Máy Bán Tự Động (3 Sách) + AI Chạy Quảng Cáo 24/7',
+      'id-ID': '1. Tahun ke-1: $990 Dapat 3 Mesin Otomatis (3 Buku) + Iklan AI 24/7'
+    } as Record<string, string>)[lang] || '1. Year-1 $990: 3 Vending Machines (3 Books) + 24/7 AI Ads',
     c1Desc: ({
-      'zh-TW': '首年認購 $990 即可免費開發 3 本雙語電子書（可自行下載電子書母檔 + 上架收費），並直接協作「微享 AI 自動來客系統」每日在社群幫您找人打廣告！之後第 4 本起每本電子書開發費為 $360。每本電子書提供 30 次修改額度（超過後加購 $30 可再修改 1 次）。',
-      'zh-CN': '首年认购 $990 即可免费开发 3 本双语电子书（可自行下载电子书母档 + 上架收费），并直接协作“微享 AI 自动来客系统”每日在社群帮您找人打广告！之后第 4 本起每本电子书开发费为 $360。每本电子书提供 30 次修改额度（超过后加购 $30 可再修改 1 次）。',
-      'en-US': 'Includes 3 e-book development quotas (download master files & monetize online) + WeiXiang AI Auto-Traffic Matrix promoting your books daily! Additional books from the 4th book are $360/book. Includes 30 edits/book ($30/+1 edit thereafter).',
-      'ja-JP': '初年度$990で多言語電子書籍3冊を開発可能（マスターファイルの保存・販売が可能）。さらに「WeiXiang AI自動集客システム」が毎日SNSであなたの書籍を自動宣伝！4冊目以降の開発費は1冊$360。各書籍30回の修正枠付き（超過時は$30で1回追加修正可能）。',
-      'vi-VN': 'Bao gồm hạn mức 3 cuốn sách (tải file master & bán trực tuyến) + Ma trận Lưu lượng AI quảng bá hàng ngày! Từ cuốn thứ 4 là $360/cuốn. Mỗi cuốn có 30 lần chỉnh sửa ($30/+1 lần sau đó).',
-      'id-ID': 'Mencakup 3 kuota buku (unduh file master & jual online) + Matriks Trafik AI yang mempromosikan buku Anda setiap hari! Buku ke-4 dan seterusnya $360/buku. Termasuk 30 kali revisi ($30/+1 revisi setelahnya).'
-    } as Record<string, string>)[lang] || 'Includes 3 e-book quotas + AI Traffic!',
+      'zh-TW': '不用自己敲鍵盤！首年認購直接解鎖 3 本專屬雙語電子書販賣機（可一鍵下載 PDF/HTML 母檔珍藏，亦可直接上架線上書櫃收款）。更直接串聯「微享 AI 自動來客」，每天在社群替你自動發傳單、打廣告拉客人！第 4 本起每本僅 $360，每本送 30 次免費微調！',
+      'zh-CN': '不用自己敲键盘！首年认购直接解锁 3 本专属双语电子书贩卖机（可一键下载 PDF/HTML 母档珍藏，亦可直接上架线上书柜收款）。更直接串联“微享 AI 自动来客”，每天在社群替您自动发传单、打广告拉客人！第 4 本起每本仅 $360，每本送 30 次免费微调！',
+      'en-US': 'No typing required! Unlock 3 bilingual knowledge vending machines (download master PDF/HTML & sell online). WeiXiang AI auto-traffic matrix distributes flyers and runs social ads daily to bring paying buyers! Additional machines from 4th book are only $360/book, with 30 free edits each!',
+      'ja-JP': 'キーボードを叩く必要すらありません！初年度で3冊分の多言語自動販売機を解放（PDF/HTMLマスターダウンロード＆即座に販売可能）。さらに「WeiXiang AI自動集客」が毎日SNSでチラシを配り自動で顧客を獲得！4冊目以降は1冊わずか$360、各書籍30回分の無料修正枠付き！',
+      'vi-VN': 'Không cần tự gõ phím! Mở khóa 3 máy bán sách tự động song ngữ (tải file PDF/HTML & bán nhận tiền ngay). Hệ thống AI tự động phát tờ rơi và quảng cáo trên mạng xã hội mỗi ngày! Từ cuốn thứ 4 chỉ $360/cuốn, tặng 30 lần chỉnh sửa miễn phí!',
+      'id-ID': 'Tidak perlu mengetik sendiri! Dapatkan 3 mesin penjual buku bilingual (unduh PDF/HTML master & jual langsung). Matriks AI menyebarkan brosur dan beriklan di medsos setiap hari! Buku ke-4 dan seterusnya hanya $360/buku, dengan 30 kali revisi gratis!'
+    } as Record<string, string>)[lang] || 'Includes 3 e-book vending machines + 24/7 AI Traffic!',
     c1Tag: ({
-      'zh-TW': '✔ 含 3 本配額(第4本起$360)｜每本30次修改(加購$30/1次)',
-      'zh-CN': '✔ 含 3 本配额(第4本起$360)｜每本30次修改(加购$30/1次)',
-      'en-US': '✔ 3 Books ($360/extra) | 30 Edits/Book ($30/+1 edit)',
-      'ja-JP': '✔ 3冊分枠(4冊目から$360)｜各書籍30回修正(追加$30/回)',
-      'vi-VN': '✔ Gồm 3 sách ($360/cuốn thêm) | 30 lần sửa ($30/+1 lần)',
-      'id-ID': '✔ 3 Buku ($360/tambah) | 30 Revisi ($30/+1 revisi)'
-    } as Record<string, string>)[lang] || '✔ 3 Books Quota',
+      'zh-TW': '✔ 內含 3 本專書販賣機(第4本起$360)｜每本送30次免費微調',
+      'zh-CN': '✔ 内含 3 本专书贩卖机(第4本起$360)｜每本送30次免费微调',
+      'en-US': '✔ Includes 3 Vending Machines ($360/extra) | 30 Free Edits/Book',
+      'ja-JP': '✔ 自動販売機3台分付属(4冊目から$360)｜各30回無料微調整',
+      'vi-VN': '✔ Gồm 3 máy bán sách ($360/máy thêm) | 30 lần sửa miễn phí',
+      'id-ID': '✔ Termasuk 3 Mesin Buku ($360/tambah) | 30 Revisi Gratis'
+    } as Record<string, string>)[lang] || '✔ 3 Vending Machines Included',
 
     c2Title: ({
-      'zh-TW': '2. 1成系統費100%倒抵 ＋ 25%推廣聯盟',
-      'zh-CN': '2. 1成系统费100%倒抵 ＋ 25%推广联盟',
-      'en-US': '2. 10% System Fee Rebate + 25% Affiliate',
-      'ja-JP': '2. システム費10%を100%相殺 ＋ 25%アフィリエイト',
-      'vi-VN': '2. Cấn trừ 100% Phí 10% + 25% Hoa hồng Tiếp thị',
-      'id-ID': '2. Pengurangan 100% Biaya 10% + Afiliasi 25%'
-    } as Record<string, string>)[lang] || '2. 10% System Fee Rebate + 25% Affiliate',
+      'zh-TW': '2. 10% 系統費 100% 全額倒抵 ＋ 全球推廣大軍幫你賣',
+      'zh-CN': '2. 10% 系统费 100% 全额倒抵 ＋ 全球推广大军帮您卖',
+      'en-US': '2. 100% System Fee Credit Rebate + Global Affiliate Army',
+      'ja-JP': '2. システム費10%を100%全額相殺 ＋ 世界の販売軍団が代理宣伝',
+      'vi-VN': '2. Hoàn phí Hệ thống 100% + Đội quân Tiếp thị Toàn cầu Bán hộ',
+      'id-ID': '2. Pengurangan 100% Biaya Sistem + Pasukan Afiliasi Global'
+    } as Record<string, string>)[lang] || '2. 100% System Fee Credit Rebate + Global Affiliate Army',
     c2Desc: ({
-      'zh-TW': '每筆成交除了撥出「25% 推廣聯盟服務費支出（讓全球推廣者幫您賣書）」外，原本收取的「1成 (10%) 系統服務費（含提款服務費及推廣服務費）」將 100% 直接從您預繳的 $990 抵用金扣除（抵滿前享 0% 系統服務費）！',
-      'zh-CN': '每笔成交除了拨出“25% 推广联盟服务费支出（让全球推广者帮您卖书）”外，原本收取的“1成 (10%) 系统服务费（含提款服务费及推广服务费）”将 100% 直接从您预缴的 $990 抵用金扣除（抵满前享 0% 系统服务费）！',
-      'en-US': 'Alongside the 25% Affiliate Commission payout to global promoters, our 10% System Service Fee (covering withdrawal & promo fees) is 100% offset by your $990 credit!',
-      'ja-JP': '注文成立ごとに「25%の紹介アフィリエイト報酬（世界中の宣伝者が販売）」を分配するほか、通常10%の「システム利用料（出金・プロモーション管理費）」は、前払いされた$990の相殺金から100%全額相殺（相殺枠終了まで実質システム手数料0%）！',
-      'vi-VN': 'Bên cạnh 25% chi trả cho mạng lưới tiếp thị liên kết, 10% phí dịch vụ hệ thống sẽ được cấn trừ 100% từ hạn mức $990 trả trước (0% phí dịch vụ cho đến khi cấn trừ hết)!',
-      'id-ID': 'Selain komisi 25% untuk promotor global, biaya layanan sistem 10% dipotong 100% dari kredit $990 Anda (biaya sistem 0% hingga saldo habis)!'
-    } as Record<string, string>)[lang] || '10% System Fee Rebate + 25% Affiliate',
+      'zh-TW': '開販賣機零負擔！原本收取的 1 成 (10%) 系統服務費，100% 直接從你預繳的 $990 抵用金倒扣返還（抵滿前手續費 0% 全額歸你）！同時自動接軌全球「25% 聯盟分潤大軍」，讓世界各地的推廣者都搶著主動幫你的販賣機賣書！',
+      'zh-CN': '开贩卖机零负担！原本收取的 1 成 (10%) 系统服务费，100% 直接从您预缴的 $990 抵用金倒扣返还（抵满前手续费 0% 全额归您）！同时自动接轨全球“25% 联盟分润大军”，让世界各地的推广者都抢着主动帮您的贩卖机卖书！',
+      'en-US': 'Zero operational burden! Our 10% system service fee is 100% credited against your $990 prepaid balance (0% effective system fee until depleted). Plus, our 25% global affiliate army is automatically incentivized to promote and sell your books worldwide!',
+      'ja-JP': '自動販売機オーナーの負担はゼロ！通常の10%システム費は、前払いされた$990の相殺金から100%全額差し引かれます（実質手数料0%）！さらに世界中の宣伝者が25%アフィリエイト報酬を目的に、あなたの書籍を競って自動販売してくれます！',
+      'vi-VN': 'Kinh doanh máy bán tri thức không gánh nặng! 10% phí hệ thống được cấn trừ 100% từ $990 trả trước (0% phí cho đến khi cấn trừ hết). Đồng thời đội ngũ tiếp thị liên kết 25% toàn cầu sẽ chủ động bán sách giúp bạn!',
+      'id-ID': 'Bebas beban biaya operasional! Biaya sistem 10% dipotong 100% dari saldo $990 Anda (biaya sistem efektif 0% hingga habis). Ditambah pasukan afiliasi global 25% yang antusias mempromosikan buku Anda ke seluruh dunia!'
+    } as Record<string, string>)[lang] || '100% System Fee Rebate + Global Affiliate Army',
     c2Tag: ({
-      'zh-TW': '✔ 10%系統費全額倒抵｜另撥25%推廣聯盟費',
-      'zh-CN': '✔ 10%系统费全额倒抵｜另拨25%推广联盟费',
-      'en-US': '✔ 10% System Fee Rebated | 25% Affiliate Payout',
-      'ja-JP': '✔ 10%手数料全額相殺｜別途25%アフィリエイト分配',
-      'vi-VN': '✔ Hoàn 100% phí 10% | Chi trả 25% tiếp thị liên kết',
-      'id-ID': '✔ Pengurangan 100% biaya 10% | Pembagian afiliasi 25%'
+      'zh-TW': '✔ 10%系統費全額倒抵返還｜25%全球推廣大軍主動幫賣',
+      'zh-CN': '✔ 10%系统费全额倒抵返还｜25%全球推广大军主动帮卖',
+      'en-US': '✔ 100% Fee Offset | 25% Global Promoters Sell for You',
+      'ja-JP': '✔ 10%手数料100%相殺返還｜25%世界アフィリエイト軍団が販売',
+      'vi-VN': '✔ Hoàn 100% phí dịch vụ | Đội ngũ 25% hoa hồng bán hộ',
+      'id-ID': '✔ Pengurangan 100% Biaya | 25% Pasukan Promotor Ikut Menjual'
     } as Record<string, string>)[lang] || '✔ 100% Fee Rebated',
 
     c3Title: ({
-      'zh-TW': '3. 次年 $450 系統服務費（同享 100% 倒抵）',
-      'zh-CN': '3. 次年 $450 系统服务费（同享 100% 倒抵）',
-      'en-US': '3. Year-2 $450 System Fee (100% Rebate)',
-      'ja-JP': '3. 次年度 $450 保守システム費（100%相殺特典付）',
-      'vi-VN': '3. Phí Hệ thống Năm 2: $450 (Cũng Hoàn 100%)',
-      'id-ID': '3. Biaya Sistem Tahun ke-2: $450 (Pengurangan 100%)'
-    } as Record<string, string>)[lang] || '3. Year-2 $450 System Fee (100% Rebate)',
+      'zh-TW': '3. 次年 $450 雲端維護（同享 100% 倒抵返還）',
+      'zh-CN': '3. 次年 $450 云端维护（同享 100% 倒抵返还）',
+      'en-US': '3. Year-2 $450 Cloud Maintenance (100% Fee Rebate)',
+      'ja-JP': '3. 次年度 $450 クラウド保守（100%相殺特典付き）',
+      'vi-VN': '3. Phí Duy trì Năm 2: $450 (Cũng Hoàn 100% Không Mất Phí)',
+      'id-ID': '3. Pemeliharaan Cloud Tahun ke-2: $450 (Pengurangan 100%)'
+    } as Record<string, string>)[lang] || '3. Year-2 $450 Cloud Maintenance (100% Fee Rebate)',
     c3Desc: ({
-      'zh-TW': '次年起每年僅收 $450「AI 自來客廣告協作及電子書雲端系統服務費」，一樣採取【先收費、後抵扣交易 1 成服務費】！繳交即獲 $450 抵用金，次年賣滿 $4,500 即等同次年系統服務費全額免費！',
-      'zh-CN': '次年起每年仅收 $450“AI 自来客广告协作及电子书云端系统服务费”，一样采取【先收费、后抵扣交易 1 成服务费】！缴交即获 $450 抵用金，次年卖满 $4,500 即等同次年系统服务费全额免费！',
-      'en-US': 'From Year 2, annual AI traffic & cloud system fee is $450—and it ALSO converts 100% into 10% transaction fee credit! Earn back the full $450 with $4,500 in book sales!',
-      'ja-JP': '2年目以降の「AI自動集客広告＆電子書籍クラウドシステム保守費」は年間わずか$450。こちらも【前払い後に10%手数料から100%相殺】！支払うと即時$450の相殺枠が付与され、年間$4,500売上げれば実質システム費ゼロ円！',
-      'vi-VN': 'Từ năm thứ 2, phí duy trì chỉ là $450/năm và CŨNG ĐƯỢC HOÀN 100% vào phí giao dịch 10%! Chỉ cần bán đạt $4,500 là hoàn toàn miễn phí!',
-      'id-ID': 'Mulai tahun ke-2, biaya sistem tahunan adalah $450—dan JUGA DIKURANGKAN 100% dari biaya transaksi 10%! Jual $4,500 buku untuk menutup biaya sepenuhnya!'
+      'zh-TW': '第二年起每年僅 $450 雲端維護費，維持你的販賣機 24H 不停機運轉與 AI 自動宣傳，同樣享有【100% 倒抵交易手續費】！只要一年賣滿 $4,500，就等於次年系統費全數免費拿回，下班後的持續被動收入永不中斷！',
+      'zh-CN': '第二年起每年仅 $450 云端维护费，维持您的贩卖机 24H 不停机运转与 AI 自动宣传，同样享有【100% 倒抵交易手续费】！只要一年卖满 $4,500，就等于次年系统费全数免费拿回，下班后的持续被动收入永不中断！',
+      'en-US': 'From Year 2, annual maintenance is only $450 to keep your vending machine operating 24/7 with continuous AI ads. This $450 ALSO 100% offsets your 10% transaction fees! Sell $4,500 in a year and your system fee is effectively 100% free!',
+      'ja-JP': '2年目以降のクラウド保守費は年間わずか$450。あなたの自動販売機を24時間稼働させAI宣伝を継続します。こちらも【10%販売手数料から100%全額相殺】！年間$4,500の売上で実質ゼロ円となり、持続的な不労所得が止まりません！',
+      'vi-VN': 'Từ năm thứ 2, phí duy trì đám mây chỉ $450/năm để máy hoạt động 24/7 cùng AI quảng bá liên tục. Khoản $450 này CŨNG ĐƯỢC HOÀN 100% vào phí giao dịch 10%! Bán $4,500/năm là hoàn toàn miễn phí!',
+      'id-ID': 'Mulai tahun ke-2, biaya cloud hanya $450/tahun agar mesin beroperasi 24/7 dengan iklan AI. $450 ini JUGA DIKURANGKAN 100% dari biaya transaksi 10%! Jual $4,500 dalam setahun maka sistem Anda 100% gratis!'
     } as Record<string, string>)[lang] || 'From Year 2, annual fee is $450 with 100% rebate!',
     c3Tag: ({
-      'zh-TW': '✔ 先收費後抵扣 10% 交易服務費',
-      'zh-CN': '✔ 先收费后抵扣 10% 交易服务费',
-      'en-US': '✔ 100% Offset Against 10% Service Fee',
-      'ja-JP': '✔ 販売手数料10%から100%全額相殺',
-      'vi-VN': '✔ Cấn trừ 100% vào phí dịch vụ 10%',
-      'id-ID': '✔ 100% Pengurangan Terhadap Biaya 10%'
-    } as Record<string, string>)[lang] || '✔ 100% Offset',
+      'zh-TW': '✔ 先收費後 100% 抵扣 10% 手續費｜賣滿即享全額免單',
+      'zh-CN': '✔ 先收费后 100% 抵扣 10% 手续费｜卖满即享全额免单',
+      'en-US': '✔ 100% Offset Against 10% Fee | Zero-Cost When Target Met',
+      'ja-JP': '✔ 10%手数料から100%全額相殺｜売上達成で実質完全無料',
+      'vi-VN': '✔ Cấn trừ 100% vào phí 10% | Đạt chỉ tiêu hoàn vốn 100%',
+      'id-ID': '✔ Potongan 100% dari Biaya 10% | Gratis Sepenuhnya Saat Target Tercapai'
+    } as Record<string, string>)[lang] || '✔ 100% Offset Against Service Fee',
 
     c4Title: ({
-      'zh-TW': '4. 嚴格書審 (3~7天) 與禁書零退費',
-      'zh-CN': '4. 严格书审 (3~7天) 与禁书零退费',
-      'en-US': '4. 3-7 Day Book Audit & Ban Policy',
-      'ja-JP': '4. 厳格な書籍審査(3〜7日)と禁止図書返金不可鉄則',
-      'vi-VN': '4. Kiểm duyệt Chặt chẽ (3-7 ngày) & Không Hoàn tiền Vi phạm',
-      'id-ID': '4. Audit Buku 3-7 Hari & Kebijakan Larangan Non-Refund'
-    } as Record<string, string>)[lang] || '4. 3-7 Day Book Audit & Ban Policy',
+      'zh-TW': '4. 嚴格品質把關 (3~7天審核) ＋ 禁書免責保障',
+      'zh-CN': '4. 严格品质把关 (3~7天审核) ＋ 禁书免责保障',
+      'en-US': '4. Quality Review (3-7 Days) & Global Compliance',
+      'ja-JP': '4. 厳格な品質管理(3〜7日審査) ＆ 禁止図書ポリシー',
+      'vi-VN': '4. Kiểm Duyệt Chất Lượng (3-7 Ngày) & An Toàn Tuân Thủ',
+      'id-ID': '4. Kontrol Kualitas Ketat (3-7 Hari) & Perlindungan Kepatuhan'
+    } as Record<string, string>)[lang] || '4. Quality Review (3-7 Days) & Global Compliance',
     c4Desc: ({
-      'zh-TW': '加盟商設定完成電子書後，會自動送入總管理後台進行「書審（審核時間 3~7 個工作天）」。付款前須詳閱全球 10 大禁書條款，付款後若違規或遭檢舉查證屬實，一律強制下架封號且不退費！',
-      'zh-CN': '加盟商设定完成电子书后，会自动送入总管理后台进行“书审（审核时间 3~7 个工作天）”。付款前须详阅全球 10 大禁书条款，付款后若违规或遭检举查证属实，一律强制下架封号且不退费！',
-      'en-US': 'Completed books enter Admin Book Review (3-7 days) before going live. Violating the 10 Global Banned Book rules results in immediate termination with NO REFUND.',
-      'ja-JP': '電子書籍の設定完了後、総管理システムで「書籍審査（3〜7営業日）」が実施されます。支払い前に世界10大禁止図書基準をご確認ください。規約違反や通報が確認された場合、即時アカウント停止および返金不可となります！',
-      'vi-VN': 'Sách hoàn thiện sẽ được gửi vào hệ thống Quản trị kiểm duyệt trong 3-7 ngày. Vi phạm 10 điều cấm sẽ bị gỡ bỏ vĩnh viễn và KHÔNG HOÀN TIỀN!',
-      'id-ID': 'Buku yang selesai akan melalui Peninjauan Kepatuhan 3-7 hari sebelum dirilis. Melanggar 10 Aturan Terlarang akan berakibat penutupan akun tanpa pengembalian dana!'
-    } as Record<string, string>)[lang] || 'Completed books enter review with strict no refund policy.',
+      'zh-TW': '設定完成後由系統進行 3~7 天專業書審，確保每一台販賣機內容優質合規，保障全球信用卡/USDT秒級自動入帳。嚴格杜絕色情欺詐等 10 大禁書，為你的個人自品牌、聲譽與長期被動金流提供最堅實的護城河！',
+      'zh-CN': '设定完成后由系统进行 3~7 天专业书审，确保每一台贩卖机内容优质合规，保障全球信用卡/USDT秒级自动入账。严格杜绝色情欺诈等 10 大禁书，为您的个人自品牌、声誉与长期被动金流提供最坚实的护城河！',
+      'en-US': 'Books undergo a 3-7 day review to guarantee quality, protecting instant international credit card and USDT payouts. Strictly prohibiting the 10 banned book categories shields your brand reputation and sustains long-term passive cash flow!',
+      'ja-JP': '設定後3〜7日間の専門審査を行い、自販機の内容が国際基準に適合していることを確認。安全なカード決済・USDT即時入金を保証します。10大禁止図書を厳格に排除し、あなたのブランドと不労所得を守り抜きます！',
+      'vi-VN': 'Hệ thống kiểm duyệt 3-7 ngày đảm bảo nội dung chất lượng cao, giúp thanh toán thẻ tín dụng/USDT quốc tế hoạt động mượt mà. Nghiêm cấm 10 điều cấm để bảo vệ uy tín thương hiệu và dòng tiền thụ động dài hạn của bạn!',
+      'id-ID': 'Audit buku 3-7 hari memastikan kualitas tinggi dan kepatuhan hukum, menjamin pembayaran kartu kredit/USDT instan. Melarang keras 10 kategori terlarang demi reputasi dan aliran kas pasif jangka panjang Anda!'
+    } as Record<string, string>)[lang] || 'Completed books enter review with strict compliance.',
     c4Tag: ({
-      'zh-TW': '⚠️ 書審時間 3~7 天｜違規檢舉一律不退費',
-      'zh-CN': '⚠️ 书审时间 3~7 天｜违规检举一律不退费',
-      'en-US': '⚠️ 3-7 Days Audit | Strictly Non-Refundable',
-      'ja-JP': '⚠️ 審査期間3〜7日｜規約違反・通報時は返金不可',
-      'vi-VN': '⚠️ Kiểm duyệt 3-7 ngày | Không hoàn tiền vi phạm',
-      'id-ID': '⚠️ Audit 3-7 Hari | Mutlak Tidak Dapat Dikembalikan'
-    } as Record<string, string>)[lang] || '⚠️ Strictly Non-Refundable',
+      'zh-TW': '⚠️ 專業書審 3~7 天｜杜絕違規禁書保護品牌',
+      'zh-CN': '⚠️ 专业书审 3~7 天｜杜绝违规禁书保护品牌',
+      'en-US': '⚠️ 3-7 Day Quality Review | Brand Protection Guaranteed',
+      'ja-JP': '⚠️ 専門審査3〜7日｜規約遵守でブランドと売上を保護',
+      'vi-VN': '⚠️ Kiểm duyệt 3-7 ngày | Bảo vệ thương hiệu và doanh thu',
+      'id-ID': '⚠️ Audit 3-7 Hari | Perlindungan Merek & Kepatuhan Terjamin'
+    } as Record<string, string>)[lang] || '⚠️ Strictly Compliant',
 
     // Compliance Alert
     noticeBadge: ({
@@ -230,21 +230,21 @@ export default function FranchiseEBookSection() {
       'id-ID': '🛠️ Perusahaan VIP × Layanan Penerbitan E-Book Khusus (Bespoke)'
     } as Record<string, string>)[lang] || '🛠️ Enterprise VIP Bespoke E-Book Publishing Service',
     bespokeTitle: ({
-      'zh-TW': '沒時間自己寫？「AI 電子書一條龍全代工客製化服務」由總工程師團隊親自操刀！',
-      'zh-CN': '没时间自己写？“AI 电子书一条龙全代工客制化服务”由总工程师团队亲自操刀！',
-      'en-US': 'No Time to Write? Full-Turnkey "AI E-Book Custom Service" Delivered by CTO SEN!',
-      'ja-JP': '執筆の時間が取れない方へ：「AI電子書籍ワンストップ完全代行サービス」をチーフエンジニアSENチームが直轄制作！',
-      'vi-VN': 'Không có thời gian viết? "Dịch vụ Sản xuất E-Book Trọn gói AI" do Đội ngũ CTO SEN trực tiếp thực hiện!',
-      'id-ID': 'Tidak Ada Waktu Menulis? "Layanan Kustom E-Book AI Siap Pakai" Dikerjakan Langsung Tim CTO SEN!'
-    } as Record<string, string>)[lang] || 'No Time to Write? Full-Turnkey "AI E-Book Custom Service" Delivered by CTO SEN!',
+      'zh-TW': '沒時間打字？「知識自動販賣機 一條龍全代工服務」由總工程師團隊親自操刀！',
+      'zh-CN': '没时间打字？“知识自动贩卖机 一条龙全代工服务”由总工程师团队亲自操刀！',
+      'en-US': 'No Time to Type? Full-Turnkey "AI-ATM Vending Machine Service" by CTO SEN Team!',
+      'ja-JP': '文字を入力する時間もない方へ：「知識の自販機AI-ATM ワンストップ完全代行」をSENチームが直轄制作！',
+      'vi-VN': 'Không có thời gian soạn thảo? "Dịch vụ Máy Bán Tri thức Trọn gói" do Đội ngũ CTO SEN thực hiện!',
+      'id-ID': 'Tidak Ada Waktu Mengetik? "Layanan Kustom Mesin Penjual AI-ATM Siap Pakai" oleh Tim CTO SEN!'
+    } as Record<string, string>)[lang] || 'No Time to Type? Full-Turnkey "AI-ATM Vending Machine Service" by CTO SEN Team!',
     bespokeSub: ({
-      'zh-TW': '專為跨國企業、高階名師、品牌創辦人量身打造：從專業深度訪談提煉、Google 4 旗艦圖文編撰、品牌專屬 CIS 視覺排版，到 4K 雙主播短影音矩陣協播與金流交付，全包式零負擔落地！（專案費用 $2,000~$5,000 USD，完工結案亦全額納入 25% 聯盟分潤！）',
-      'zh-CN': '专为跨国企业、高阶名师、品牌创办人量身打造：从专业深度访谈提炼、Google 4 旗舰图文编撰、品牌专属 CIS 视觉排版，到 4K 双主播短影音矩阵协播与金流交付，全包式零负担落地！（专案费用 $2,000~$5,000 USD，完工结案亦全额纳入 25% 联盟分润！）',
-      'en-US': 'Tailored for enterprises, industry authorities, and founders: From AI voice interview structuring to 25+ page masterbook compilation, brand CIS design, 4K dual-anchor video promotion, and automated payment delivery! ($2,000~$5,000 USD, 25% affiliate eligible)',
-      'ja-JP': 'グローバル企業、著名講師、ブランド創業者向け特別設計：深層ヒアリング取材、Google 4 による本格図解編纂、ブランド独自CISデザイン組版、4Kダブルアナウンサー短尺動画連動プロモーション、決済・納品まで完全ワンストップ！（プロジェクト費用 $2,000〜$5,000 USD、完了時は全額25%アフィリエイト分配対象！）',
-      'vi-VN': 'Thiết kế riêng cho doanh nghiệp, chuyên gia và nhà sáng lập: Từ phỏng vấn chuyên sâu, biên soạn Google 4 hơn 25 trang, thiết kế CIS thương hiệu đến video 4K phát sóng và thanh toán tự động! ($2,000~$5,000 USD, áp dụng 25% hoa hồng!)',
-      'id-ID': 'Disesuaikan khusus untuk perusahaan, pakar industri, dan pendiri: Dari wawancara mendalam, penyusunan Google 4 lebih dari 25 halaman, desain visual merek, hingga video promosi 4K dan pengiriman pembayaran otomatis! ($2,000~$5,000 USD, berlaku komisi 25%!)'
-    } as Record<string, string>)[lang] || 'Tailored for enterprises and authorities: Full-turnkey e-book service!',
+      'zh-TW': '專為跨國企業、高階名師、品牌創辦人量身打造：只需口述訪談或提供零散想法，由 20 年架構經驗總工程師 SEN 團隊全包式交付！從 Google 4 旗艦圖文編撰、CIS 品牌視覺排版，到 4K 雙主播短影音矩陣宣傳與金流自動交付，讓你輕鬆擁有一整座全球化 AI 知識變現王國！（專案預算 $2,000~$5,000 USD，完工結案亦全額納入 25% 聯盟分潤！）',
+      'zh-CN': '专为跨国企业、高阶名师、品牌创办人量身打造：只需口述访谈或提供零散想法，由 20 年架构经验总工程师 SEN 团队全包式交付！从 Google 4 旗舰图文编撰、CIS 品牌视觉排版，到 4K 双主播短影音矩阵宣传与金流自动交付，让您轻松拥有一整座全球化 AI 知识变现王国！（专案预算 $2,000~$5,000 USD，完工结案亦全额纳入 25% 联盟分润！）',
+      'en-US': 'Tailored for enterprises, speakers, and creators: Simply share voice notes or ideas; our team with 20 years of architecture experience handles everything! From Google 4 AI writing, CIS visual typography, to 4K dual-anchor video promotion and payment pipelines ($2,000~$5,000 USD, 25% affiliate eligible)!',
+      'ja-JP': 'グローバル企業、著名講師、事業主向け：インタビューや音声メモを渡すだけ！20年のシステム構築実績を持つSENチームが全工程を代行。Google 4 による図解編纂、ブランドCISデザイン、4Kアナウンサー動画宣伝、決済・自動納品まで完備！（予算 $2,000〜$5,000 USD、完了時25%アフィリエイト対象）',
+      'vi-VN': 'Thiết kế riêng cho doanh nghiệp và chuyên gia: Chỉ cần ghi âm chia sẻ ý tưởng, đội ngũ 20 năm kinh nghiệm của CTO SEN sẽ thực hiện toàn bộ! Từ biên soạn Google 4, dàn trang chuẩn CIS, video 4K phát sóng đến hệ thống thanh toán tự động ($2,000~$5,000 USD, áp dụng 25% hoa hồng)!',
+      'id-ID': 'Khusus untuk perusahaan, pakar, dan kreator: Cukup bagikan rekaman suara ide Anda, tim dengan 20 tahun pengalaman arsitektur CTO SEN akan menangani semuanya! Dari penyusunan Google 4, tata letak visual CIS, video promosi 4K, hingga pembayaran otomatis ($2,000~$5,000 USD, komisi 25%)!'
+    } as Record<string, string>)[lang] || 'Full-turnkey knowledge vending machine service delivered by CTO SEN!',
     budgetLabel: ({
       'zh-TW': '專案委託預算區間',
       'zh-CN': '专案委托预算区间',
@@ -367,21 +367,21 @@ export default function FranchiseEBookSection() {
 
     // Main bottom action buttons
     join990Btn: ({
-      'zh-TW': '🚀 立即認購 $990 加盟方案 (含3本書+AI廣告+100%倒抵)',
-      'zh-CN': '🚀 立即认购 $990 加盟方案 (含3本书+AI广告+100%倒抵)',
-      'en-US': '🚀 Join $990 Franchise Plan (3 Books + AI Ads)',
-      'ja-JP': '🚀 今すぐ$990加盟プランに申し込む (3冊分+AI広告+100%相殺)',
-      'vi-VN': '🚀 Tham gia Gói $990 (3 Sách + AI Ads + Hoàn 100%)',
-      'id-ID': '🚀 Daftar Paket Kemitraan $990 (3 Buku + Iklan AI + 100%)'
-    } as Record<string, string>)[lang] || '🚀 Join $990 Franchise Plan (3 Books + AI Ads)',
+      'zh-TW': '🚀 立即認購 $990 開設知識販賣機 (含3本書+AI廣告+100%倒抵)',
+      'zh-CN': '🚀 立即认购 $990 开设知识贩卖机 (含3本书+AI广告+100%倒抵)',
+      'en-US': '🚀 Join $990 Plan: Launch Your Vending Machine (3 Books + AI Ads)',
+      'ja-JP': '🚀 今すぐ$990で知識の自販機を開設 (書籍3冊分+AI広告+100%相殺)',
+      'vi-VN': '🚀 Đăng ký Gói $990 Mở Máy Bán Tri Thức (3 Sách + AI Ads + Hoàn 100%)',
+      'id-ID': '🚀 Buka Mesin Penjual $990 Sekarang (3 Buku + Iklan AI + 100% Potongan)'
+    } as Record<string, string>)[lang] || '🚀 Join $990 Plan: Launch Your Vending Machine (3 Books + AI Ads)',
     enterStudioBtn: ({
-      'zh-TW': '🛠️ 進入「加盟商電子書模版引擎工作台 (/studio)」',
-      'zh-CN': '🛠️ 进入“加盟商电子书模版引擎工作台 (/studio)”',
-      'en-US': '🛠️ Open Franchisee E-Book Studio (/studio)',
-      'ja-JP': '🛠️ 「加盟店電子書籍スタジオ (/studio)」へ',
-      'vi-VN': '🛠️ Vào Bàn làm việc Tác giả E-Book (/studio)',
-      'id-ID': '🛠️ Buka Studio Pembuat E-Book (/studio)'
-    } as Record<string, string>)[lang] || '🛠️ Open Franchisee E-Book Studio (/studio)',
+      'zh-TW': '🛠️ 進入「知識自動販賣機 創作工作台 (/studio)」',
+      'zh-CN': '🛠️ 进入“知识自动贩卖机 创作工作台 (/studio)”',
+      'en-US': '🛠️ Open Knowledge Vending Machine Studio (/studio)',
+      'ja-JP': '🛠️ 「知識の自販機 制作スタジオ (/studio)」へ',
+      'vi-VN': '🛠️ Vào Xưởng Sáng tạo Máy Bán Tri thức (/studio)',
+      'id-ID': '🛠️ Buka Studio Mesin Penjual Pengetahuan (/studio)'
+    } as Record<string, string>)[lang] || '🛠️ Open Knowledge Vending Machine Studio (/studio)',
     gotoEbookStoreBtn: ({
       'zh-TW': '📖 前往「讀者 VIP 訂閱書櫃 (/ebook-store)」',
       'zh-CN': '📖 前往“读者 VIP 订阅书柜 (/ebook-store)”',
@@ -391,13 +391,13 @@ export default function FranchiseEBookSection() {
       'id-ID': '📖 Kunjungi Toko Buku VIP (/ebook-store)'
     } as Record<string, string>)[lang] || '📖 Reader VIP Bookstore (/ebook-store)',
     askAiBtn: ({
-      'zh-TW': '💬 喚起 AI 客服諮詢',
-      'zh-CN': '💬 唤起 AI 客服咨询',
-      'en-US': '💬 Ask AI Support',
-      'ja-JP': '💬 AIサポートに相談',
-      'vi-VN': '💬 Chat với Hỗ trợ AI',
-      'id-ID': '💬 Tanya Dukungan AI'
-    } as Record<string, string>)[lang] || '💬 Ask AI Support'
+      'zh-TW': '💬 諮詢 AI 客服了解販賣機細節',
+      'zh-CN': '💬 咨询 AI 客服了解贩卖机细节',
+      'en-US': '💬 Ask AI About Knowledge Vending Machines',
+      'ja-JP': '💬 AIサポートに自販機の詳細を相談',
+      'vi-VN': '💬 Hỏi AI về Máy Bán Tri thức',
+      'id-ID': '💬 Tanya AI Tentang Mesin Penjual'
+    } as Record<string, string>)[lang] || '💬 Ask AI About Knowledge Vending Machines'
   };
 
   return (
@@ -629,7 +629,7 @@ export default function FranchiseEBookSection() {
                 window.dispatchEvent(
                   new CustomEvent('open-ai-chat', {
                     detail: {
-                      query: '我想了解 $990 電子書加盟方案（含3本書、AI打廣告、3~7天書審與禁書條款）'
+                      query: '我想了解「知識自動販賣機 AI-ATM」首年 $990 方案（含3台專書自販機、AI打廣告、3~7天書審與禁書條款）'
                     }
                   })
                 );

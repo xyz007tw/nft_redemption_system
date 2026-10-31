@@ -149,8 +149,27 @@ export default function ChatWidget() {
         {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
         {!isOpen && (
           <div className="relative group flex flex-col items-end">
-            {/* 懸浮展開之四服務快速跳轉氣泡 */}
+            {/* 懸浮展開之服務快速跳轉氣泡 */}
             <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+              {/* 🏪 旗艦項目：知識自動販賣機 AI-ATM */}
+              <a
+                href="/#author-coop"
+                onClick={(e) => handleJumpToSection(e, 'author-coop')}
+                className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-pink-950 via-purple-950 to-indigo-950 hover:from-pink-800 hover:to-purple-800 text-pink-200 hover:text-white border-2 border-pink-400/80 text-xs font-black shadow-[0_0_18px_rgba(236,72,153,0.45)] whitespace-nowrap transition-all flex items-center gap-1.5 hover:scale-105"
+              >
+                <span>🏪</span>
+                <span>
+                  {lang === 'zh-TW' ? '知識自動販賣機｜首年$990 AI-ATM' :
+                   lang === 'zh-CN' ? '知识自动贩卖机｜首年$990 AI-ATM' :
+                   lang === 'ja-JP' ? '知識の自動販売機｜初年度$990 AI-ATM' :
+                   lang === 'ko-KR' ? '지식 자판기｜$990 AI-ATM' :
+                   lang === 'vi-VN' ? 'Máy Bán Tri Thức｜$990 AI-ATM' :
+                   'Knowledge Vending | $990 AI-ATM'}
+                </span>
+                <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.2 rounded-full font-black animate-pulse">
+                  HOT
+                </span>
+              </a>
               {/* 👑 旗艦首選：總工程師20年資歷 · AI-ATM變現接案 */}
               <a
                 href="/#video-shoppable-service"
@@ -295,6 +314,26 @@ export default function ChatWidget() {
                 ✕
               </button>
             </div>
+            {/* 🏪 旗艦項目：知識自動販賣機 AI-ATM */}
+            <a
+              href="/#author-coop"
+              onClick={(e) => handleJumpToSection(e, 'author-coop')}
+              className="px-3 py-2 rounded-xl bg-gradient-to-r from-pink-950 via-purple-950 to-indigo-950 text-pink-200 border-2 border-pink-400/80 text-xs font-black flex items-center justify-between shadow-lg"
+            >
+              <div className="flex items-center gap-1.5">
+                <span>🏪</span>
+                <span>
+                  {lang === 'zh-TW' ? '知識自動販賣機 AI-ATM' :
+                   lang === 'zh-CN' ? '知识自动贩卖机 AI-ATM' :
+                   lang === 'ja-JP' ? '知識の自動販売機 AI-ATM' :
+                   lang === 'ko-KR' ? '지식 자판기 AI-ATM' :
+                   lang === 'vi-VN' ? 'Máy Bán Tri Thức AI-ATM' :
+                   'Knowledge Vending AI-ATM'}
+                </span>
+                <span className="text-[9px] bg-pink-500 text-white px-1 rounded font-black">HOT</span>
+              </div>
+              <span className="text-amber-300 font-black text-[11px]">$990 →</span>
+            </a>
             {/* 👑 旗艦首選：總工程師20年資歷 · AI-ATM變現接案 */}
             <a
               href="/#video-shoppable-service"
