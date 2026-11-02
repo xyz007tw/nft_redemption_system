@@ -76,13 +76,17 @@ export default function ChatWidget() {
       if (messages.length === 0) {
         setMessages([{ role: 'ai', content: welcomeMessage }]);
       }
-      const query = e?.detail?.query;
+      const query = e?.detail?.query || e?.detail?.question;
       if (query) {
         setInput(query);
       }
     };
     window.addEventListener('open-ai-chat', handleOpenChat);
-    return () => window.removeEventListener('open-ai-chat', handleOpenChat);
+    window.addEventListener('wx-open-ai-chat', handleOpenChat);
+    return () => {
+      window.removeEventListener('open-ai-chat', handleOpenChat);
+      window.removeEventListener('wx-open-ai-chat', handleOpenChat);
+    };
   }, [messages, welcomeMessage]);
 
   const toggleChat = () => {
@@ -224,6 +228,15 @@ export default function ChatWidget() {
                  lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료 ($660)' :
                  lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($660)' :
                  '🚀 03 | AI 365-Day Free Plan ($660)'}
+              </a>
+              <a
+                href="/blog"
+                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-amber-600 text-amber-200 hover:text-white border border-amber-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all"
+              >
+                {lang === 'zh-TW' ? '📝 創客實戰部落格 (每日SEO專欄)' :
+                 lang === 'zh-CN' ? '📝 创客实战部落格 (每日SEO专栏)' :
+                 lang === 'ja-JP' ? '📝 クリエイター実践ブログ (SEO)' :
+                 '📝 Creator SEO Blog (Daily)'}
               </a>
             </div>
 
@@ -402,6 +415,19 @@ export default function ChatWidget() {
                  '🚀 03 | AI 365-Day Free'}
               </span>
               <span className="text-amber-300 font-black text-[11px]">$660 USD →</span>
+            </a>
+            <a
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl bg-amber-950/80 hover:bg-amber-600 text-amber-200 border border-amber-400/40 text-xs font-extrabold flex items-center justify-between"
+            >
+              <span>
+                {lang === 'zh-TW' ? '📝 創客實戰部落格｜每日SEO專欄' :
+                 lang === 'zh-CN' ? '📝 创客实战部落格｜每日SEO专栏' :
+                 lang === 'ja-JP' ? '📝 クリエイター実践ブログ' :
+                 '📝 Creator SEO Blog'}
+              </span>
+              <span className="text-amber-300 font-black text-[11px]">閱讀 →</span>
             </a>
           </div>
         )}

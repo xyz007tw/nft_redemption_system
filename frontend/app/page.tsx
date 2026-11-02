@@ -10,6 +10,7 @@ import TutorCourseSection from '@/components/TutorCourseSection';
 import VideoShoppableSection from '@/components/VideoShoppableSection';
 import FranchiseEBookSection from '@/components/FranchiseEBookSection';
 import FeaturedEBookShowcaseSection from '@/components/FeaturedEBookShowcaseSection';
+import { OfficialBlogShowcaseSection } from '@/components/OfficialBlogShowcaseSection';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -233,6 +234,12 @@ export default function Home() {
               {navShoppableText}
             </a>
             <Link
+              href="/blog"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-rose-500/25 hover:from-amber-500/40 hover:to-rose-500/40 border border-amber-400/60 text-amber-200 font-black text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:scale-105 whitespace-nowrap"
+            >
+              {lang === 'en-US' ? '📝 Creator Blog' : lang === 'ja-JP' ? '📝 実践ブログ' : '📝 創客專欄'}
+            </Link>
+            <Link
               href="/sponsor"
               className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 hover:from-purple-500/35 hover:to-amber-500/35 border border-purple-400/50 text-purple-200 font-bold text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:scale-105 whitespace-nowrap"
             >
@@ -308,6 +315,17 @@ export default function Home() {
               <span>🛠️</span>
               <span>{navShoppableText}</span>
             </a>
+            <Link
+              href="/blog"
+              onClick={() => setMobileNavOpen(false)}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 font-black text-xs"
+            >
+              <span className="flex items-center gap-2">
+                <span>📝</span>
+                <span>{lang === 'en-US' ? 'Creator Blog (SEO)' : lang === 'ja-JP' ? '実践ブログ (SEO)' : '創客實戰部落格 (SEO專欄)'}</span>
+              </span>
+              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded font-black">每日更</span>
+            </Link>
             <Link
               href="/sponsor"
               onClick={() => setMobileNavOpen(false)}
@@ -652,6 +670,9 @@ export default function Home() {
 
       {/* 新開發 AI「影片導購系統」客製化建置服務專區 */}
       <VideoShoppableSection />
+
+      {/* 微享官網原生 SEO 類部落客實戰文章專欄 */}
+      <OfficialBlogShowcaseSection />
 
       {/* 推廣區塊 */}
       <section className="w-full bg-white/5 border-t border-white/10 py-12 pb-24 md:pb-12">
