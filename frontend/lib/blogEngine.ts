@@ -21,6 +21,24 @@ export interface BlogSection {
   highlight_tip?: string;
 }
 
+export interface BlogTranslationPackage {
+  title: string;
+  subtitle: string;
+  excerpt: string;
+  badge: string;
+  author_role: string;
+  target_cta_text: string;
+  sections: Array<{
+    heading: string;
+    body: string;
+    highlight_tip?: string;
+  }>;
+  faqs?: Array<{
+    q: string;
+    a: string;
+  }>;
+}
+
 export interface BlogPost {
   slug: string;
   category_id: BlogCategoryId;
@@ -44,6 +62,56 @@ export interface BlogPost {
   target_cta_text_en: string;
   sections: BlogSection[];
   faqs: BlogFAQ[];
+  translations?: Partial<Record<string, BlogTranslationPackage>>;
+}
+
+export function getLocalizedPost(post: BlogPost, lang: string): {
+  title: string;
+  subtitle: string;
+  excerpt: string;
+  badge: string;
+  author_role: string;
+  target_cta_text: string;
+  sections: Array<{ heading: string; body: string; highlight_tip?: string }>;
+  faqs: Array<{ q: string; a: string }>;
+} {
+  if (post.translations && post.translations[lang]) {
+    const t = post.translations[lang]!;
+    return {
+      title: t.title || (lang === 'en-US' ? post.title_en : post.title_zh),
+      subtitle: t.subtitle || (lang === 'en-US' ? post.subtitle_en : post.subtitle_zh),
+      excerpt: t.excerpt || (lang === 'en-US' ? post.excerpt_en : post.excerpt_zh),
+      badge: t.badge || (lang === 'en-US' ? post.badge_en : post.badge_zh),
+      author_role: t.author_role || post.author_role_zh,
+      target_cta_text: t.target_cta_text || (lang === 'en-US' ? post.target_cta_text_en : post.target_cta_text_zh),
+      sections: t.sections && t.sections.length > 0 ? t.sections : post.sections,
+      faqs: t.faqs && t.faqs.length > 0 ? t.faqs : post.faqs,
+    };
+  }
+
+  if (lang === 'en-US') {
+    return {
+      title: post.title_en || post.title_zh,
+      subtitle: post.subtitle_en || post.subtitle_zh,
+      excerpt: post.excerpt_en || post.excerpt_zh,
+      badge: post.badge_en || post.badge_zh,
+      author_role: post.author_role_zh,
+      target_cta_text: post.target_cta_text_en || post.target_cta_text_zh,
+      sections: post.sections,
+      faqs: post.faqs,
+    };
+  }
+
+  return {
+    title: post.title_zh,
+    subtitle: post.subtitle_zh,
+    excerpt: post.excerpt_zh,
+    badge: post.badge_zh,
+    author_role: post.author_role_zh,
+    target_cta_text: post.target_cta_text_zh,
+    sections: post.sections,
+    faqs: post.faqs,
+  };
 }
 
 export const BLOG_CATEGORIES: Array<{

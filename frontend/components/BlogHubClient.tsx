@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { BLOG_CATEGORIES, BlogCategoryId, BlogPost } from '@/lib/blogEngine';
+import { BLOG_CATEGORIES, BlogCategoryId, BlogPost, getLocalizedPost } from '@/lib/blogEngine';
 import { SiteNavbar } from '@/components/SiteNavbar';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -151,78 +151,81 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
       {/* 文章卡片列表 */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPosts.map((post) => (
-            <article
-              key={post.slug}
-              className="group rounded-3xl bg-slate-900/80 border border-white/10 hover:border-pink-400/60 overflow-hidden shadow-xl hover:shadow-[0_10px_35px_rgba(236,72,153,0.2)] transition-all flex flex-col justify-between"
-            >
-              <div>
-                {/* 封面圖與分類徽章 */}
-                <Link href={`/blog/${post.slug}`} className="block relative h-48 overflow-hidden bg-slate-950">
-                  <img
-                    src={post.cover_image}
-                    alt={post.title_zh}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
-                  <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-pink-400/50 text-pink-200 text-xs font-black">
-                    {lang === 'en-US' ? post.badge_en : post.badge_zh}
-                  </span>
-                  <span className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-lg bg-black/70 text-amber-300 text-[11px] font-bold">
-                    ⏱️ {post.read_minutes} min read
-                  </span>
-                </Link>
-
-                {/* 標題與摘要 */}
-                <div className="p-5">
-                  <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
-                    <span>{post.author_avatar}</span>
-                    <span className="font-bold text-slate-300">{post.author_name}</span>
-                    <span>•</span>
-                    <span>{post.published_at}</span>
-                  </div>
-
-                  <Link href={`/blog/${post.slug}`}>
-                    <h2 className="text-lg sm:text-xl font-black text-white group-hover:text-pink-300 transition-colors leading-snug mb-2.5 line-clamp-2">
-                      {lang === 'en-US' ? post.title_en : post.title_zh}
-                    </h2>
+          {filteredPosts.map((post) => {
+            const loc = getLocalizedPost(post, lang);
+            return (
+              <article
+                key={post.slug}
+                className="group rounded-3xl bg-slate-900/80 border border-white/10 hover:border-pink-400/60 overflow-hidden shadow-xl hover:shadow-[0_10px_35px_rgba(236,72,153,0.2)] transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* 封面圖與分類徽章 */}
+                  <Link href={`/blog/${post.slug}`} className="block relative h-48 overflow-hidden bg-slate-950">
+                    <img
+                      src={post.cover_image}
+                      alt={loc.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-pink-400/50 text-pink-200 text-xs font-black">
+                      {loc.badge}
+                    </span>
+                    <span className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-lg bg-black/70 text-amber-300 text-[11px] font-bold">
+                      ⏱️ {post.read_minutes} min read
+                    </span>
                   </Link>
 
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-4">
-                    {lang === 'en-US' ? post.excerpt_en : post.excerpt_zh}
-                  </p>
+                  {/* 標題與摘要 */}
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+                      <span>{post.author_avatar}</span>
+                      <span className="font-bold text-slate-300">{post.author_name}</span>
+                      <span>•</span>
+                      <span>{post.published_at}</span>
+                    </div>
 
-                  {/* SEO 關鍵字標籤 */}
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {post.seo_keywords.slice(0, 4).map((kw) => (
-                      <span
-                        key={kw}
-                        className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-slate-300"
-                      >
-                        #{kw}
-                      </span>
-                    ))}
+                    <Link href={`/blog/${post.slug}`}>
+                      <h2 className="text-lg sm:text-xl font-black text-white group-hover:text-pink-300 transition-colors leading-snug mb-2.5 line-clamp-2">
+                        {loc.title}
+                      </h2>
+                    </Link>
+
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-4">
+                      {loc.excerpt}
+                    </p>
+
+                    {/* SEO 關鍵字標籤 */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {post.seo_keywords.slice(0, 4).map((kw) => (
+                        <span
+                          key={kw}
+                          className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-slate-300"
+                        >
+                          #{kw}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 底部雙按鈕：閱讀全文 ＋ 直達對應官網項目 */}
-              <div className="px-5 pb-5 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500/25 to-purple-500/25 hover:from-pink-500 hover:to-purple-600 border border-pink-400/50 text-pink-200 hover:text-white font-black text-xs text-center transition-all"
-                >
-                  {lang === 'en-US' ? '📖 Read Full Review →' : '📖 閱讀部落客開箱全文 →'}
-                </Link>
-                <Link
-                  href={post.target_section_href}
-                  className="py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-300 font-black text-xs whitespace-nowrap transition-all"
-                >
-                  {lang === 'en-US' ? '⚡ Try Now' : '⚡ 直達該項目'}
-                </Link>
-              </div>
-            </article>
-          ))}
+                {/* 底部雙按鈕：閱讀全文 ＋ 直達對應官網項目 */}
+                <div className="px-5 pb-5 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500/25 to-purple-500/25 hover:from-pink-500 hover:to-purple-600 border border-pink-400/50 text-pink-200 hover:text-white font-black text-xs text-center transition-all"
+                  >
+                    {lang === 'en-US' ? '📖 Read Full Review →' : lang === 'ja-JP' ? '📖 実戦レビューを読む →' : lang === 'ko-KR' ? '📖 칼럼 전문 읽기 →' : lang === 'vi-VN' ? '📖 Đọc bài đánh giá →' : '📖 閱讀部落客開箱全文 →'}
+                  </Link>
+                  <Link
+                    href={post.target_section_href}
+                    className="py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-300 font-black text-xs whitespace-nowrap transition-all"
+                  >
+                    {lang === 'en-US' ? '⚡ Try Now' : lang === 'ja-JP' ? '⚡ 今すぐ体験' : lang === 'ko-KR' ? '⚡ 바로가기' : lang === 'vi-VN' ? '⚡ Trải nghiệm ngay' : '⚡ 直達該項目'}
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

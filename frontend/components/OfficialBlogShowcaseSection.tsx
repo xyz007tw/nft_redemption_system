@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BlogPost, SEED_BLOG_POSTS } from '@/lib/blogEngine';
+import { BlogPost, SEED_BLOG_POSTS, getLocalizedPost } from '@/lib/blogEngine';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export function OfficialBlogShowcaseSection() {
@@ -60,55 +60,58 @@ export function OfficialBlogShowcaseSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <article
-            key={post.slug}
-            className="group rounded-3xl bg-slate-900/75 border border-white/10 hover:border-amber-400/60 overflow-hidden shadow-lg hover:shadow-[0_8px_30px_rgba(245,158,11,0.2)] transition-all flex flex-col justify-between"
-          >
-            <div>
-              <Link href={`/blog/${post.slug}`} className="block relative h-44 overflow-hidden bg-slate-950">
-                <img
-                  src={post.cover_image}
-                  alt={post.title_zh}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
-                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/85 border border-pink-400/50 text-pink-200 text-[11px] font-black">
-                  {lang === 'en-US' ? post.badge_en : post.badge_zh}
-                </span>
-                <span className="absolute bottom-2.5 right-3 text-[11px] text-amber-300 font-bold bg-black/70 px-2 py-0.5 rounded">
-                  {post.published_at}
-                </span>
-              </Link>
-
-              <div className="p-5">
-                <Link href={`/blog/${post.slug}`}>
-                  <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug mb-2 line-clamp-2">
-                    {lang === 'en-US' ? post.title_en : post.title_zh}
-                  </h3>
+        {posts.map((post) => {
+          const loc = getLocalizedPost(post, lang);
+          return (
+            <article
+              key={post.slug}
+              className="group rounded-3xl bg-slate-900/75 border border-white/10 hover:border-amber-400/60 overflow-hidden shadow-lg hover:shadow-[0_8px_30px_rgba(245,158,11,0.2)] transition-all flex flex-col justify-between"
+            >
+              <div>
+                <Link href={`/blog/${post.slug}`} className="block relative h-44 overflow-hidden bg-slate-950">
+                  <img
+                    src={post.cover_image}
+                    alt={loc.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/85 border border-pink-400/50 text-pink-200 text-[11px] font-black">
+                    {loc.badge}
+                  </span>
+                  <span className="absolute bottom-2.5 right-3 text-[11px] text-amber-300 font-bold bg-black/70 px-2 py-0.5 rounded">
+                    {post.published_at}
+                  </span>
                 </Link>
-                <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
-                  {lang === 'en-US' ? post.excerpt_en : post.excerpt_zh}
-                </p>
-              </div>
-            </div>
 
-            <div className="px-5 pb-4 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-              <Link
-                href={`/blog/${post.slug}`}
-                className="text-xs font-black text-pink-300 hover:text-pink-200"
-              >
-                {lang === 'en-US' ? '📖 Read Article →' : '📖 閱讀開箱全文 →'}
-              </Link>
-              <Link
-                href={post.target_section_href}
-                className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/40 px-2.5 py-1 rounded-lg hover:bg-amber-500/30"
-              >
-                {lang === 'en-US' ? '⚡ Go to Feature' : '⚡ 前往該專區'}
-              </Link>
-            </div>
-          </article>
-        ))}
+                <div className="p-5">
+                  <Link href={`/blog/${post.slug}`}>
+                    <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug mb-2 line-clamp-2">
+                      {loc.title}
+                    </h3>
+                  </Link>
+                  <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
+                    {loc.excerpt}
+                  </p>
+                </div>
+              </div>
+
+              <div className="px-5 pb-4 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="text-xs font-black text-pink-300 hover:text-pink-200"
+                >
+                  {lang === 'en-US' ? '📖 Read Article →' : lang === 'ja-JP' ? '📖 記事を読む →' : lang === 'ko-KR' ? '📖 칼럼 읽기 →' : lang === 'vi-VN' ? '📖 Đọc bài viết →' : '📖 閱讀開箱全文 →'}
+                </Link>
+                <Link
+                  href={post.target_section_href}
+                  className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/40 px-2.5 py-1 rounded-lg hover:bg-amber-500/30"
+                >
+                  {lang === 'en-US' ? '⚡ Go to Feature' : lang === 'ja-JP' ? '⚡ 該当エリア' : lang === 'ko-KR' ? '⚡ 바로가기' : lang === 'vi-VN' ? '⚡ Đến mục' : '⚡ 前往該專區'}
+                </Link>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
