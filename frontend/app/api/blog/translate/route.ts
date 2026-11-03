@@ -46,8 +46,10 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. If target is Traditional Chinese, return original
-    if (target_lang === 'zh-TW') {
+    const isSourceChinese = /[\u4e00-\u9fa5]/.test(post.sections?.[0]?.heading || post.title_zh || '');
+
+    // 2. If target matches source language, return original
+    if (target_lang === 'zh-TW' && isSourceChinese) {
       const origPkg: BlogTranslationPackage = {
         title: post.title_zh,
         subtitle: post.subtitle_zh,
@@ -61,7 +63,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, translation: origPkg });
     }
 
+    if (target_lang === 'en-US' && !isSourceChinese) {
+      const origPkg: BlogTranslationPackage = {
+        title: post.title_en,
+        subtitle: post.subtitle_en,
+        excerpt: post.excerpt_en,
+        badge: post.badge_en,
+        author_role: post.author_role_zh,
+        target_cta_text: post.target_cta_text_en,
+        sections: post.sections,
+        faqs: post.faqs,
+      };
+      return NextResponse.json({ success: true, translation: origPkg });
+    }
+
     const langName = LANG_NAMES[target_lang] || target_lang;
+    const srcDesc = isSourceChinese ? 'Traditional Chinese' : 'Native English';
+    const srcTitle = isSourceChinese ? post.title_zh : post.title_en;
+    const srcSubtitle = isSourceChinese ? post.subtitle_zh : post.subtitle_en;
+    const srcExcerpt = isSourceChinese ? post.excerpt_zh : post.excerpt_en;
+    const srcBadge = isSourceChinese ? post.badge_zh : post.badge_en;
+    const srcCTA = isSourceChinese ? post.target_cta_text_zh : post.target_cta_text_en;
 
     const prompt = `You are a professional native-level SEO marketing translator and localization master.
 Please translate the following blog post article into ${langName} (${target_lang}).
@@ -70,13 +92,13 @@ Keep the friendly, conversational, enthusiastic 'side-hustle blogger' tone for b
 Do NOT use robotic or dry translation. Make it sound like a top native blogger wrote it.
 Keep system names like 'AI-ATM', 'WeiXiang AI', 'SEN', 'LINE', 'WordPress', 'SEO', 'USDT' intact.
 
-ARTICLE TO TRANSLATE (Source: Traditional Chinese):
-Title: ${post.title_zh}
-Subtitle: ${post.subtitle_zh}
-Excerpt: ${post.excerpt_zh}
-Badge: ${post.badge_zh}
+ARTICLE TO TRANSLATE (Source: ${srcDesc}):
+Title: ${srcTitle}
+Subtitle: ${srcSubtitle}
+Excerpt: ${srcExcerpt}
+Badge: ${srcBadge}
 Author Role: ${post.author_role_zh}
-CTA Text: ${post.target_cta_text_zh}
+CTA Text: ${srcCTA}
 
 Sections to translate:
 ${JSON.stringify(post.sections, null, 2)}

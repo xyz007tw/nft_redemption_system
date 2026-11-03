@@ -267,8 +267,10 @@ export function BlogPostDetailClient({ post, relatedPosts }: BlogPostDetailClien
 
   // 當使用者在切換語系 (例如英文/日文/簡中/韓文/越文) 時，若本地尚無快取翻譯，即刻背景請求 AI 專屬語系套件
   useEffect(() => {
-    if (lang === 'zh-TW') return;
     if (activePost.translations && activePost.translations[lang]) return;
+    const isSourceChinese = /[\u4e00-\u9fa5]/.test(activePost.sections?.[0]?.heading || activePost.title_zh || '');
+    if (lang === 'zh-TW' && isSourceChinese) return;
+    if (lang === 'en-US' && !isSourceChinese) return;
 
     setIsTranslating(true);
     fetch('/api/blog/translate', {
