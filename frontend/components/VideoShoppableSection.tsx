@@ -14,26 +14,73 @@ export default function VideoShoppableSection() {
   const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
   const free365ContainerRef = useRef<HTMLDivElement | null>(null);
 
+  const handleSelectTab = (tab: 'architecture' | 'shoppable' | 'livegood' | 'free365') => {
+    setActiveServiceTab(tab);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', `/#video-shoppable-service?tab=${tab}`);
+    }
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleSwitchTab = (e: any) => {
       const targetTab = e?.detail?.tab;
       if (targetTab === 'architecture' || targetTab === 'shoppable' || targetTab === 'livegood' || targetTab === 'free365') {
         setActiveServiceTab(targetTab);
+        window.history.replaceState(null, '', `/#video-shoppable-service?tab=${targetTab}`);
       }
     };
     window.addEventListener('weixiang-switch-service-tab', handleSwitchTab);
 
-    // 支援從子頁面跳轉回來時透過網址參數或 hash 帶入預設 tab
-    const hash = window.location.hash;
-    if (hash.includes('tab=livegood')) {
-      setActiveServiceTab('livegood');
-    } else if (hash.includes('tab=free365')) {
-      setActiveServiceTab('free365');
-    } else if (hash.includes('tab=shoppable')) {
-      setActiveServiceTab('shoppable');
-    } else if (hash.includes('tab=architecture') || hash.includes('intake') || hash.includes('architecture')) {
-      setActiveServiceTab('architecture');
+    // 支援從轉址、外部廣告、短網址跳轉時透過 search 參數或 hash 帶入預設 tab
+    const hash = window.location.hash.toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = (params.get('tab') || params.get('service') || '').toLowerCase();
+
+    let initialTab: 'architecture' | 'shoppable' | 'livegood' | 'free365' | null = null;
+
+    if (
+      tabParam === 'livegood' ||
+      tabParam === '02' ||
+      hash.includes('livegood') ||
+      hash.includes('service-02') ||
+      hash.includes('tab=livegood')
+    ) {
+      initialTab = 'livegood';
+    } else if (
+      tabParam === 'free365' ||
+      tabParam === '03' ||
+      hash.includes('free365') ||
+      hash.includes('service-03') ||
+      hash.includes('tab=free365')
+    ) {
+      initialTab = 'free365';
+    } else if (
+      tabParam === 'shoppable' ||
+      tabParam === '01' ||
+      hash.includes('shoppable') ||
+      hash.includes('service-01') ||
+      hash.includes('tab=shoppable')
+    ) {
+      initialTab = 'shoppable';
+    } else if (
+      tabParam === 'architecture' ||
+      hash.includes('tab=architecture') ||
+      hash.includes('intake') ||
+      hash.includes('architecture')
+    ) {
+      initialTab = 'architecture';
+    }
+
+    if (initialTab) {
+      setActiveServiceTab(initialTab);
+      // 若帶有參數跳轉進來，自動平滑滾動至該服務區塊
+      setTimeout(() => {
+        const el = document.getElementById('video-shoppable-service');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 350);
     }
 
     return () => window.removeEventListener('weixiang-switch-service-tab', handleSwitchTab);
@@ -140,7 +187,7 @@ export default function VideoShoppableSection() {
               {/* Tab 0: 👑 20年首席架構師 · AI-ATM 自動商業變現系統客製接案 */}
               <button
                 type="button"
-                onClick={() => setActiveServiceTab('architecture')}
+                onClick={() => handleSelectTab('architecture')}
                 className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
                   activeServiceTab === 'architecture'
                     ? 'bg-gradient-to-r from-sky-950 via-indigo-950 to-purple-950 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.45)]'
@@ -180,7 +227,7 @@ export default function VideoShoppableSection() {
               {/* Tab 1: AI 影片導購系統 */}
               <button
                 type="button"
-                onClick={() => setActiveServiceTab('shoppable')}
+                onClick={() => handleSelectTab('shoppable')}
                 className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
                   activeServiceTab === 'shoppable'
                     ? 'bg-gradient-to-r from-sky-900/90 to-blue-900/90 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.35)]'
@@ -220,7 +267,7 @@ export default function VideoShoppableSection() {
               {/* Tab 2: LiveGood 會員訂閱與 AI 自動化協播 */}
               <button
                 type="button"
-                onClick={() => setActiveServiceTab('livegood')}
+                onClick={() => handleSelectTab('livegood')}
                 className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
                   activeServiceTab === 'livegood'
                     ? 'bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-amber-400 shadow-[0_0_25px_rgba(168,85,247,0.4)]'
@@ -260,7 +307,7 @@ export default function VideoShoppableSection() {
               {/* Tab 3: AI尋客365天攏免錢 ($660 全包辦) */}
               <button
                 type="button"
-                onClick={() => setActiveServiceTab('free365')}
+                onClick={() => handleSelectTab('free365')}
                 className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
                   activeServiceTab === 'free365'
                     ? 'bg-gradient-to-r from-emerald-900/95 to-teal-900/95 border-emerald-400 shadow-[0_0_25px_rgba(20,184,166,0.45)]'
@@ -851,7 +898,38 @@ export default function VideoShoppableSection() {
 
         {/* 服務 02：AI 點子變現商隊 - LiveGood 會員訂閱與 AI 自動化協播 (保留原 HTML 架構・含 $139.95 自行處理 / $180 專人協辦 & 6 國語系 10 步驟註冊指南) */}
         {activeServiceTab === 'livegood' && (
-          <div className="p-4 md:p-8 bg-slate-100">
+          <div id="livegood" className="p-4 md:p-8 bg-slate-100 scroll-mt-24">
+            {/* 02 專屬廣告指向網址工具列 (直達複製) */}
+            <div className="max-w-4xl mx-auto mb-6 p-4 bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 rounded-2xl border border-amber-400/80 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl sm:text-3xl">⚡</span>
+                <div>
+                  <div className="text-xs sm:text-sm font-black text-amber-300 flex items-center gap-2">
+                    <span>【客製與協辦 02】LiveGood × AI 協播 專屬廣告指向網址</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/40">可直接轉址</span>
+                  </div>
+                  <div className="text-xs text-sky-200 font-mono mt-0.5 select-all break-all">
+                    https://nft1314.party/#video-shoppable-service?tab=livegood
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = 'https://nft1314.party/#video-shoppable-service?tab=livegood';
+                  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                    navigator.clipboard.writeText(url).catch(() => {});
+                  }
+                  setCopyToast('✅ 已複製「02 協播專案」專屬廣告直達網址！可直接貼在短網址、廣告轉址或各社群。');
+                  setTimeout(() => setCopyToast(null), 4000);
+                }}
+                className="w-full sm:w-auto px-4 py-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <span>📋</span>
+                <span>點擊複製此區塊轉址</span>
+              </button>
+            </div>
+
             <div
               ref={livegoodContainerRef}
               className="w-full"
