@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { useLanguage, Lang } from '@/lib/LanguageContext';
 import BuyNFTButton from './BuyNFTButton';
 import PayUniButton from './PayUniButton';
+import PayPalButton from './PayPalButton';
 import { BIGMONEY_PROMO_HTML_ZH, BIGMONEY_PROMO_HTML_EN } from '@/lib/bigmoneyPromoHtml';
 import { SAAS_AVME_PROMO_HTML_ZH, SAAS_AVME_PROMO_HTML_EN } from '@/lib/saasAvmePromoHtml';
 
@@ -602,6 +603,12 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
 
             <div className="flex flex-col gap-3">
               <PayUniButton
+                packageId={selectedCourse.id}
+                priceInUSDT={selectedCourse.price}
+                productType="DIRECT_COURSE"
+                productName={isChinese ? selectedCourse.name_zh : (selectedCourse.name_en || selectedCourse.name_zh)}
+              />
+              <PayPalButton
                 packageId={selectedCourse.id}
                 priceInUSDT={selectedCourse.price}
                 productType="DIRECT_COURSE"

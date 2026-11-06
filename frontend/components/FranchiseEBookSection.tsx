@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { GLOBAL_BANNED_BOOK_CATEGORIES } from '@/lib/ebookEngine';
 import PayUniButton from '@/components/PayUniButton';
+import PayPalButton from '@/components/PayPalButton';
 
 export default function FranchiseEBookSection() {
   const { lang } = useLanguage();
@@ -844,6 +845,12 @@ export default function FranchiseEBookSection() {
             ) : (
               <div className="space-y-4">
                 <PayUniButton
+                  packageId={990}
+                  priceInUSDT={planPrice}
+                  productType="NFT_REDEEM"
+                  productName={getPlanName(checkoutPlan)}
+                />
+                <PayPalButton
                   packageId={990}
                   priceInUSDT={planPrice}
                   productType="NFT_REDEEM"

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
+import PayPalButton from '@/components/PayPalButton';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 
@@ -201,6 +202,13 @@ export default function SponsorPage() {
                 </div>
 
                 <PayUniButton 
+                  packageId={selectedPackage.id}
+                  priceInUSDT={selectedPackage.price}
+                  productType="SPONSOR"
+                  productName={lang === 'zh-TW' ? selectedPackage.name_zh : selectedPackage.name_en}
+                />
+
+                <PayPalButton 
                   packageId={selectedPackage.id}
                   priceInUSDT={selectedPackage.price}
                   productType="SPONSOR"

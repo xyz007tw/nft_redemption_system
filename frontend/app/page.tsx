@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import BuyNFTButton from '@/components/BuyNFTButton';
 import PayUniButton from '@/components/PayUniButton';
+import PayPalButton from '@/components/PayPalButton';
 import TutorCourseSection from '@/components/TutorCourseSection';
 import VideoShoppableSection from '@/components/VideoShoppableSection';
 import FranchiseEBookSection from '@/components/FranchiseEBookSection';
@@ -612,6 +613,13 @@ export default function Home() {
                   {t.payCard}
                 </div>
               </div>
+
+              <PayPalButton 
+                packageId={selectedPackage.id}
+                priceInUSDT={selectedPackage.price}
+                productType={selectedPackage.product_type || 'NFT_REDEEM'}
+                productName={getPkgName(selectedPackage)}
+              />
             </div>
             
             <p className="text-xs text-center text-gray-500 mt-6">

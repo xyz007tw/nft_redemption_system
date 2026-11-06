@@ -6,6 +6,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { EBookProject, generateStandaloneEBookHTML, getEBookLocalizedContent } from '@/lib/ebookEngine';
 import PayUniButton from '@/components/PayUniButton';
+import PayPalButton from '@/components/PayPalButton';
 
 export default function ReaderEBookStorePage() {
   const { lang } = useLanguage();
@@ -369,6 +370,12 @@ export default function ReaderEBookStorePage() {
 
                 <div className="space-y-3">
                   <PayUniButton
+                    packageId={991}
+                    priceInUSDT={selectedBook.price_single_usdt}
+                    productType="DIRECT_COURSE"
+                    productName={`電子書單本買斷：${selectedLocalized.title}`}
+                  />
+                  <PayPalButton
                     packageId={991}
                     priceInUSDT={selectedBook.price_single_usdt}
                     productType="DIRECT_COURSE"
