@@ -29,13 +29,13 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const fallbackCourses = [
     {
       id: 101,
-      name_zh: '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
-      name_en: 'Course 01 | BIGMONEY.AI · AI Master Practical Materials (Incl. 2 NFTs)',
-      amount: 2,
-      price: 198,
-      discount_text: isChinese ? '🔥 贈微享NFT 2枚 (360天系統)＋享 25% 推廣分潤' : '🔥 Bonus 2 NFTs (360d) · 25% Affiliate Eligible',
+      name_zh: '教材 01｜20年首席架構師 · AI-ATM 自動商業變現大師班',
+      name_en: 'Course 01 | 20-Year Chief Architect · AI-ATM Commercial Monetization Masterclass',
+      amount: 1,
+      price: 39,
+      discount_text: isChinese ? '🔥 20年老兵底層思維・現省$260・享25%分潤' : '🔥 20y Chief Architect · Save $260 · 25% Affiliate',
       product_type: 'DIRECT_COURSE',
-      course_link: '',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_101_ai_atm.pdf',
       promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
       promo_html_en: BIGMONEY_PROMO_HTML_EN
     },
@@ -44,12 +44,120 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
       name_zh: '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊',
       name_en: 'Course 02 | SaaS-AVME 3.0 Dual-Engine AI Short Video Master Manual',
       amount: 1,
-      price: 99,
-      discount_text: isChinese ? '⚡ 開口即成片・雙引擎無頭渲染＋享 25% 推廣分潤' : '⚡ Speak It into Video · 25% Affiliate Eligible',
+      price: 39,
+      discount_text: isChinese ? '⚡ 開口即成片・雙引擎無頭渲染・享25%分潤' : '⚡ Speak It into Video · Save $160 · 25% Affiliate',
       product_type: 'DIRECT_COURSE',
-      course_link: '',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_102_saas_avme.pdf',
       promo_html_zh: SAAS_AVME_PROMO_HTML_ZH,
       promo_html_en: SAAS_AVME_PROMO_HTML_EN
+    },
+    {
+      id: 103,
+      name_zh: '教材 03｜WordPress 多語系自動化 SEO 站群變現術',
+      name_en: 'Course 03 | WordPress Multilingual Automated SEO Network Monetization',
+      amount: 1,
+      price: 39,
+      discount_text: isChinese ? '🌐 12站被動長尾流量・自動造血・享25%分潤' : '🌐 12-Site SEO Network · Save $160 · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_103_wp_seo.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 104,
+      name_zh: '教材 04｜24H 零人工看守：AI Agent 智慧客服搭建與 RAG 實戰',
+      name_en: 'Course 04 | 24/7 Zero-Staff AI Agent Support & Enterprise RAG Masterclass',
+      amount: 1,
+      price: 49,
+      discount_text: isChinese ? '🤖 私有知識庫・多語系自適應・享25%分潤' : '🤖 RAG Knowledge Base · Save $250 · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_104_ai_agent.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 105,
+      name_zh: '教材 05｜25% 聯盟裂變與全球金流自動交付系統深度解密',
+      name_en: 'Course 05 | 25% Viral Affiliate Engine & Global Automated Payment Architecture',
+      amount: 1,
+      price: 59,
+      discount_text: isChinese ? '💰 10%級差+10%對等+5%全球分紅・享25%分潤' : '💰 25% Viral Commission System · Save $340',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_105_affiliate_25.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 106,
+      name_zh: '教材 06｜全球電子書自動交付與 100% 倒抵 SaaS 系統架構',
+      name_en: 'Course 06 | Global EBook Automated Delivery & 100% Offset SaaS Architecture',
+      amount: 1,
+      price: 49,
+      discount_text: isChinese ? '📖 數位資產SaaS・秒級交付・享25%分潤' : '📖 Digital Asset SaaS · Save $250 · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_106_ebook_saas.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 107,
+      name_zh: '教材 07｜LINE 貼圖 AI 批量生圖與全自動裁切上架實戰',
+      name_en: 'Course 07 | LINE Sticker AI Batch Generation & Automated Publishing Masterclass',
+      amount: 1,
+      price: 29,
+      discount_text: isChinese ? '🎨 圖文輕創業・小白即學即用・享25%分潤' : '🎨 Graphic Creative Moat · Save $70 · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_107_line_sticker.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 108,
+      name_zh: '教材 08｜LiveGood 智能協辦與 AI 協播自動化系統',
+      name_en: 'Course 08 | LiveGood Smart Copilot & Automated AI Broadcasting Matrix',
+      amount: 1,
+      price: 39,
+      discount_text: isChinese ? '⚡ 國際訂閱制漏斗・自動協播・享25%分潤' : '⚡ Global Subscription Funnel · Save $160',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_108_livegood_ai.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 109,
+      name_zh: '教材 09｜零成本獲客：AI 尋客 365 天自動拓客實操指南',
+      name_en: 'Course 09 | Zero-Cost Traffic Moat: 365-Day AI Automated Prospecting Manual',
+      amount: 1,
+      price: 29,
+      discount_text: isChinese ? '🔍 爬蟲熱門採集・去重造血・享25%分潤' : '🔍 365-Day AI Prospecting · Save $100 · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_109_ai_traffic.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 110,
+      name_zh: '教材 10｜Web3 NFT 數位憑證與智能合約商務賦能大師手冊',
+      name_en: 'Course 10 | Web3 NFT Certificate & Smart Contract Business Empowerment Manual',
+      amount: 1,
+      price: 59,
+      discount_text: isChinese ? '💎 虛實整合・錢包免簽・享25%分潤' : '💎 Web3 NFT Smart Contract Moat · Save $340',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/wp-content/uploads/ebooks/material_110_web3_nft.pdf',
+      promo_html_zh: '',
+      promo_html_en: ''
+    },
+    {
+      id: 100,
+      name_zh: '🏆 全套 10 門課 VIP 終身旗艦合輯（贈 2 枚微享 NFT 憑證）',
+      name_en: 'VIP 100 | Complete 10-Course Master Bundle (Incl. 2 Weixiang NFTs)',
+      amount: 2,
+      price: 198,
+      discount_text: isChinese ? '👑 現省$232・贈2枚NFT(360天權限)＋享25%分潤' : '👑 Save $232 · Incl. 2 NFTs · 25% Affiliate',
+      product_type: 'DIRECT_COURSE',
+      course_link: 'https://vip.5208.uk/courses/all-master-bundle',
+      promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
+      promo_html_en: BIGMONEY_PROMO_HTML_EN
     }
   ];
 
@@ -58,46 +166,137 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const selectedCourse = displayCourses.find(c => c.id === selectedCourseId) || displayCourses[0];
   const selectedCourseIndex = displayCourses.findIndex(c => c.id === selectedCourse.id);
 
-  // AI頂配教材大綱導覽卡片 (AI Master Materials Showcase)
+  // AI頂配教材大綱導覽卡片 (AI Master Materials Showcase - 10 Modules)
   const curriculumModules = [
     {
-      badge: isChinese ? 'AI頂配教材 01' : 'Master Material 01',
-      icon: '🎬',
-      title: isChinese ? 'AI 短影音與爆款圖卡全自動產線' : 'Automated AI Short Video & Viral Infographic Pipeline',
+      badge: isChinese ? '教材 01 · 旗艦架構' : 'Master 01 · Flagship Architecture',
+      icon: '👑',
+      title: isChinese ? '20年首席架構師 · AI-ATM 自動商業變現' : '20-Year Chief Architect · AI-ATM Commercial Monetization',
       desc: isChinese
-        ? '手把手拆解如何運用 AI 腳本生成、多語系配音與高轉化資訊圖表，一鍵打造日產百支跨國短影音的流量印鈔機。'
-        : 'Step-by-step guide to building an automated AI video, voiceover, and viral infographic production matrix.',
+        ? '徹底告別「1份時間賣1次」的傳統思維！結合短影音衝刺、WP-SEO馬拉松長跑與25%人脈裂變三軌流量，在全世界開幾十台24H無人自動販賣機。'
+        : 'Break free from trading time for money. Leverage triple-track traffic (Shorts + SEO + 25% Affiliate) to build global automated money machines.',
       points: isChinese
-        ? ['✓ 零剪輯基礎也能 24H 自動產片', '✓ 跨平台自動排程發佈實戰', '✓ 專屬 QR Code 導流私域秘笈']
-        : ['✓ Zero editing skills required', '✓ Multi-platform auto-publishing', '✓ High-converting QR funnel setup'],
+        ? ['✓ 三軌流量引擎協同打法', '✓ 平行時間擴展多重被動收入', '✓ 20年工程實戰系統閉環思維']
+        : ['✓ Triple-track traffic engine', '✓ Parallel multi-income expansion', '✓ 20y veteran architectural loop'],
+      color: 'from-amber-500 to-yellow-600',
+      border: 'hover:border-amber-400/60'
+    },
+    {
+      badge: isChinese ? '教材 02 · 影音產線' : 'Master 02 · Video Automation',
+      icon: '🎬',
+      title: isChinese ? 'SaaS-AVME 3.0 雙引擎 AI 短影音自動化' : 'SaaS-AVME 3.0 Dual-Engine AI Short Video Matrix',
+      desc: isChinese
+        ? '手把手拆解 Remotion 代碼級無頭渲染＋開口即成片產線，打造日產百支跨國高品質短影音的超級印鈔機。'
+        : 'Headless Remotion rendering + instant AI voiceover to mass-produce 100+ high-converting short videos daily.',
+      points: isChinese
+        ? ['✓ 零剪輯基礎 24H 自動出片', '✓ 多語系 AI 語音配音與字幕自動合成', '✓ 專屬 QR 導流高轉化漏斗']
+        : ['✓ Zero editing skills required', '✓ Multilingual AI dubbing & auto-subtitles', '✓ High-converting QR funnel setup'],
       color: 'from-emerald-500 to-teal-600',
       border: 'hover:border-emerald-400/60'
     },
     {
-      badge: isChinese ? 'AI頂配教材 02' : 'Master Material 02',
+      badge: isChinese ? '教材 03 · 站群長跑' : 'Master 03 · SEO Matrix',
       icon: '🌐',
-      title: isChinese ? '全球多語系 SEO 矩陣與精準截流' : 'Global Multilingual SEO Matrix & Traffic Capture',
+      title: isChinese ? 'WordPress 多語系自動化 SEO 站群變現術' : 'WordPress Multilingual Automated SEO Network',
       desc: isChinese
-        ? '掌握 AI 雙大腦自動化長文造血技術，自動翻譯並佈署中、英、日、韓、越等多國語系網站，精準收割全球搜尋引擎自然流量。'
-        : 'Master dual-brain AI long-form SEO generation across 6+ languages to dominate global search engine traffic.',
+        ? 'AI 雙大腦自動化造血，自動抓取趨勢熱門話題、去重、翻譯並自動發布至 12 個獨立站台，卡位 Google 長尾自然流量。'
+        : 'Dual-brain AI trend harvesting, deduplication, translation, and automated publishing across 12 independent WP sites.',
       points: isChinese
-        ? ['✓ 熱門趨勢話題自動抓取與去重', '✓ WordPress 全自動發文串接', '✓ 打造被動搜尋流量護城河']
-        : ['✓ Automated trend harvesting', '✓ Seamless WordPress integration', '✓ Evergreen organic search moat'],
+        ? ['✓ 熱門話題自動採集與造血去重', '✓ 中/英/日多語系站群全自動發布', '✓ 建立被動搜尋流量護城河']
+        : ['✓ Automated trend scraping & deduplication', '✓ Multilingual automated publishing', '✓ Evergreen organic search moat'],
       color: 'from-cyan-500 to-blue-600',
       border: 'hover:border-cyan-400/60'
     },
     {
-      badge: isChinese ? 'AI頂配教材 03' : 'Master Material 03',
-      icon: '💎',
-      title: isChinese ? 'Web2 刷卡 + Web3 錢包自動收單與 25% 裂變' : 'Web2 + Web3 Auto-Checkout & 25% Viral Affiliate System',
+      badge: isChinese ? '教材 04 · 智慧客服' : 'Master 04 · AI Agent Support',
+      icon: '🤖',
+      title: isChinese ? '24H 零人工看守：AI Agent 智慧客服與 RAG' : '24/7 Zero-Staff AI Agent Support & RAG Engine',
       desc: isChinese
-        ? '完整收錄如何將您的知識產品、電子書或服務結合自動發貨系統與 25% 聯盟分潤機制，讓全球學員成為您的自動推廣大軍！'
-        : 'Complete blueprint on combining digital products with automated fulfillment and a 25% viral affiliate engine.',
+        ? '將您的產品知識庫、常見問題、分潤規則寫入私有向量資料庫，打造跨時區、跨語系、秒級回應且主動促成轉化的 AI 員工。'
+        : 'Embed knowledge bases into private vector stores to deploy 24/7 multilingual sales and support agents that convert.',
       points: isChinese
-        ? ['✓ 信用卡與 USDT 雙軌收款實戰', '✓ 24H AI 智能客服自動成交配置', '✓ 10%級差 + 10%對等 + 5%分紅解析']
-        : ['✓ Credit Card & USDT dual checkout', '✓ 24/7 AI sales agent configuration', '✓ 25% affiliate viral loop blueprint'],
+        ? ['✓ 私有 RAG 檢索增強生成架構', '✓ 智能巡檢與最優 CP 值模型容錯', '✓ 跨時區 24H 自動促單成交']
+        : ['✓ Private RAG retrieval architecture', '✓ Model auto-patrol & fallback sequence', '✓ 24/7 automated closing & conversion'],
+      color: 'from-purple-500 to-indigo-600',
+      border: 'hover:border-purple-400/60'
+    },
+    {
+      badge: isChinese ? '教材 05 · 裂變金流' : 'Master 05 · Viral Affiliate',
+      icon: '💰',
+      title: isChinese ? '25% 聯盟裂變與全球金流自動交付系統' : '25% Viral Affiliate Engine & Global Payments',
+      desc: isChinese
+        ? '10% 級差 + 10% 對等 + 5% 全球分紅裂變協議！結合信用卡、PayPal、銀聯與 USDT 雙軌收款，實現無人看守秒級分潤。'
+        : '10% Tier + 10% Matching + 5% Global Pool viral model. Integrated fiat, PayPal, UnionPay, and Web3 crypto auto-payouts.',
+      points: isChinese
+        ? ['✓ 信用卡、PayPal、銀聯與 USDT 雙軌收單', '✓ 智能推薦鏈路與非推廣者訪客自動歸戶', '✓ 25% 聯盟分潤全自動結算合約']
+        : ['✓ Fiat, PayPal, UnionPay & Web3 crypto payments', '✓ Organic visitor top-tier auto-bind', '✓ 100% automated 25% commission payout'],
       color: 'from-amber-500 to-orange-600',
       border: 'hover:border-amber-400/60'
+    },
+    {
+      badge: isChinese ? '教材 06 · 電子書 SaaS' : 'Master 06 · EBook SaaS',
+      icon: '📖',
+      title: isChinese ? '全球電子書自動交付與 100% 倒抵 SaaS' : 'Global EBook Automated Delivery & 100% Offset SaaS',
+      desc: isChinese
+        ? '為全球知識創作者打造的無人看守 SaaS！一次性加盟費 100% 倒抵平台抽成，學員付款後秒級自動發送專屬加密閱讀連結。'
+        : 'Zero-touch SaaS for digital authors: 100% setup fee offset against commissions with automated instant reader delivery.',
+      points: isChinese
+        ? ['✓ $990 加盟 100% 倒抵零風險機制', '✓ 專屬 Cloudflare R2 加密閱讀與下載', '✓ 中/英/日多語系自選雙語生成']
+        : ['✓ 100% offset risk-free SaaS model', '✓ Dedicated R2 secure reading & download', '✓ Dual-language automatic compilation'],
+      color: 'from-pink-500 to-rose-600',
+      border: 'hover:border-pink-400/60'
+    },
+    {
+      badge: isChinese ? '教材 07 · 輕量副業' : 'Master 07 · Graphic Creative',
+      icon: '🎨',
+      title: isChinese ? 'LINE 貼圖 AI 批量生圖與全自動裁切上架' : 'LINE Sticker AI Batch Generation & Publishing',
+      desc: isChinese
+        ? '運用 AI 批量產出高辨識度原創角色，配合自動化批次裁剪、打包與格式轉換腳本，快速攻佔 LINE 貼圖文創被動收入市場。'
+        : 'Leverage generative AI to create viral IP characters with automated cropping, resizing, and one-click store packaging.',
+      points: isChinese
+        ? ['✓ 提示詞工程打造專屬角色 IP', '✓ Python 自動裁切合規尺寸與透明底', '✓ 快速上架搶佔文創被動分潤']
+        : ['✓ IP prompt engineering blueprint', '✓ Auto-cropping & transparency processing', '✓ Instant submission to LINE store'],
+      color: 'from-green-500 to-emerald-600',
+      border: 'hover:border-green-400/60'
+    },
+    {
+      badge: isChinese ? '教材 08 · 跨國協銷' : 'Master 08 · LiveGood Automation',
+      icon: '⚡',
+      title: isChinese ? 'LiveGood 智能協辦與 AI 協播自動化' : 'LiveGood Smart Copilot & Automated Broadcasting',
+      desc: isChinese
+        ? '專為國際訂閱制直銷量身打造的自動化協辦系統，AI 自動協播、多語系解說並自動鎖定推薦人，打造全球化拓展利器。'
+        : 'Automated broadcasting, multilingual landing pages, and lead locking tailored for global subscription funnels.',
+      points: isChinese
+        ? ['✓ 國際訂閱制漏斗設計與自動追蹤', '✓ 多國語言 AI 影音即時解說', '✓ 自動綁定推薦碼與無漏單分潤']
+        : ['✓ Global subscription funnel setup', '✓ Multilingual AI video presentations', '✓ Referral tracking & lead capture'],
+      color: 'from-teal-500 to-cyan-600',
+      border: 'hover:border-teal-400/60'
+    },
+    {
+      badge: isChinese ? '教材 09 · 流量造血' : 'Master 09 · 365 Traffic Moat',
+      icon: '🔍',
+      title: isChinese ? '零成本獲客：AI 尋客 365 天自動拓客' : 'Zero-Cost Traffic: 365-Day AI Prospecting Moat',
+      desc: isChinese
+        ? '告別昂貴付費廣告！運用自動化找題爬蟲與趨勢雷達，365 天源源不絕製造精準潛在客戶感興趣的解決方案內容。'
+        : 'Say goodbye to expensive ads! Deploy automated trend spiders to generate customer-attracting content 365 days a year.',
+      points: isChinese
+        ? ['✓ 趨勢話題自動監控與庫存補水', '✓ 零歷史依賴動態去重產線', '✓ $0 獲取高精準高轉化商業客戶']
+        : ['✓ Trend radar & auto-replenishment', '✓ Zero-history deduplication engine', '✓ $0 cost for high-intent B2B/B2C leads'],
+      color: 'from-sky-500 to-blue-600',
+      border: 'hover:border-sky-400/60'
+    },
+    {
+      badge: isChinese ? '教材 10 · 數位資產' : 'Master 10 · Web3 Smart Contract',
+      icon: '💎',
+      title: isChinese ? 'Web3 NFT 數位憑證與智能合約商務賦能' : 'Web3 NFT Certificate & Smart Contract Moat',
+      desc: isChinese
+        ? '鏈上不可篡改的數位會員證！結合 ERC-721/1155 智能合約，實現錢包免簽名身分認證、秒級收益提領與虛實權益兌換。'
+        : 'Immutable on-chain membership passes. Deploy smart contracts for signature-free auth, instant payouts, and asset redemption.',
+      points: isChinese
+        ? ['✓ ERC-721 智能合約商務客製', '✓ Web3 錢包免註冊一鍵授權開課', '✓ 鏈上永久版權與防偽憑證']
+        : ['✓ ERC-721 custom smart contracts', '✓ Web3 wallet 1-click authentication', '✓ Permanent on-chain IP & proof of ownership'],
+      color: 'from-violet-500 to-purple-600',
+      border: 'hover:border-violet-400/60'
     }
   ];
 
