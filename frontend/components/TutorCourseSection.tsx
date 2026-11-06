@@ -305,6 +305,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
   const [targetEmail, setTargetEmail] = useState('');
   const [isForwarding, setIsForwarding] = useState(false);
   const [unlockedLink, setUnlockedLink] = useState<string | null>(null);
+  const [downloadLinks, setDownloadLinks] = useState<any | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleForwardAndUnlock = async () => {
@@ -332,11 +333,12 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
       const data = await res.json();
       if (data.success) {
         setUnlockedLink(data.courseLink);
+        if (data.downloadLinks) setDownloadLinks(data.downloadLinks);
         setStatusMsg({
           type: 'success',
           text: isChinese
-            ? `✅ 驗證成功！AI頂配教材連結已轉發至 ${targetEmail}，您也可以直接點擊下方按鈕下載！`
-            : `✅ Verified! AI Master Material link forwarded to ${targetEmail}, and unlocked below!`
+            ? `✅ 驗證成功！各語系教材與下載連結已發送至 ${targetEmail}，您也可以直接在下方點選各語系版本下載！`
+            : `✅ Verified! Multi-language material links forwarded to ${targetEmail}, and unlocked below!`
         });
       } else {
         setStatusMsg({

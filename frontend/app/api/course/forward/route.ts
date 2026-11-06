@@ -131,6 +131,17 @@ export async function POST(req: Request) {
       }
     }
 
+    const effectiveId = packageId ? Number(packageId) : 101;
+    const downloadLinks = {
+      primary: courseLink,
+      zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_tw.pdf`,
+      zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_cn.pdf`,
+      en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_en.pdf`,
+      ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_ja.pdf`,
+      code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_source_code.zip`,
+      interactive_html: `https://1.5208.uk/ebooks/material_${effectiveId}/master_bilingual.html`
+    };
+
     // 3. Send email if SMTP credentials are configured
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       const transporter = nodemailer.createTransport({
@@ -144,24 +155,31 @@ export async function POST(req: Request) {
       await transporter.sendMail({
         from: `"WeiXiang AI 學院" <${process.env.EMAIL_USER}>`,
         to: targetEmail.trim(),
-        subject: `🎓 【WeiXiang AI】學員轉發：${courseName} 下載與觀看連結`,
+        subject: `🎓 【WeiXiang AI】學員專屬多語系教材發貨：${courseName}`,
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
-            <h2 style="color: #111827;">🎓 歡迎學習：${courseName}</h2>
-            <p style="color: #374151; line-height: 1.6;">
-              您好！您的親友或團隊夥伴（${buyerEmail || walletAddress}）已將微享 <strong>「${courseName}」</strong> 頂配家教課程教材轉發給您。
+          <div style="font-family: sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background: #ffffff;">
+            <h2 style="color: #111827; margin-bottom: 8px;">🎓 歡迎學習：${courseName}</h2>
+            <p style="color: #4b5563; font-size: 14px; line-height: 1.6;">
+              您好！您或您的團隊夥伴（${buyerEmail || walletAddress}）已成功解鎖微享 <strong>「${courseName}」</strong> 頂配實戰教材！
             </p>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0;">
+              <h4 style="margin: 0 0 12px; color: #0f172a; font-size: 15px;">📥 多語系電子書與隨堂資產下載專區：</h4>
+              <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+                <li>🇹🇼 <a href="${downloadLinks.zh_tw}" style="color: #0284c7; text-decoration: none; font-weight: bold;">繁體中文版 PDF 下載</a></li>
+                <li>🇨🇳 <a href="${downloadLinks.zh_cn}" style="color: #0284c7; text-decoration: none; font-weight: bold;">简体中文版 PDF 下载</a></li>
+                <li>🇺🇸 <a href="${downloadLinks.en}" style="color: #0284c7; text-decoration: none; font-weight: bold;">English Edition PDF Download</a></li>
+                <li>🇯🇵 <a href="${downloadLinks.ja}" style="color: #0284c7; text-decoration: none; font-weight: bold;">日本語版 PDF ダウンロード</a></li>
+                <li>🌐 <a href="${downloadLinks.interactive_html}" style="color: #059669; text-decoration: none; font-weight: bold;">在線雙語互動閱讀器 (R2 邊緣高速)</a></li>
+                <li>💻 <a href="${downloadLinks.code_zip}" style="color: #7c3aed; text-decoration: none; font-weight: bold;">實戰代碼與 Prompt 完整資產包 (.zip)</a></li>
+              </ul>
+            </div>
             <div style="margin: 28px 0; text-align: center;">
               <a href="${courseLink}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #10b981, #06b6d4); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px;">
-                📥 立即下載 / 觀看家教課程教材
+                🚀 立即進入 VIP 實戰學員教室
               </a>
             </div>
-            <p style="color: #6b7280; font-size: 13px;">
-              若按鈕無法點擊，請複製以下網址至瀏覽器開啟：<br/>
-              <a href="${courseLink}" style="color: #2563eb;">${courseLink}</a>
-            </p>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-            <p style="color: #9ca3af; font-size: 12px;">WeiXiang AI 自動來客系統團隊 敬上</p>
+            <p style="color: #9ca3af; font-size: 12px;">WeiXiang AI 自動來客系統團隊 · 24H 自動化發貨引擎</p>
           </div>
         `
       });
@@ -171,7 +189,8 @@ export async function POST(req: Request) {
       success: true,
       courseName,
       courseLink,
-      message: `課程教材已成功發送至 ${targetEmail}！`
+      downloadLinks,
+      message: `課程教材已成功發送至 ${targetEmail}！各語系版本已同步就緒。`
     });
   } catch (error: any) {
     console.error('Course forward error:', error);
