@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { decryptTradeInfo, generateTradeSha } from '@/lib/payuni';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail } from '@/lib/vipEnroll';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -157,17 +158,22 @@ export async function POST(req: Request) {
           <p>微享 AI 團隊 敬上</p>
       `;
 
+      let clientEmailHandled = false;
       if (pkgData?.product_type === 'DIRECT_COURSE') {
-        emailSubject = "🎓 【WeiXiang AI】您的 AI頂配教材 已開通！";
-        emailHtml = `
-          <h2>親愛的學員，恭喜您成功購買「${pkgData.name_zh || 'AI頂配教材'}」！</h2>
-          <p>您的付款已確認完畢。請點擊下方連結下載/觀看您的專屬 AI頂配教材：</p>
-          <br/>
-          <a href="${pkgData.course_link || '#'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即下載 / 觀看 AI頂配教材</a>
-          <br/><br/>
-          <p>（此連結為您的專屬教材，您亦可隨時回到首頁「AI頂配教材導覽專區」輸入購買信箱一鍵轉發電郵。）</p>
-          <p>微享 AI 團隊 敬上</p>
-        `;
+        try {
+          const enrollResult = await autoEnrollVipStudent(email, Number(packageId), tradeKey);
+          await sendVipCourseWelcomeEmail({
+            email,
+            pkgId: Number(packageId),
+            txnId: tradeKey,
+            magicLoginUrl: enrollResult.magic_login_url,
+            courseName: pkgData.name_zh,
+            priceUsdt: packagePriceUSDT
+          });
+          clientEmailHandled = true;
+        } catch (enrollErr) {
+          console.error('[PayUni Callback] Error in VIP auto-enroll:', enrollErr);
+        }
       } else if (pkgData?.product_type === 'SPONSOR') {
         emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
         emailHtml = `
@@ -193,12 +199,15 @@ export async function POST(req: Request) {
           ? '💖 【新訂單・斗內贊助】'
           : '🚀 【新訂單・眾籌憑證】';
 
-      const mailToClient = {
-        from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: emailSubject,
-        html: emailHtml
-      };
+      if (!clientEmailHandled) {
+        const mailToClient = {
+          from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: emailSubject,
+          html: emailHtml
+        };
+        await transporter.sendMail(mailToClient);
+      }
 
       const adminToList = Array.from(
         new Set(['xyz007tw@gmail.com', process.env.ADMIN_EMAIL, process.env.EMAIL_USER].filter(Boolean))
@@ -244,10 +253,9 @@ export async function POST(req: Request) {
       };
 
       try {
-        await transporter.sendMail(mailToClient);
         await transporter.sendMail(mailToAdmin);
       } catch (e) {
-        console.error('Callback email failed', e);
+        console.error('Callback admin email failed', e);
       }
     }
 

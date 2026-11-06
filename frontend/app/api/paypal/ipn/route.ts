@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import { isPaymentDuplicate, acquirePaymentLock, releasePaymentLock, markPaymentProcessed } from '@/lib/idempotency';
 import { PAYPAL_RECEIVER_EMAIL } from '@/components/PayPalButton';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail } from '@/lib/vipEnroll';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,56 +107,23 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. Automated Material Delivery Email
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS && email.includes('@')) {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+    // 3. Automated VIP Course Enrollment & Email Delivery
+    if (email && email.includes('@')) {
+      try {
+        console.log(`[PayPal IPN] Auto enrolling user ${email} into package ${pkgNumericId}...`);
+        const enrollResult = await autoEnrollVipStudent(email, pkgNumericId, txnId);
+        console.log(`[PayPal IPN] Auto enroll result:`, enrollResult);
 
-      const downloadLinks = {
-        zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgNumericId}_zh_tw.pdf`,
-        zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgNumericId}_zh_cn.pdf`,
-        en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgNumericId}_en.pdf`,
-        ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgNumericId}_ja.pdf`,
-        code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgNumericId}_source_code.zip`,
-        interactive_html: `https://1.5208.uk/ebooks/material_${pkgNumericId}/master_bilingual.html`
-      };
-
-      await transporter.sendMail({
-        from: `"WeiXiang AI 學院" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: `🎉 【WeiXiang AI】PayPal 付款成功！教材與學員權限已開通`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background: #ffffff;">
-            <h2 style="color: #111827; margin-bottom: 8px;">🎉 感謝您的購買！PayPal 款項已確認收訖</h2>
-            <p style="color: #4b5563; font-size: 14px; line-height: 1.6;">
-              親愛的學員，恭喜您成功解鎖微享 <strong>AI頂配實戰教材 #${pkgNumericId}</strong>！
-            </p>
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0;">
-              <h4 style="margin: 0 0 12px; color: #0f172a; font-size: 15px;">📥 多語系教材與隨堂資產下載專區：</h4>
-              <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-                <li>🇹🇼 <a href="${downloadLinks.zh_tw}" style="color: #0284c7; text-decoration: none; font-weight: bold;">繁體中文版 PDF 下載</a></li>
-                <li>🇨🇳 <a href="${downloadLinks.zh_cn}" style="color: #0284c7; text-decoration: none; font-weight: bold;">简体中文版 PDF 下载</a></li>
-                <li>🇺🇸 <a href="${downloadLinks.en}" style="color: #0284c7; text-decoration: none; font-weight: bold;">English Edition PDF Download</a></li>
-                <li>🇯🇵 <a href="${downloadLinks.ja}" style="color: #0284c7; text-decoration: none; font-weight: bold;">日本語版 PDF ダウンロード</a></li>
-                <li>🌐 <a href="${downloadLinks.interactive_html}" style="color: #059669; text-decoration: none; font-weight: bold;">在線雙語互動閱讀器 (R2 邊緣高速)</a></li>
-                <li>💻 <a href="${downloadLinks.code_zip}" style="color: #7c3aed; text-decoration: none; font-weight: bold;">實戰代碼與 Prompt 完整資產包 (.zip)</a></li>
-              </ul>
-            </div>
-            <div style="margin: 28px 0; text-align: center;">
-              <a href="https://vip.5208.uk" style="display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #10b981, #06b6d4); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px;">
-                🚀 進入 VIP 家教學院 (vip.5208.uk)
-              </a>
-            </div>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-            <p style="color: #9ca3af; font-size: 12px;">交易序號: ${txnId} · PayPal 專屬收款引擎</p>
-          </div>
-        `
-      });
+        await sendVipCourseWelcomeEmail({
+          email,
+          pkgId: pkgNumericId,
+          txnId,
+          magicLoginUrl: enrollResult.magic_login_url,
+          priceUsdt
+        });
+      } catch (enrollErr) {
+        console.error('[PayPal IPN] Error in auto-enroll or welcome email:', enrollErr);
+      }
     }
 
     // 4. Mark payment processed & release lock
