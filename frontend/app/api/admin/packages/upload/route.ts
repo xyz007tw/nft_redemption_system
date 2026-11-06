@@ -4,6 +4,13 @@ import { putObjectToDedicatedR2 } from '@/lib/r2Storage';
 
 export async function POST(req: Request) {
   try {
+    // 🛡️ 後台管理 API 權限查核
+    const { verifyAdminRequest } = await import('@/lib/adminAuth');
+    const auth = await verifyAdminRequest(req);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.reason || 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { fileData, fileName, fileType, packageId } = body;
 

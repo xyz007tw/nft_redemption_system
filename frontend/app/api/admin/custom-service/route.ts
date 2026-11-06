@@ -50,8 +50,15 @@ function writeLocalCustomOrders(records: CustomServiceOrderRecord[]) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // 🛡️ 後台管理 API 權限查核
+    const { verifyAdminRequest } = await import('@/lib/adminAuth');
+    const auth = await verifyAdminRequest(req);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.reason || 'Unauthorized' }, { status: 401 });
+    }
+
     const { data: dbUsers } = await supabase
       .from('users')
       .select('*')
@@ -117,6 +124,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    // 🛡️ 後台管理 API 權限查核
+    const { verifyAdminRequest } = await import('@/lib/adminAuth');
+    const auth = await verifyAdminRequest(req);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.reason || 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const {
       clientIdentifier, // 客戶 Email 或 0x 錢包地址

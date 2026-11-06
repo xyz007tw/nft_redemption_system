@@ -25,9 +25,9 @@ export async function POST(req: Request) {
     // 嘗試從資料庫尋找使用者最後購買的商品 (如果是法幣會記錄，如果是 Web3 需要靠其他方式，這裡為了相容先讀取)
     const { data: userData } = await supabase
       .from('users')
-      .select('last_purchased_package')
+      .select('last_purchased_package, has_purchased, referrer_address')
       .eq('wallet_address', walletAddress)
-      .single();
+      .maybeSingle();
 
     let productType = 'NFT_REDEEM';
     let courseLink = '';
@@ -51,8 +51,15 @@ export async function POST(req: Request) {
       }
     }
 
-    // Process Affiliate logic and Database Update
-    const referrerAddress = await processAffiliateCommissions(walletAddress, refCode, pkgPrice, productType);
+    // 🔒 防重複入帳保護：若金流回呼 (PayUni) 或先前核銷已將 has_purchased 標記為 true，
+    // 嚴禁重複觸發 processAffiliateCommissions，防止二次分潤與業績暴衝！
+    let referrerAddress = userData?.referrer_address || '';
+    if (userData?.has_purchased) {
+      console.log(`[Redeem] 用戶 (${walletAddress}) 先前已於金流端完成入帳分潤，略過重複派發佣金。`);
+    } else {
+      // 首次 Web3 核銷或尚未計算分潤者，執行一次性 25% 聯盟分潤
+      referrerAddress = await processAffiliateCommissions(walletAddress, refCode, pkgPrice, productType);
+    }
 
     // ==========================================
     // Send Notification Emails (Nodemailer)

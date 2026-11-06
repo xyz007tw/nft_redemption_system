@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { getAdminHeaders } from '@/lib/adminClient';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -43,7 +44,9 @@ export default function UsersPage() {
 
   const loadUsersAndCustomOrders = async () => {
     try {
-      const apiRes = await fetch('/api/admin/custom-service');
+      const apiRes = await fetch('/api/admin/custom-service', {
+        headers: { ...getAdminHeaders() }
+      });
       const apiData = await apiRes.json();
       if (apiData.customServiceOrders) {
         setCustomOrders(apiData.customServiceOrders);
@@ -152,7 +155,7 @@ export default function UsersPage() {
     try {
       const res = await fetch('/api/admin/custom-service', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
         body: JSON.stringify({
           clientIdentifier: clientIdentifier.trim(),
           referrerCode: referrerCode.trim(),

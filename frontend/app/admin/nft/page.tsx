@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useWriteContract, useAccount } from 'wagmi';
 import { WEIXIANG_NFT_ABI, WEIXIANG_NFT_ADDRESS } from '@/lib/contractAbi';
 import { parseUnits } from 'viem';
+import { getAdminHeaders } from '@/lib/adminClient';
 
 import {
   BIGMONEY_PROMO_HTML_ZH as DEFAULT_PROMO_TEMPLATE_ZH,
@@ -67,7 +68,7 @@ export default function AdminNFTPage() {
 
       const res = await fetch('/api/admin/packages/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
         body: JSON.stringify({
           fileData,
           fileName: file.name,
@@ -140,7 +141,7 @@ export default function AdminNFTPage() {
 
       const res = await fetch('/api/admin/packages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
         body: JSON.stringify(payload)
       });
       const data = await res.json();

@@ -30,6 +30,22 @@ export async function POST(req: Request) {
       return new Response('OK', { status: 200 }); // Still return 200 so PayUni stops retrying
     }
 
+    // 🔒 防重複入帳與冪等性查核 (Idempotency Lock)
+    const { isPaymentDuplicate, acquirePaymentLock, releasePaymentLock, markPaymentProcessed } = await import('@/lib/idempotency');
+    const tradeKey = String(decryptedInfo.TradeNo || decryptedInfo.MerTradeNo || TradeSha || '').trim();
+    const merTradeNo = String(decryptedInfo.MerTradeNo || '').trim();
+    const tradeNo = String(decryptedInfo.TradeNo || '').trim();
+
+    if (await isPaymentDuplicate(tradeKey)) {
+      console.warn(`[PayUni Idempotency] 交易已於先前成功入帳 (TradeKey: ${tradeKey})，主動攔截重複派發佣金並回傳 200 OK。`);
+      return new Response('OK', { status: 200 });
+    }
+
+    if (!acquirePaymentLock(tradeKey)) {
+      console.warn(`[PayUni Idempotency] 交易正在併發處理中 (In-Flight: ${tradeKey})，防止競態條件回傳 200 OK。`);
+      return new Response('OK', { status: 200 });
+    }
+
     // Extract custom Web3 data we sent
     let walletAddress = decryptedInfo.CustomField1;
     const refCode = decryptedInfo.CustomField2;
@@ -95,6 +111,16 @@ export async function POST(req: Request) {
     
     // Process commissions, this also upserts the user with has_purchased: true
     await processAffiliateCommissions(walletAddress, refCode, packagePriceUSDT, pkgData?.product_type);
+
+    // 🔒 成功入帳標記：記錄交易號並寫入冪等性防重複鎖
+    await markPaymentProcessed({
+      tradeKey,
+      source: 'PAYUNI',
+      merTradeNo,
+      tradeNo,
+      amount: Number(decryptedInfo.TradeAmt || 0),
+      wallet: walletAddress
+    });
 
 
     // Update the user's last purchased package specifically for fiat tracking
@@ -229,6 +255,19 @@ export async function POST(req: Request) {
     return new Response('OK', { status: 200 });
   } catch (error) {
     console.error('PayUni Callback Error:', error);
+    try {
+      const { releasePaymentLock } = await import('@/lib/idempotency');
+      const formData = await req.clone().formData().catch(() => null);
+      if (formData) {
+        const tradeInfo = formData.get('TradeInfo') as string;
+        if (tradeInfo) {
+          const { decryptTradeInfo } = await import('@/lib/payuni');
+          const dec = decryptTradeInfo(tradeInfo);
+          const k = String(dec?.TradeNo || dec?.MerTradeNo || '').trim();
+          if (k) releasePaymentLock(k);
+        }
+      }
+    } catch {}
     return new Response('Server Error', { status: 500 });
   }
 }
