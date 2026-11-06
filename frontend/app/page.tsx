@@ -191,9 +191,20 @@ export default function Home() {
     fetchPackages();
   }, []);
 
-  const crowdfundPackages = packages.filter(p => !p.product_type || p.product_type === 'NFT_REDEEM');
-  const coursePackages = packages.filter(p => p.product_type === 'DIRECT_COURSE');
-  const displayCrowdfundPackages = crowdfundPackages.length > 0 ? crowdfundPackages : packages;
+  const isUserFacingPackage = (p: any) => {
+    if (!p) return false;
+    if (p.is_active === false) return false;
+    if (typeof p.id === 'number' && p.id >= 900000) return false;
+    if (typeof p.name_zh === 'string' && p.name_zh.startsWith('__')) return false;
+    if (typeof p.discount_text === 'string' && p.discount_text.includes('SYSTEM_')) return false;
+    if (typeof p.roi_text === 'string' && (p.roi_text.startsWith('__WX_') || p.roi_text.startsWith('__WXMETA__:'))) return false;
+    return true;
+  };
+
+  const visiblePackages = packages.filter(isUserFacingPackage);
+  const crowdfundPackages = visiblePackages.filter(p => !p.product_type || p.product_type === 'NFT_REDEEM');
+  const coursePackages = visiblePackages.filter(p => p.product_type === 'DIRECT_COURSE');
+  const displayCrowdfundPackages = crowdfundPackages.length > 0 ? crowdfundPackages : defaultPackages;
   const selectedPackage = displayCrowdfundPackages.find(p => p.id === selectedPackageId) || displayCrowdfundPackages[0];
 
   return (
@@ -542,7 +553,11 @@ export default function Home() {
                     <td className="p-6 font-mono text-xl">${pkg.price.toLocaleString()}</td>
                     <td className="p-6 font-mono text-gray-400">${(pkg.price / pkg.amount).toFixed(1)}</td>
                     <td className="p-6 text-green-400 font-bold">{getPkgDiscount(pkg)}</td>
-                    <td className="p-6 text-purple-400 font-bold">{pkg.roi_text || pkg.roi}</td>
+                    <td className="p-6 text-purple-400 font-bold">
+                      {typeof pkg.roi_text === 'string' && !pkg.roi_text.startsWith('__') && !pkg.roi_text.includes('{')
+                        ? pkg.roi_text
+                        : (pkg.roi || '-')}
+                    </td>
                   </tr>
                 ))}
               </tbody>

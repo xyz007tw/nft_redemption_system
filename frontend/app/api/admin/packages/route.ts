@@ -16,7 +16,14 @@ export async function GET() {
       .order('id', { ascending: true });
 
     if (error) throw error;
-    const unpacked = (data || []).map(unpackPackageRow);
+    // 🛡️ 排除內部免遷移雲端 JSON Store 系統保留行 (id >= 900000 或 __SYSTEM_)
+    const userFacing = (data || []).filter((p: any) => {
+      if (typeof p.id === 'number' && p.id >= 900000) return false;
+      if (typeof p.name_zh === 'string' && p.name_zh.startsWith('__')) return false;
+      if (typeof p.discount_text === 'string' && p.discount_text.includes('SYSTEM_')) return false;
+      return true;
+    });
+    const unpacked = userFacing.map(unpackPackageRow);
     return NextResponse.json({ success: true, packages: unpacked });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

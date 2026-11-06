@@ -43,6 +43,9 @@ export function unpackPackageRow(row: any): any {
     } catch {
       // Ignore parse errors
     }
+  } else if (typeof copy.roi_text === 'string' && copy.roi_text.startsWith('__WX_')) {
+    // 🛡️ 徹底防禦：內部雲端 JSON Store 欄位絕不作為 ROI 文字外洩
+    copy.roi_text = '-';
   }
   if (!copy.product_type) copy.product_type = 'NFT_REDEEM';
   return copy;
