@@ -70,38 +70,38 @@ export default function FranchiseEBookSection() {
       'id-ID': 'Tanpa Keterampilan Teknis! Buka "Mesin Penjual Pengetahuan AI-ATM" Seharga $990 + Iklan AI Otomatis 24/7 Saat Anda Tidur!'
     } as Record<string, string>)[lang] || 'Zero Tech Skills! Launch Your "Knowledge Vending Machine AI-ATM" for $990 + 24/7 AI Ad Traffic While You Sleep!',
     heroSub: ({
-      'zh-TW': '不懂程式、沒時間寫書也能當作家！內建 Google 4 旗艦大腦，一鍵自動產出 25+ 頁圖文並茂全球暢銷專書（可自行下載母檔＋定價開賣）。首年 $990 與次年 $450 系統費全享【100% 倒抵手續費】零風險返還，連鎖店 24 小時睡覺自動收錢！',
-      'zh-CN': '不懂编程、没时间写书也能当作家！内置 Google 4 旗舰大脑，一键自动产出 25+ 页图文并茂全球畅销专书（可自行下载母档＋定价开卖）。首年 $990 与次年 $450 系统费全享【100% 倒抵手续费】零风险返还，连锁店 24 小时睡觉自动收钱！',
-      'en-US': 'No coding or writing needed! Powered by Google 4 AI, automatically create 25+ page illustrated authority books (download master files + sell online). Both Year-1 ($990) and Year-2 ($450) fees are 100% offset by transaction fee credits—100% risk-free passive income!',
-      'ja-JP': 'プログラミングも執筆時間も不要！Google 4 旗艦AIが、25ページ超の図解ベストセラー書籍を自動生成（マスター保存＆即時オンライン販売対応）。初年度$990・次年度$450のシステム費はすべて【10%販売手数料から100%相殺】され、ノーリスクで24時間寝ている間も不労所得を獲得！',
-      'vi-VN': 'Không cần biết lập trình hay dành hàng tháng viết sách! Tích hợp Google 4 AI tự động tạo sách bán chạy 25+ trang có hình minh họa (tải file master & bán ngay). Hoàn phí 100% cho cả Năm 1 ($990) và Năm 2 ($450)—tạo dòng tiền thụ động 24/7 không rủi ro!',
-      'id-ID': 'Tidak perlu coding atau menulis berbulan-bulan! Didukung Google 4 AI untuk otomatis menghasilkan buku otoritas 25+ halaman berilustrasi (unduh file master + jual online). Biaya tahun ke-1 ($990) dan ke-2 ($450) dikurangi 100% dari biaya transaksi—penghasilan pasif bebas risiko 24/7!'
+      'zh-TW': '不懂程式、沒時間寫書也能當作家！內建 Google 4 旗艦大腦，一鍵自動產出 25+ 頁圖文並茂全球暢銷專書（可自行下載母檔＋定價開賣）。通過書審即享【AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售】，首年 $990 與次年 $450 系統費全享【100% 倒抵手續費】零風險返還，連鎖店 24 小時睡覺自動收錢！',
+      'zh-CN': '不懂编程、没时间写书也能当作家！内置 Google 4 旗舰大脑，一键自动产出 25+ 页图文并茂全球畅销专书（可自行下载母档＋定价开卖）。通过书审即享【AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 双站联合展售】，首年 $990 与次年 $450 系统费全享【100% 倒抵手续费】零风险返还，连锁店 24 小时睡觉自动收钱！',
+      'en-US': 'No coding or writing needed! Powered by Google 4 AI, automatically create 25+ page illustrated authority books (download master files + sell online). Approved books enjoy Dual-Site Joint Exhibition across AI Cloud Classroom (vip.5208.uk) × WeiXiang Official Site (nft1314.party), with 100% fee credit rebate on Year-1 ($990) and Year-2 ($450)!',
+      'ja-JP': 'プログラミングも執筆時間も不要！Google 4 旗艦AIが、25ページ超の図解ベストセラー書籍を自動生成（マスター保存＆即時オンライン販売対応）。審査承認後は【AIクラウド教室 (vip.5208.uk) × 微享公式サイト (nft1314.party) 2サイト共同展示販売】が自動適用され、初年度$990・次年度$450も100%手数料相殺！',
+      'vi-VN': 'Không cần biết lập trình hay dành hàng tháng viết sách! Tích hợp Google 4 AI tự động tạo sách bán chạy 25+ trang có hình minh họa (tải file master & bán ngay). Triển lãm & Bán sách Liên hợp Hai Trang (AI Cloud Classroom vip.5208.uk × Website Chính thức nft1314.party) cùng hoàn phí 100% cho Năm 1 ($990) & Năm 2 ($450)!',
+      'id-ID': 'Tidak perlu coding atau menulis berbulan-bulan! Didukung Google 4 AI untuk otomatis menghasilkan buku otoritas 25+ halaman berilustrasi (unduh file master + jual online). Pameran & Penjualan Gabungan Dua Situs (AI Cloud Classroom vip.5208.uk × Situs Resmi nft1314.party) + potongan biaya 100% Tahun ke-1 ($990) & ke-2 ($450)!'
     } as Record<string, string>)[lang] || 'Powered by Google 4 AI: Launch your Knowledge Vending Machine with 100% Fee Credit Rebate!',
 
     // 4 Core Cards
     c1Title: ({
-      'zh-TW': '1. 首年 $990 送 3 台知識自動販賣機 ＋ AI 24H 幫打廣告',
-      'zh-CN': '1. 首年 $990 送 3 台知识自动贩卖机 ＋ AI 24H 帮打广告',
-      'en-US': '1. Year-1 $990: 3 Vending Machines (3 Books) + 24/7 AI Ads',
-      'ja-JP': '1. 初年度$990で自動販売機3台(書籍3冊分) ＋ AIが24時間集客広告',
-      'vi-VN': '1. Năm 1: $990 Tặng 3 Máy Bán Tự Động (3 Sách) + AI Chạy Quảng Cáo 24/7',
-      'id-ID': '1. Tahun ke-1: $990 Dapat 3 Mesin Otomatis (3 Buku) + Iklan AI 24/7'
+      'zh-TW': '1. 首年 $990 送 3 台販賣機 ＋ 雙站聯合展售 ＆ AI 幫打廣告',
+      'zh-CN': '1. 首年 $990 送 3 台贩卖机 ＋ 双站联合展售 ＆ AI 帮打广告',
+      'en-US': '1. Year-1 $990: 3 Vending Machines + Dual-Site Joint Sales & AI Ads',
+      'ja-JP': '1. 初年度$990で自販機3台 ＋ 2サイト共同展示販売＆AI24時間広告',
+      'vi-VN': '1. Năm 1: $990 Tặng 3 Máy Bán + Bán Liên Hợp 2 Web & AI Quảng Cáo 24/7',
+      'id-ID': '1. Tahun ke-1: $990 Dapat 3 Mesin + Penjualan 2 Situs & Iklan AI 24/7'
     } as Record<string, string>)[lang] || '1. Year-1 $990: 3 Vending Machines (3 Books) + 24/7 AI Ads',
     c1Desc: ({
-      'zh-TW': '不用自己敲鍵盤！首年認購直接解鎖 3 本專屬雙語電子書販賣機（可一鍵下載 PDF/HTML 母檔珍藏，亦可直接上架線上書櫃收款）。更直接串聯「微享 AI 自動來客」，每天在社群替你自動發傳單、打廣告拉客人！第 4 本起每本僅 $360，每本送 30 次免費微調！',
-      'zh-CN': '不用自己敲键盘！首年认购直接解锁 3 本专属双语电子书贩卖机（可一键下载 PDF/HTML 母档珍藏，亦可直接上架线上书柜收款）。更直接串联“微享 AI 自动来客”，每天在社群替您自动发传单、打广告拉客人！第 4 本起每本仅 $360，每本送 30 次免费微调！',
-      'en-US': 'No typing required! Unlock 3 bilingual knowledge vending machines (download master PDF/HTML & sell online). WeiXiang AI auto-traffic matrix distributes flyers and runs social ads daily to bring paying buyers! Additional machines from 4th book are only $360/book, with 30 free edits each!',
-      'ja-JP': 'キーボードを叩く必要すらありません！初年度で3冊分の多言語自動販売機を解放（PDF/HTMLマスターダウンロード＆即座に販売可能）。さらに「WeiXiang AI自動集客」が毎日SNSでチラシを配り自動で顧客を獲得！4冊目以降は1冊わずか$360、各書籍30回分の無料修正枠付き！',
-      'vi-VN': 'Không cần tự gõ phím! Mở khóa 3 máy bán sách tự động song ngữ (tải file PDF/HTML & bán nhận tiền ngay). Hệ thống AI tự động phát tờ rơi và quảng cáo trên mạng xã hội mỗi ngày! Từ cuốn thứ 4 chỉ $360/cuốn, tặng 30 lần chỉnh sửa miễn phí!',
-      'id-ID': 'Tidak perlu mengetik sendiri! Dapatkan 3 mesin penjual buku bilingual (unduh PDF/HTML master & jual langsung). Matriks AI menyebarkan brosur dan beriklan di medsos setiap hari! Buku ke-4 dan seterusnya hanya $360/buku, dengan 30 kali revisi gratis!'
+      'zh-TW': '不用自己敲鍵盤！首年認購直接解鎖 3 本專屬雙語電子書販賣機（可一鍵下載 PDF/HTML 母檔珍藏）。通過書審後更直接享有「AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售」＋「微享 AI 自動來客」每天在社群替你打廣告拉客人！第 4 本起每本僅 $360，每本送 30 次免費微調！',
+      'zh-CN': '不用自己敲键盘！首年认购直接解锁 3 本专属双语电子书贩卖机（可一键下载 PDF/HTML 母档珍藏）。通过书审后更直接享有“AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 双站联合展售”＋“微享 AI 自动来客”每天在社群替您打广告拉客人！第 4 本起每本仅 $360，每本送 30 次免费微调！',
+      'en-US': 'No typing required! Unlock 3 bilingual knowledge vending machines (download master PDF/HTML). Once approved, your books are jointly exhibited & sold across AI Cloud Classroom (vip.5208.uk) × WeiXiang Official Site (nft1314.party), backed by 24/7 AI social ads! 4th+ books only $360, 30 free edits each!',
+      'ja-JP': 'キーボード入力不要！初年度で3冊分の多言語自販機を解放（PDF/HTMLマスター保存可）。審査通過後は「AIクラウド教室 (vip.5208.uk) × 微享公式サイト (nft1314.party) 2サイト共同展示販売」＋「AI自動集客広告」で24時間世界中から集客！4冊目以降は$360、各30回無料修正付き！',
+      'vi-VN': 'Không cần tự gõ phím! Mở khóa 3 máy bán sách song ngữ (tải file PDF/HTML). Sau khi duyệt, sách được Triển lãm & Bán Liên hợp trên cả AI Cloud Classroom (vip.5208.uk) × Website Chính thức (nft1314.party) cùng AI quảng cáo 24/7! Từ cuốn thứ 4 chỉ $360, tặng 30 lần sửa miễn phí!',
+      'id-ID': 'Tidak perlu mengetik sendiri! Buka 3 mesin buku bilingual (unduh PDF/HTML). Setelah disetujui, buku Anda dipamerkan & dijual bersama di AI Cloud Classroom (vip.5208.uk) × Situs Resmi (nft1314.party) ditambah iklan AI 24/7! Buku ke-4+ hanya $360, gratis 30 revisi!'
     } as Record<string, string>)[lang] || 'Includes 3 e-book vending machines + 24/7 AI Traffic!',
     c1Tag: ({
-      'zh-TW': '✔ 內含 3 本專書販賣機(第4本起$360)｜每本送30次免費微調',
-      'zh-CN': '✔ 内含 3 本专书贩卖机(第4本起$360)｜每本送30次免费微调',
-      'en-US': '✔ Includes 3 Vending Machines ($360/extra) | 30 Free Edits/Book',
-      'ja-JP': '✔ 自動販売機3台分付属(4冊目から$360)｜各30回無料微調整',
-      'vi-VN': '✔ Gồm 3 máy bán sách ($360/máy thêm) | 30 lần sửa miễn phí',
-      'id-ID': '✔ Termasuk 3 Mesin Buku ($360/tambah) | 30 Revisi Gratis'
+      'zh-TW': '✔ 含3本販賣機｜vip.5208.uk × nft1314.party 雙站聯合展售',
+      'zh-CN': '✔ 含3本贩卖机｜vip.5208.uk × nft1314.party 双站联合展售',
+      'en-US': '✔ 3 Machines | vip.5208.uk × nft1314.party Dual-Site Joint Sales',
+      'ja-JP': '✔ 3冊枠付属｜vip.5208.uk × nft1314.party 2サイト共同展示販売',
+      'vi-VN': '✔ Gồm 3 máy | Bán Liên hợp 2 Web vip.5208.uk × nft1314.party',
+      'id-ID': '✔ 3 Mesin | Penjualan Gabungan vip.5208.uk × nft1314.party'
     } as Record<string, string>)[lang] || '✔ 3 Vending Machines Included',
 
     c2Title: ({
@@ -421,6 +421,49 @@ export default function FranchiseEBookSection() {
           <p className="text-base sm:text-lg md:text-xl text-pink-200/90 mb-10 max-w-4xl mx-auto leading-relaxed">
             {t.heroSub}
           </p>
+        </div>
+
+        {/* 🌟 AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售 王牌加盟優勢橫幅 */}
+        <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-950/90 via-purple-900/60 to-pink-950/90 border-2 border-cyan-400/50 shadow-[0_0_35px_rgba(34,211,238,0.2)] text-left flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-2xl shrink-0 shadow-lg">
+              🌐
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[11px] font-black mb-1">
+                {lang === 'ja-JP' ? '👑 AI-ATM 加盟店限定・ダブルトラフィック特典' :
+                 lang === 'zh-CN' ? '👑 AI-ATM 加盟商王牌优势・双黄金流量池赋能' :
+                 lang === 'en-US' ? '👑 AI-ATM Franchisee Exclusive · Dual-Traffic Powerhouse' :
+                 '👑 AI-ATM 加盟商王牌優勢・雙黃金流量池賦能'}
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white">
+                {lang === 'ja-JP' ? 'AIクラウド教室 (vip.5208.uk) × 微享公式サイト (nft1314.party) 「2サイト共同展示販売」！' :
+                 lang === 'zh-CN' ? 'AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 雙站聯合展售！' :
+                 lang === 'en-US' ? 'AI Cloud Classroom (vip.5208.uk) × WeiXiang Official Site (nft1314.party) Dual-Site Joint Exhibition!' :
+                 'AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售！'}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-200 mt-1 leading-relaxed">
+                {lang === 'ja-JP'
+                  ? '審査を通過した加盟店の電子書籍は、公式サイトの本棚だけでなく「AIクラウド教室 (vip.5208.uk)」にもリアルタイム同時掲載！単品専用25%アフィリエイトリンクとPayUni/PayPal即時決済により、2つの巨大トラフィックから24時間自動販売されます！'
+                  : lang === 'zh-CN'
+                  ? '加盟商电子书通过书审后，不仅上架微享官网首页读者书柜与独立书城，更透过跨网域 API 即时同步展售于「AI 云教室 / 微享商学院 (vip.5208.uk)」！搭配「单书专属 25% 分润推广链接」与真实双金流秒级发货，让官网访客与商学院高净值学员同时为您买单！'
+                  : lang === 'en-US'
+                  ? 'Approved franchisee e-books are simultaneously exhibited & sold on both the WeiXiang Official Site (nft1314.party) and the AI Cloud Classroom (vip.5208.uk) with per-book 25% referral links and instant PayUni/PayPal checkout!'
+                  : '加盟商電子書通過書審後，不僅上架微享官網首頁讀者書櫃與獨立書城，更透過跨網域 API 即時同步展售於「AI 雲教室 / 微享商學院 (vip.5208.uk)」！搭配「單書專屬 25% 分潤推廣連結」與真實雙金流秒級發貨，讓官網訪客與商學院高淨值學員同時為您買單！'}
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://vip.5208.uk/learning-zone/#sec-ebook-franchise"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400 text-cyan-200 font-black text-xs whitespace-nowrap shrink-0 transition-all hover:scale-105"
+          >
+            {lang === 'ja-JP' ? '🏫 クラウド教室の共同本棚を見る ↗' :
+             lang === 'zh-CN' ? '🏫 查看云教室双站联合书柜 ↗' :
+             lang === 'en-US' ? '🏫 View Dual-Site Showcase ↗' :
+             '🏫 查看雲教室雙站聯合書櫃 ↗'}
+          </a>
         </div>
 
         {/* 四大核心商業規則卡片 */}

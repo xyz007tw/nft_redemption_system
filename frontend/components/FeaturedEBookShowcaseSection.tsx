@@ -321,10 +321,10 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
       'id-ID': '🔥 Jelajahi E-Book Ahli: Beli Langsung + Akses Bulanan VIP'
     } as Record<string, string>)[lang] || '🔥 Explore Authority E-Books: Instant Buy & VIP Monthly Access',
     desc: ({
-      'zh-TW': '微享電子書加盟商創作者之通過書審精裝力作！內建「防盜版動態浮水印閱讀」、獨立高解析 HTML/PDF 格式下載、單本買斷與 VIP 專欄月訂閱，更全面整合 25% 聯盟裂變分潤！',
-      'zh-CN': '微享电子书加盟商创作者之通过书审精装力作！内置“防盗版动态水印阅读”、独立高解析 HTML/PDF 格式下载、单本买断与 VIP 专栏月订阅，更全面整合 25% 联盟裂变分润！',
-      'en-US': 'Official masterworks published by WeiXiang Franchisees! Enjoy anti-piracy dynamic watermark reading, master HTML/PDF downloads, single purchases, and VIP subscriptions with 25% affiliate viral revenue!',
-      'ja-JP': '審査を通過したWeiXiang加盟著者の本格電子書籍！ダイナミック透かしによる海賊版防止機能、HTML/PDFマスターダウンロード、単品購入とVIP月額購読、そして25%アフィリエイト分配に対応！',
+      'zh-TW': '微享電子書加盟商創作者之通過書審精裝力作！全面啟動「AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售」，內建防盜版動態浮水印閱讀、單本買斷與 VIP 月閱真實金流秒發貨，更配備單書專屬 25% 聯盟推廣連結！',
+      'zh-CN': '微享电子书加盟商创作者之通过书审精装力作！全面启动“AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 双站联合展售”，内置防盗版动态水印阅读、单本买断与 VIP 月阅真实金流秒发货，更配备单书专属 25% 联盟推广链接！',
+      'en-US': 'Official masterworks by WeiXiang Franchisees! Featuring Dual-Site Joint Exhibition across AI Cloud Classroom (vip.5208.uk) × WeiXiang Official Site (nft1314.party), anti-piracy reading, instant checkout, and per-book 25% referral links!',
+      'ja-JP': '審査を通過したWeiXiang加盟著者の本格電子書籍！「AIクラウド教室 (vip.5208.uk) × 微享公式サイト (nft1314.party) 2サイト共同展示販売」、海賊版防止リーダー、即時決済、単品専用25%紹介リンクを完備！',
       'vi-VN': 'Các tác phẩm đã được kiểm duyệt của tác giả đối tác WeiXiang! Tích hợp đọc chống sao chép với hình mờ động, tải file HTML/PDF, mua đứt hoặc đăng ký VIP với 25% hoa hồng tiếp thị liên kết!',
       'id-ID': 'Karya resmi yang telah lolos peninjauan oleh penulis mitra WeiXiang! Dilengkapi pembaca watermark dinamis anti-pembajakan, unduhan HTML/PDF master, pembelian tunggal dan langganan VIP dengan komisi afiliasi 25%!'
     } as Record<string, string>)[lang] || 'Official masterworks published by WeiXiang Franchisees!',
@@ -604,12 +604,12 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                    '想擁有自己的專屬「知識自動販賣機 AI-ATM」？'}
                 </span>
                 <span className="text-[11px] sm:text-xs text-gray-300">
-                  {lang === 'ja-JP' ? '専門知識ゼロ・初年度$990で自販機3台＋24H AI自動集客！' :
-                   lang === 'zh-CN' ? '零技术！首年 $990 打造3台专书自贩机＋AI 24H 睡觉帮您打广告！' :
-                   lang === 'vi-VN' ? 'Không cần kỹ thuật! Chỉ $990 mở 3 máy bán + AI tìm khách 24/7!' :
-                   lang === 'id-ID' ? 'Tanpa keahlian teknis! Hanya $990 miliki 3 mesin + iklan AI 24/7!' :
-                   lang === 'en-US' ? 'Zero tech skills! Launch 3 machines for $990 with 24/7 automated AI ads!' :
-                   '零技術！首年 $990 打造 3 台專書自販機＋AI 24H 睡覺幫你打廣告！'}
+                  {lang === 'ja-JP' ? '初年度$990で自販機3台＋【AIクラウド教室 vip.5208.uk × 公式サイト nft1314.party 2サイト共同販売】＋24H AI広告！' :
+                   lang === 'zh-CN' ? '首年 $990 打造 3 台专书自贩机＋【AI 云教室 vip.5208.uk × 微享官网 nft1314.party 双站联合展售】＋AI 24H 打广告！' :
+                   lang === 'vi-VN' ? 'Chỉ $990 mở 3 máy bán + Bán Liên hợp 2 Web (vip.5208.uk × nft1314.party) + AI tìm khách 24/7!' :
+                   lang === 'id-ID' ? 'Hanya $990 miliki 3 mesin + Penjualan 2 Situs (vip.5208.uk × nft1314.party) + iklan AI 24/7!' :
+                   lang === 'en-US' ? '$990 for 3 machines + Dual-Site Joint Sales (vip.5208.uk × nft1314.party) + 24/7 AI Ads!' :
+                   '首年 $990 打造 3 台專書自販機＋【AI 雲教室 vip.5208.uk × 微享官網 nft1314.party 雙站聯合展售】＋AI 24H 打廣告！'}
                 </span>
               </div>
             </div>

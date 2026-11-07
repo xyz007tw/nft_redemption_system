@@ -613,7 +613,7 @@ export default function FranchiseStudioPage() {
             <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
               <div className="font-black text-amber-400 text-sm mb-1">步驟 ④ 提交總後台書審 (3~7天)</div>
               <p className="text-gray-300 leading-relaxed mb-2">
-                點擊「⚖️ 提交至管理後台書審」，通過 3~7 天書審後即公開上架 `/ebook-store`，並啟動 AI 自動來客幫您打廣告！
+                點擊「⚖️ 提交至管理後台書審」，通過 3~7 天書審後即自動啟動「AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售」，並由 AI 自動來客幫您打廣告！
               </p>
               <div className="text-[11px] text-cyan-300 font-bold">🤝 協作方：微享總管理後台 ＋ AI 自來客矩陣</div>
             </div>

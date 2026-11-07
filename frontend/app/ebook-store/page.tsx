@@ -69,12 +69,12 @@ export default function ReaderEBookStorePage() {
       'ko-KR': '🛠️ 크리에이터 스튜디오 (/studio)'
     }[lang] || '🛠️ Creator Studio (/studio)',
     shelfTitle: (count: number) => {
-      if (lang === 'ja-JP') return `✨ 公式審査承認済・世界公開発行の電子書籍 (${count} 冊)`;
-      if (lang === 'zh-CN') return `✨ 已通过总后台书审・全球公开发行电子书 (${count} 本)`;
-      if (lang === 'vi-VN') return `✨ E-Book Đã Duyệt Chính Thức Toàn Cầu (${count} Cuốn)`;
-      if (lang === 'id-ID') return `✨ E-Book Resmi Lolos Uji Rilis Global (${count} Buku)`;
-      if (lang === 'en-US') return `✨ Officially Approved E-Books for Global Release (${count} Books)`;
-      return `✨ 已通過總後台書審・全球公開發行電子書 (${count} 本)`;
+      if (lang === 'ja-JP') return `✨ 公式審査承認済・AIクラウド教室 (vip.5208.uk) × 公式サイト (nft1314.party) 2サイト共同展示販売 (${count} 冊)`;
+      if (lang === 'zh-CN') return `✨ 已通过总后台书审・AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 双站联合展售 (${count} 本)`;
+      if (lang === 'vi-VN') return `✨ E-Book Đã Duyệt・Triển lãm Liên hợp 2 Web vip.5208.uk × nft1314.party (${count} Cuốn)`;
+      if (lang === 'id-ID') return `✨ E-Book Resmi・Pameran Gabungan 2 Situs vip.5208.uk × nft1314.party (${count} Buku)`;
+      if (lang === 'en-US') return `✨ Approved E-Books · AI Cloud Classroom (vip.5208.uk) × Official Site (nft1314.party) Dual-Site Exhibition (${count} Books)`;
+      return `✨ 已通過總後台書審・AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售 (${count} 本)`;
     },
     approvedBadge: {
       'zh-TW': '✅ 官方書審通過',
