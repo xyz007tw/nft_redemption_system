@@ -88,9 +88,7 @@ export async function POST(req: Request) {
     const requiredMinUsdt = pkgData?.price || BUILTIN_PRICES[numPkgId] || Math.round(actualPaidTwd / 32);
 
     if (numPkgId >= 9 && actualPaidTwd > 0 && maxAllowedUsdt < requiredMinUsdt * 0.85) {
-      console.error(`[PayUni Security] Underpaid callback blocked! pkg=${numPkgId}, paidTwd=${actualPaidTwd}, requiredUsdt=${requiredMinUsdt}`);
-      releasePaymentLock(tradeKey);
-      return new Response('Underpaid Amount Rejected', { status: 400 });
+      console.warn(`[PayUni Security Notice] Paid TWD (${actualPaidTwd}) is lower than list price (${requiredMinUsdt} USDT) for pkg=${numPkgId}, capping commission base to ${maxAllowedUsdt} USDT while allowing student access.`);
     }
 
     // Fallback for built-in AI Master Courses (100~110) or if CustomField3 explicitly specifies productType

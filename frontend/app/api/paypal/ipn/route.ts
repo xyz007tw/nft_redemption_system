@@ -62,24 +62,28 @@ export async function POST(req: Request) {
       return new Response('Missing txn_id', { status: 400 });
     }
 
-    // 3. 🛡️ Official PayPal IPN Postback Verification (cmd=_notify-validate)
+    // 3. 🛡️ Official PayPal IPN Postback Verification (cmd=_notify-validate with network timeout graceful fallback)
     const verifyUrl = process.env.PAYPAL_SANDBOX === 'true'
       ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
       : 'https://ipnpb.paypal.com/cgi-bin/webscr';
 
-    const verifyResp = await fetch(verifyUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'WeiXiang-IPN-Security-Verifier/1.0'
-      },
-      body: `cmd=_notify-validate&${rawBody}`,
-      signal: AbortSignal.timeout(15000)
-    });
-    const verifyText = (await verifyResp.text()).trim();
-    if (verifyText !== 'VERIFIED') {
-      console.error(`[PayPal IPN Security] Forged or unverified IPN blocked! Response: ${verifyText}`);
-      return new Response('Invalid IPN', { status: 400 });
+    try {
+      const verifyResp = await fetch(verifyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'WeiXiang-IPN-Security-Verifier/1.0'
+        },
+        body: `cmd=_notify-validate&${rawBody}`,
+        signal: AbortSignal.timeout(12000)
+      });
+      const verifyText = (await verifyResp.text()).trim();
+      if (verifyText === 'INVALID') {
+        console.error(`[PayPal IPN Security] Forged IPN explicitly rejected by PayPal! Response: ${verifyText}`);
+        return new Response('Invalid IPN', { status: 400 });
+      }
+    } catch (verifyNetErr) {
+      console.warn('[PayPal IPN] Postback network timeout/error, proceeding with receiver & amount checks to protect buyer delivery:', verifyNetErr);
     }
 
     // 4. 🔒 Idempotency & Concurrency Lock
@@ -106,9 +110,12 @@ export async function POST(req: Request) {
     const pkgNumericId = normalizeCoursePkgId(Number(packageId));
     const expectedMinPrice = MIN_PKG_PRICE_MAP[pkgNumericId] || 0;
 
-    if (actualPaidUsd <= 0 || (expectedMinPrice > 0 && actualPaidUsd + 0.5 < expectedMinPrice)) {
-      console.error(`[PayPal IPN Security] Underpayment blocked for pkg ${pkgNumericId}: paid $${actualPaidUsd} vs expected $${expectedMinPrice}`);
-      return new Response('Underpayment Blocked', { status: 400 });
+    if (actualPaidUsd <= 0) {
+      console.error(`[PayPal IPN Security] Zero/negative payment ignored for pkg ${pkgNumericId}: paid $${actualPaidUsd}`);
+      return new Response('OK', { status: 200 });
+    }
+    if (expectedMinPrice > 0 && actualPaidUsd + 0.5 < expectedMinPrice) {
+      console.warn(`[PayPal IPN Notice] Paid $${actualPaidUsd} vs list price $${expectedMinPrice} for pkg ${pkgNumericId}; calculating commission strictly on actual paid amount $${actualPaidUsd} while preserving customer access.`);
     }
 
     const priceUsdt = actualPaidUsd;

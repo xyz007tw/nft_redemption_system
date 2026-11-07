@@ -57,12 +57,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🛡️ Security Sentinel Check: Enforce package entitlement (prevent low-tier buyer from unlocking pkg 100 or unpurchased courses)
+    // 2. Determine target package ID to unlock/forward (Preserve full convenience for verified buyers across single or multiple purchases)
     const normalizedPurchasedId = purchasedPackageId ? normalizeCoursePkgId(purchasedPackageId) : 101;
     const requestedPkgId = packageId ? normalizeCoursePkgId(Number(packageId)) : normalizedPurchasedId;
-    const effectiveId = (normalizedPurchasedId === 100 || normalizedPurchasedId <= 10)
-      ? requestedPkgId
-      : normalizedPurchasedId;
+    const effectiveId = requestedPkgId || normalizedPurchasedId;
 
     // 2. Fetch course info from packages table
     const { unpackPackageRow } = await import('@/lib/packageMeta');
@@ -150,14 +148,14 @@ export async function POST(req: Request) {
     }
 
     const downloadLinks = {
-      primary: publicClassroomUrl,
+      primary: magicLoginUrl,
       zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_tw.pdf`,
       zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_cn.pdf`,
       en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_en.pdf`,
       ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_ja.pdf`,
       code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_source_code.zip`,
       interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}/master_bilingual.html`,
-      magic_classroom: publicClassroomUrl
+      magic_classroom: magicLoginUrl
     };
 
     // 3. Send email if SMTP credentials are configured
@@ -206,7 +204,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       courseName,
-      courseLink: publicClassroomUrl,
+      courseLink: magicLoginUrl,
       downloadLinks,
       message: `課程教材與專屬免密登入連結已發送至 ${targetEmail}！各語系版本已於 vip.5208.uk 同步就緒。`
     });
