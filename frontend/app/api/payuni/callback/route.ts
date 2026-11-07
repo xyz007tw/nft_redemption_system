@@ -15,10 +15,13 @@ export async function POST(req: Request) {
     const TradeInfo = formData.get('TradeInfo') as string;
     const TradeSha = formData.get('TradeSha') as string;
 
-    // Validate Signature
-    const expectedSha = generateTradeSha(TradeInfo);
-    if (expectedSha !== TradeSha) {
-      console.error('PayUni signature verification failed');
+    // Validate Signature (Constant-time comparison to prevent timing side-channel attacks)
+    const expectedSha = generateTradeSha(TradeInfo || '');
+    const cryptoMod = await import('crypto');
+    const expBuf = Buffer.from(expectedSha || '', 'utf8');
+    const recBuf = Buffer.from(TradeSha || '', 'utf8');
+    if (!TradeInfo || !TradeSha || expBuf.length !== recBuf.length || !cryptoMod.timingSafeEqual(expBuf, recBuf)) {
+      console.error('[Security Alert] PayUni signature verification failed');
       return new Response('Signature Verification Failed', { status: 400 });
     }
 
@@ -70,29 +73,43 @@ export async function POST(req: Request) {
       .single();
     let pkgData = unpackPackageRow(rawPkgData);
 
-    // Fallback for built-in AI Master Courses (101 / 102) or if CustomField3 explicitly specifies productType
+    // 🔒 實際付款金額校驗：以 PayUni 官方回傳之 TradeAmt (TWD) 折算最高允許 USDT 金額，嚴防篡改 CustomField3 虛報高價方案
+    const actualPaidTwd = Number(decryptedInfo.TradeAmt || 0);
+    const maxAllowedUsdt = Math.max(1, Math.ceil(actualPaidTwd / 28)); // 給予匯率寬容上限 (約 1 USDT = 28~33 TWD)
+
+    const BUILTIN_PRICES: Record<number, number> = {
+      100: 198, 101: 99, 102: 79, 103: 59, 104: 59, 105: 79,
+      106: 79, 107: 29, 108: 39, 109: 29, 110: 59,
+      9: 99, 25: 79, 30: 59, 35: 59, 40: 79,
+      45: 79, 50: 29, 55: 39, 60: 29, 65: 59
+    };
+
+    const numPkgId = Number(packageId);
+    const requiredMinUsdt = pkgData?.price || BUILTIN_PRICES[numPkgId] || Math.round(actualPaidTwd / 32);
+
+    if (numPkgId >= 9 && actualPaidTwd > 0 && maxAllowedUsdt < requiredMinUsdt * 0.85) {
+      console.error(`[PayUni Security] Underpaid callback blocked! pkg=${numPkgId}, paidTwd=${actualPaidTwd}, requiredUsdt=${requiredMinUsdt}`);
+      releasePaymentLock(tradeKey);
+      return new Response('Underpaid Amount Rejected', { status: 400 });
+    }
+
+    // Fallback for built-in AI Master Courses (100~110) or if CustomField3 explicitly specifies productType
     if (!pkgData) {
-      if (Number(packageId) === 101) {
+      if (BUILTIN_PRICES[numPkgId]) {
+        const { COURSE_NAMES, normalizeCoursePkgId } = await import('@/lib/vipEnroll');
+        const normId = normalizeCoursePkgId(numPkgId);
         pkgData = {
-          id: 101,
-          name_zh: '教材 01｜BIGMONEY.AI・AI頂配實戰全套教材（贈微享NFT 2枚）',
-          price: Number(parsedPriceUsdt) || 198,
+          id: normId,
+          name_zh: COURSE_NAMES[normId] || `AI 實戰教材 #${normId}`,
+          price: BUILTIN_PRICES[normId] || Math.min(Number(parsedPriceUsdt) || maxAllowedUsdt, maxAllowedUsdt),
           product_type: 'DIRECT_COURSE',
-          course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
-        };
-      } else if (Number(packageId) === 102) {
-        pkgData = {
-          id: 102,
-          name_zh: '教材 02｜SaaS-AVME 3.0 雙引擎 AI 短影音自動化大師手冊',
-          price: Number(parsedPriceUsdt) || 99,
-          product_type: 'DIRECT_COURSE',
-          course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
+          course_link: process.env.DEFAULT_COURSE_LINK || 'https://vip.5208.uk/dashboard/'
         };
       } else {
         pkgData = {
-          id: Number(packageId),
+          id: numPkgId,
           name_zh: `方案 #${packageId}`,
-          price: Number(parsedPriceUsdt) || Math.round(Number(decryptedInfo.TradeAmt || 0) / 32),
+          price: Math.min(Number(parsedPriceUsdt) || Math.round(actualPaidTwd / 32), maxAllowedUsdt),
           product_type: parsedProductType || 'NFT_REDEEM',
           course_link: process.env.DEFAULT_COURSE_LINK || 'https://nft1314.party/redeem'
         };
@@ -100,11 +117,11 @@ export async function POST(req: Request) {
     } else if (parsedProductType) {
       pkgData.product_type = parsedProductType;
       if (parsedPriceUsdt && Number(parsedPriceUsdt) > 0) {
-        pkgData.price = Number(parsedPriceUsdt);
+        pkgData.price = Math.min(Number(parsedPriceUsdt), maxAllowedUsdt);
       }
     }
     
-    const packagePriceUSDT = pkgData?.price || 0;
+    const packagePriceUSDT = Math.min(pkgData?.price || 0, maxAllowedUsdt);
 
     // 2. Process Database updates (Assign NFT / Mark as Paid) & Process Affiliate logic
     // Import dynamically or at the top of file
@@ -261,6 +278,7 @@ export async function POST(req: Request) {
     }
 
     // PayUni expects a 200 OK response with specific text, typically empty or JSON
+    releasePaymentLock(tradeKey);
     return new Response('OK', { status: 200 });
   } catch (error) {
     console.error('PayUni Callback Error:', error);

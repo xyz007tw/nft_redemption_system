@@ -49,6 +49,15 @@ export interface EnrollResult {
   user_id?: number;
 }
 
+function escapeHtml(str: string): string {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
  * Call VIP Academy REST API to auto enroll student and obtain 1-click magic login URL
  */
@@ -60,13 +69,15 @@ export async function autoEnrollVipStudent(email: string, pkgId: number, txnId: 
       txn_id: String(txnId)
     });
 
+    const vipSecret = process.env.VIP_API_SECRET || 'vip_sec_2026_xyz007';
     const resp = await fetch('https://vip.5208.uk/wp-json/vip/v1/auto-enroll', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'x-vip-secret': 'vip_sec_2026_xyz007'
+        'x-vip-secret': vipSecret
       },
-      body: params.toString()
+      body: params.toString(),
+      signal: AbortSignal.timeout(15000)
     });
 
     if (!resp.ok) {
@@ -118,7 +129,10 @@ export async function sendVipCourseWelcomeEmail(options: {
   }
 
   const normalizedPkgId = normalizeCoursePkgId(pkgId);
-  const courseTitle = options.courseName || COURSE_NAMES[normalizedPkgId] || COURSE_NAMES[pkgId] || `實戰專題 #${normalizedPkgId}`;
+  const rawTitle = options.courseName || COURSE_NAMES[normalizedPkgId] || COURSE_NAMES[pkgId] || `實戰專題 #${normalizedPkgId}`;
+  const courseTitle = escapeHtml(rawTitle);
+  const safeEmail = escapeHtml(email);
+  const safeTxnId = escapeHtml(txnId);
 
   const downloadLinks = {
     zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_zh_tw.pdf`,
@@ -194,11 +208,11 @@ export async function sendVipCourseWelcomeEmail(options: {
         <h4 style="margin: 0 0 10px; font-size: 14px; color: #1e293b; font-weight: 800;">
           🏫 VIP 家教商學院平台服務指引：
         </h4>
-        <div>• <strong>學員信箱</strong>：${email}</div>
+        <div>• <strong>學員信箱</strong>：${safeEmail}</div>
         <div>• <strong>學院官方網址</strong>：<a href="https://vip.5208.uk" style="color: #2563eb;">https://vip.5208.uk</a></div>
         <div>• <strong>學員後台 (Dashboard)</strong>：<a href="https://vip.5208.uk/dashboard/" style="color: #2563eb;">https://vip.5208.uk/dashboard/</a></div>
         <div>• <strong>25% 聯盟分潤後台</strong>：<a href="https://nft1314.party/dashboard" style="color: #2563eb;">https://nft1314.party/dashboard</a></div>
-        <div>• <strong>交易序號 (Txn ID)</strong>：${txnId}</div>
+        <div>• <strong>交易序號 (Txn ID)</strong>：${safeTxnId}</div>
       </div>
 
       <!-- 20-Year Chief Architect Footer -->

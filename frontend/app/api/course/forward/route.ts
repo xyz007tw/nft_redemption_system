@@ -19,8 +19,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Verify buyer eligibility (by buyerEmail or walletAddress)
+    // 1. Verify buyer eligibility & purchased package (by buyerEmail or walletAddress)
     let isVerified = false;
+    let purchasedPackageId: number | null = null;
+
     if (buyerEmail && buyerEmail.includes('@')) {
       const { data: userByEmail } = await supabase
         .from('users')
@@ -29,17 +31,19 @@ export async function POST(req: Request) {
         .single();
       if (userByEmail?.has_purchased) {
         isVerified = true;
+        purchasedPackageId = userByEmail.last_purchased_package ? Number(userByEmail.last_purchased_package) : null;
       }
     }
 
     if (!isVerified && walletAddress && walletAddress.startsWith('0x')) {
       const { data: userByWallet } = await supabase
         .from('users')
-        .select('has_purchased')
+        .select('has_purchased, last_purchased_package')
         .ilike('wallet_address', walletAddress)
         .single();
       if (userByWallet?.has_purchased) {
         isVerified = true;
+        purchasedPackageId = userByWallet.last_purchased_package ? Number(userByWallet.last_purchased_package) : null;
       }
     }
 
@@ -52,6 +56,13 @@ export async function POST(req: Request) {
         { status: 403 }
       );
     }
+
+    // 🛡️ Security Sentinel Check: Enforce package entitlement (prevent low-tier buyer from unlocking pkg 100 or unpurchased courses)
+    const normalizedPurchasedId = purchasedPackageId ? normalizeCoursePkgId(purchasedPackageId) : 101;
+    const requestedPkgId = packageId ? normalizeCoursePkgId(Number(packageId)) : normalizedPurchasedId;
+    const effectiveId = (normalizedPurchasedId === 100 || normalizedPurchasedId <= 10)
+      ? requestedPkgId
+      : normalizedPurchasedId;
 
     // 2. Fetch course info from packages table
     const { unpackPackageRow } = await import('@/lib/packageMeta');
@@ -105,8 +116,8 @@ export async function POST(req: Request) {
       }
     };
 
-    if (packageId) {
-      const pId = Number(packageId);
+    if (effectiveId) {
+      const pId = Number(effectiveId);
       const { data: rawPkg } = await supabase
         .from('packages')
         .select('*')
@@ -120,42 +131,33 @@ export async function POST(req: Request) {
         courseName = COURSE_MAP[pId].name;
         courseLink = COURSE_MAP[pId].link;
       }
-    } else {
-      const { data: allPkgs } = await supabase
-        .from('packages')
-        .select('*')
-        .order('id', { ascending: true });
-      const coursePkg = (allPkgs || []).map(unpackPackageRow).find((p: any) => p.product_type === 'DIRECT_COURSE');
-      if (coursePkg) {
-        courseName = coursePkg.name_zh || courseName;
-        if (coursePkg.course_link) courseLink = coursePkg.course_link;
-      }
     }
 
-    const effectiveId = packageId ? normalizeCoursePkgId(Number(packageId)) : 101;
-    let magicLoginUrl = courseLink;
+    let magicLoginUrl = 'https://vip.5208.uk/dashboard/';
+    let publicClassroomUrl = 'https://vip.5208.uk/dashboard/';
     try {
       const enrollRes = await autoEnrollVipStudent(
         (buyerEmail && buyerEmail.includes('@')) ? buyerEmail.trim() : targetEmail.trim(),
         effectiveId,
         `FORWARD_${Date.now()}`
       );
-      if (enrollRes.success && enrollRes.magic_login_url) {
-        magicLoginUrl = enrollRes.magic_login_url;
+      if (enrollRes.success) {
+        if (enrollRes.magic_login_url) magicLoginUrl = enrollRes.magic_login_url;
+        if (enrollRes.course_url) publicClassroomUrl = enrollRes.course_url;
       }
     } catch (e) {
       console.warn('[Course Forward] Magic link generation fallback:', e);
     }
 
     const downloadLinks = {
-      primary: magicLoginUrl,
+      primary: publicClassroomUrl,
       zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_tw.pdf`,
       zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_cn.pdf`,
       en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_en.pdf`,
       ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_ja.pdf`,
       code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_source_code.zip`,
       interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}/master_bilingual.html`,
-      magic_classroom: magicLoginUrl
+      magic_classroom: publicClassroomUrl
     };
 
     // 3. Send email if SMTP credentials are configured
@@ -204,9 +206,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       courseName,
-      courseLink: magicLoginUrl,
+      courseLink: publicClassroomUrl,
       downloadLinks,
-      message: `課程教材已成功發送至 ${targetEmail}！各語系版本已於 vip.5208.uk 同步就緒。`
+      message: `課程教材與專屬免密登入連結已發送至 ${targetEmail}！各語系版本已於 vip.5208.uk 同步就緒。`
     });
   } catch (error: any) {
     console.error('Course forward error:', error);

@@ -22,13 +22,42 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
     }
 
-
     // 嘗試從資料庫尋找使用者最後購買的商品 (如果是法幣會記錄，如果是 Web3 需要靠其他方式，這裡為了相容先讀取)
     const { data: userData } = await supabase
       .from('users')
-      .select('last_purchased_package, has_purchased, referrer_address')
+      .select('last_purchased_package, has_purchased, referrer_address, email')
       .eq('wallet_address', walletAddress)
       .maybeSingle();
+
+    // 🛡️ Security Sentinel Check: Verify Web3 Wallet Signature or Validated Fiat Purchase Record
+    if (signature === 'FIAT_VERIFIED_SIGNATURE') {
+      const crypto = await import('crypto');
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const expectedDerived = '0x' + crypto.createHash('sha256').update(cleanEmail).digest('hex').substring(0, 40);
+      const isAuthorizedFiat =
+        userData?.has_purchased === true &&
+        (walletAddress.toLowerCase() === expectedDerived.toLowerCase() ||
+         (userData?.email && userData.email.toLowerCase() === cleanEmail));
+
+      if (!isAuthorizedFiat) {
+        return NextResponse.json(
+          { error: '查無此信箱的已完成付款紀錄，請確認輸入的 Email 與刷卡/PayPal 付款時一致。' },
+          { status: 403 }
+        );
+      }
+    } else {
+      if (!signature || !message || !signature.startsWith('0x')) {
+        return NextResponse.json({ error: '請先完成 Web3 錢包簽章驗證 (Missing valid signature)' }, { status: 401 });
+      }
+      const isValidSig = await verifyMessage({
+        address: walletAddress as `0x${string}`,
+        message,
+        signature: signature as `0x${string}`,
+      });
+      if (!isValidSig) {
+        return NextResponse.json({ error: 'Web3 錢包簽章驗證失敗 (Invalid wallet signature)' }, { status: 401 });
+      }
+    }
 
     let productType = 'NFT_REDEEM';
     let courseLink = '';
