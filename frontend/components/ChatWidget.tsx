@@ -59,10 +59,10 @@ export default function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const welcomeMessage = lang === 'zh-TW' ? '您好！我是微享 AI 專屬客服 🤖 歡迎諮詢 25% 分潤、$990 電子書自動販賣機，或點擊參觀全新成立的【AI 雲教室 / 微享商學院】(https://vip.5208.uk/courses/) 免費試讀第 1 講與【🧭 AI 實戰百科】(https://vip.5208.uk/learning-zone/)！請問有什麼可以協助您？' :
-                         lang === 'zh-CN' ? '您好！我是微享 AI 专属客服 🤖 欢迎咨询 25% 分润、$990 电子书自动贩卖机，或点击参观全新成立的【AI 云教室 / 微享商学院】(https://vip.5208.uk/courses/) 免费试读第 1 讲与【🧭 AI 实战百科】(https://vip.5208.uk/learning-zone/)！请问有什么可以协助您？' :
-                         lang === 'en-US' ? 'Hello! I am the WeiXiang AI Assistant 🤖 Ask me about our 25% Affiliate Program, E-Book SaaS, or visit our newly launched [AI Cloud Classroom](https://vip.5208.uk/courses/) (Lesson 1 Free Preview!) and [🧭 AI Master Hub](https://vip.5208.uk/learning-zone/). How can I help you today?' :
-                         lang === 'ja-JP' ? 'こんにちは！WeiXiang AIアシスタントです 🤖 25%アフィリエイトや電子書籍SaaSのご相談、または新設の【AIクラウド教室】(https://vip.5208.uk/courses/)（第1講無料試読）＆【🧭 AI実践百科】(https://vip.5208.uk/learning-zone/)へぜひお越しください！' :
+  const welcomeMessage = lang === 'zh-TW' ? '您好！我是微享 AI 專屬客服 🤖 歡迎諮詢 25% 分潤、$990 電子書自動販賣機，或點擊參觀全新成立的【AI 雲教室 / 微享商學院】(https://vip.5208.uk/courses/) 免費試讀第 1 講與【🧭 AI-ATM實戰百科】(https://vip.5208.uk/learning-zone/)！請問有什麼可以協助您？' :
+                         lang === 'zh-CN' ? '您好！我是微享 AI 专属客服 🤖 欢迎咨询 25% 分润、$990 电子书自动贩卖机，或点击参观全新成立的【AI 云教室 / 微享商学院】(https://vip.5208.uk/courses/) 免费试读第 1 讲与【🧭 AI-ATM实战百科】(https://vip.5208.uk/learning-zone/)！请问有什么可以协助您？' :
+                         lang === 'en-US' ? 'Hello! I am the WeiXiang AI Assistant 🤖 Ask me about our 25% Affiliate Program, E-Book SaaS, or visit our newly launched [AI Cloud Classroom](https://vip.5208.uk/courses/) (Lesson 1 Free Preview!) and [🧭 AI-ATM Master Hub](https://vip.5208.uk/learning-zone/). How can I help you today?' :
+                         lang === 'ja-JP' ? 'こんにちは！WeiXiang AIアシスタントです 🤖 25%アフィリエイトや電子書籍SaaSのご相談、または新設の【AIクラウド教室】(https://vip.5208.uk/courses/)（第1講無料試読）＆【🧭 AI-ATM実践百科】(https://vip.5208.uk/learning-zone/)へぜひお越しください！' :
                          lang === 'ko-KR' ? '안녕하세요! WeiXiang AI 어시스턴트입니다. 무엇을 도와드릴까요? [AI Cloud Classroom](https://vip.5208.uk/courses/)' :
                          'Xin chào! Tôi là Trợ lý AI WeiXiang. Tôi có thể giúp gì cho bạn? [AI Cloud Classroom](https://vip.5208.uk/courses/)';
 
