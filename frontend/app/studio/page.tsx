@@ -1365,6 +1365,32 @@ export default function FranchiseStudioPage() {
                       {b.review_note && (
                         <div className="text-[11px] text-gray-400 mt-1">後台備註：{b.review_note}</div>
                       )}
+                      {b.status === 'APPROVED_PUBLISHED' && (
+                        <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              const refWallet = address || b.author_wallet || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
+                              const url = `${window.location.origin}/ebook-store?book=${encodeURIComponent(b.id)}&ref=${encodeURIComponent(refWallet)}`;
+                              navigator.clipboard.writeText(url);
+                              setStatusMessage(`📣 已複製《${b.title_zh}》專屬推廣連結（含您的推薦碼）：${url}`);
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-200 text-[10px] font-black cursor-pointer"
+                          >
+                            📣 複製單書專屬推廣連結 (25%分潤)
+                          </button>
+                          <a
+                            href={`/ebook-store?book=${encodeURIComponent(b.id)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-[10px] font-bold"
+                          >
+                            📚 查看書櫃賣場 ➔
+                          </a>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

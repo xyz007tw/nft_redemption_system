@@ -3,7 +3,7 @@ import { PAYUNI_MERCHANT_ID, encryptTradeInfo, generateTradeSha } from '@/lib/pa
 
 export async function POST(req: Request) {
   try {
-    const { packageId, priceInUSDT, productType, productName, buyerAddress, walletAddress, email, refCode } = await req.json();
+    const { packageId, priceInUSDT, productType, productName, bookId, buyerAddress, walletAddress, email, refCode } = await req.json();
     const finalWallet = buyerAddress || walletAddress || '';
 
     if (!PAYUNI_MERCHANT_ID) {
@@ -13,7 +13,9 @@ export async function POST(req: Request) {
     // Convert USDT to TWD (Fixed rate for now: 1 USDT = 32 TWD)
     const amountTWD = Math.round(Number(priceInUSDT) * 32);
     const orderNo = `ORD${Date.now()}`;
-    const customField3Value = productType ? `${packageId}|${productType}|${Number(priceInUSDT)}` : packageId.toString();
+    const customField3Value = productType
+      ? `${packageId}|${productType}|${Number(priceInUSDT)}${bookId ? `|${bookId}` : ''}`
+      : packageId.toString();
 
     // Payload for PayUni
     const tradeData = {

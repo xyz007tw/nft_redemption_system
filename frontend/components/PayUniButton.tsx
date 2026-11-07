@@ -9,9 +9,10 @@ interface PayUniButtonProps {
   priceInUSDT: number;
   productType?: string;
   productName?: string;
+  bookId?: string;
 }
 
-export default function PayUniButton({ packageId, priceInUSDT, productType, productName }: PayUniButtonProps) {
+export default function PayUniButton({ packageId, priceInUSDT, productType, productName, bookId }: PayUniButtonProps) {
   const { address } = useAccount();
   const { t, lang } = useLanguage();
   const isChinese = lang.includes('zh');
@@ -38,6 +39,7 @@ export default function PayUniButton({ packageId, priceInUSDT, productType, prod
           priceInUSDT,
           productType: productType || '',
           productName: productName || '',
+          bookId: bookId || '',
           buyerAddress: address || '',
           email: email.trim().toLowerCase(),
           refCode

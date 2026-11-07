@@ -45,9 +45,10 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 const STORE_PKG_ID = 990990;
 const STORE_PREFIX = '__WX_EBOOK_STORE__:';
 
-interface EBookCloudStore {
+export interface EBookCloudStore {
   franchisees: Record<string, FranchiseeProfile>;
   books: EBookProject[];
+  reader_purchases?: Record<string, string[]>;
 }
 
 const DEFAULT_STORE: EBookCloudStore = {
@@ -260,9 +261,24 @@ async function saveCloudStore(store: EBookCloudStore): Promise<void> {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const verifyReaderEmail = searchParams.get('readerEmail')?.trim().toLowerCase();
   const store = await loadCloudStore();
-  return NextResponse.json({ success: true, store });
+  let unlockedBooks: string[] = [];
+  if (verifyReaderEmail && store.reader_purchases && store.reader_purchases[verifyReaderEmail]) {
+    unlockedBooks = store.reader_purchases[verifyReaderEmail];
+  }
+  return NextResponse.json(
+    { success: true, store, unlockedBooks },
+    {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    }
+  );
 }
 
 export async function POST(req: Request) {
@@ -971,6 +987,14 @@ export async function POST(req: Request) {
       }
 
       profile.total_sales_usdt = Number((profile.total_sales_usdt + price).toFixed(2));
+      if (readerEmail && typeof readerEmail === 'string' && readerEmail.includes('@')) {
+        const cleanMail = readerEmail.trim().toLowerCase();
+        if (!store.reader_purchases) store.reader_purchases = {};
+        if (!store.reader_purchases[cleanMail]) store.reader_purchases[cleanMail] = [];
+        if (!store.reader_purchases[cleanMail].includes(book.id)) {
+          store.reader_purchases[cleanMail].push(book.id);
+        }
+      }
       await saveCloudStore(store);
 
       // 同步觸發 25% 推廣服務費分潤引擎（若為非推廣者的自然流量訪客下單，系統自動綁定最高 10% 級差獎金、10% 對等獎金及永久 5% 均分全球分紅）

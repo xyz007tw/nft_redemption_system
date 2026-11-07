@@ -16,6 +16,8 @@ export default function ReaderEBookStorePage() {
   const [unlockedBookIds, setUnlockedBookIds] = useState<string[]>(['ebook-demo-001']);
   const [readingModeLang, setReadingModeLang] = useState<'AUTO' | 'BILINGUAL' | 'ZH_TW' | 'ZH_CN' | 'EN' | 'JA' | 'VI' | 'ID'>('AUTO');
   const [settlementNotice, setSettlementNotice] = useState<string | null>(null);
+  const [storePlanMode, setStorePlanMode] = useState<'SINGLE' | 'MONTHLY'>('SINGLE');
+  const [copiedBookLink, setCopiedBookLink] = useState(false);
 
   // 決定目前閱讀器所採用的語系
   const effectiveLang =
@@ -191,13 +193,25 @@ export default function ReaderEBookStorePage() {
   };
 
   useEffect(() => {
+    let targetBookParam: string | null = null;
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      targetBookParam = sp.get('book');
+      const refParam = sp.get('ref');
+      if (refParam && refParam.trim()) {
+        localStorage.setItem('weixiang_referrer', refParam.trim());
+      }
+    }
     fetch('/api/ebook')
       .then(r => r.json())
       .then(data => {
         if (data.success && data.store?.books) {
           const published = data.store.books.filter((b: EBookProject) => b.status === 'APPROVED_PUBLISHED');
           setBooks(published);
-          if (published.length > 0) setSelectedBook(published[0]);
+          if (published.length > 0) {
+            const matched = targetBookParam ? published.find((b: EBookProject) => b.id === targetBookParam) : null;
+            setSelectedBook(matched || published[0]);
+          }
         }
       })
       .catch(console.error);
@@ -368,19 +382,59 @@ export default function ReaderEBookStorePage() {
                   />
                 </div>
 
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setStorePlanMode('SINGLE')}
+                    className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
+                      storePlanMode === 'SINGLE' ? 'bg-emerald-500/20 border-emerald-400' : 'bg-black/40 border-white/10'
+                    }`}
+                  >
+                    <span className="text-[11px] text-emerald-300 font-bold block">單本永久買斷</span>
+                    <span className="text-lg font-black text-white">${selectedBook.price_single_usdt} USDT</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStorePlanMode('MONTHLY')}
+                    className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
+                      storePlanMode === 'MONTHLY' ? 'bg-pink-500/20 border-pink-400' : 'bg-black/40 border-white/10'
+                    }`}
+                  >
+                    <span className="text-[11px] text-pink-300 font-bold block">VIP 專欄月閱</span>
+                    <span className="text-lg font-black text-pink-300">${selectedBook.price_monthly_sub_usdt} /月</span>
+                  </button>
+                </div>
+
                 <div className="space-y-3">
                   <PayUniButton
-                    packageId={991}
-                    priceInUSDT={selectedBook.price_single_usdt}
-                    productType="DIRECT_COURSE"
-                    productName={`電子書單本買斷：${selectedLocalized.title}`}
+                    packageId={storePlanMode === 'SINGLE' ? 991 : 992}
+                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedBook.price_single_usdt : selectedBook.price_monthly_sub_usdt}
+                    productType="EBOOK_PURCHASE"
+                    productName={`${storePlanMode === 'SINGLE' ? '電子書單本買斷' : 'VIP電子書專欄月閱'}：${selectedLocalized.title}`}
+                    bookId={selectedBook.id}
                   />
                   <PayPalButton
-                    packageId={991}
-                    priceInUSDT={selectedBook.price_single_usdt}
-                    productType="DIRECT_COURSE"
-                    productName={`電子書單本買斷：${selectedLocalized.title}`}
+                    packageId={storePlanMode === 'SINGLE' ? 991 : 992}
+                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedBook.price_single_usdt : selectedBook.price_monthly_sub_usdt}
+                    productType="EBOOK_PURCHASE"
+                    productName={`${storePlanMode === 'SINGLE' ? 'EBook Buyout' : 'VIP EBook Monthly'}: ${selectedLocalized.title}`}
+                    bookId={selectedBook.id}
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof window === 'undefined') return;
+                      const savedRef = localStorage.getItem('weixiang_referrer') || selectedBook.author_wallet || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
+                      const url = `${window.location.origin}/ebook-store?book=${encodeURIComponent(selectedBook.id)}&ref=${encodeURIComponent(savedRef)}`;
+                      navigator.clipboard.writeText(url);
+                      setCopiedBookLink(true);
+                      setTimeout(() => setCopiedBookLink(false), 3000);
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-200 font-black text-xs cursor-pointer text-center"
+                  >
+                    {copiedBookLink ? '✅ 已複製本書專屬推廣連結 (自動綁定 25% 分潤)！' : '📣 複製本書專屬推廣連結 (分享享 25% 推廣分潤)'}
+                  </button>
 
                   <button
                     onClick={() => handleSimulateUnlock(selectedBook, false)}

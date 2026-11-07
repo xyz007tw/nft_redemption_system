@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { EBookProject, getEBookLocalizedContent } from '@/lib/ebookEngine';
+import PayUniButton from '@/components/PayUniButton';
+import PayPalButton from '@/components/PayPalButton';
 
 interface FeaturedEBookShowcaseSectionProps {
   initialBooks?: EBookProject[];
@@ -191,6 +193,32 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
   const [verifyResult, setVerifyResult] = useState<{ success: boolean; msg: string; r2Url?: string } | null>(null);
   const [simulatingBuy, setSimulatingBuy] = useState(false);
   const [simSettlement, setSimSettlement] = useState<any>(null);
+  const [selectedPlanMode, setSelectedPlanMode] = useState<'SINGLE' | 'MONTHLY'>('SINGLE');
+  const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
+
+  // 支援單書專屬推廣連結 (?book=ebook-xxx&ref=xxx) 自動定位與推薦碼綁定
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const bookParam = params.get('book');
+    const refParam = params.get('ref');
+    if (refParam && refParam.trim()) {
+      localStorage.setItem('weixiang_referrer', refParam.trim());
+    }
+    if (bookParam && books.some(b => b.id === bookParam)) {
+      setSelectedBookId(bookParam);
+    }
+  }, [books]);
+
+  const handleCopyBookShareLink = (book: EBookProject) => {
+    if (typeof window === 'undefined') return;
+    const savedRef = localStorage.getItem('weixiang_referrer') || book.author_wallet || '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc';
+    const shareUrl = `${window.location.origin}/ebook-store?book=${encodeURIComponent(book.id)}&ref=${encodeURIComponent(savedRef)}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopiedShareId(book.id);
+      setTimeout(() => setCopiedShareId(null), 3000);
+    });
+  };
 
   // 監聽全局導覽列切換語系，自動無縫連動電子書預覽語系
   useEffect(() => {
@@ -778,35 +806,82 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                 </div>
               </div>
 
-              {/* 結帳定價與購買 CTA */}
+              {/* 結帳定價與購買 CTA (真實 PayUni 信用卡 / PayPal 結帳 + 單書專屬推廣連結 + 100% 倒抵分潤預覽) */}
               <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/90 to-purple-950/90 border border-indigo-400/50 shadow-xl space-y-3">
-                <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
-                  <div>
-                    <span className="text-xs text-indigo-300 font-bold block">{t.lifetimeBuyout}</span>
-                    <span className="text-2xl sm:text-3xl font-black text-white">${currentBook.price_single_usdt} <span className="text-xs font-normal text-gray-300">USDT</span></span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-pink-300 font-bold block">{t.monthlyVip}</span>
-                    <span className="text-xl sm:text-2xl font-black text-pink-400">${currentBook.price_monthly_sub_usdt} <span className="text-xs font-normal text-gray-300">{t.perMonth}</span></span>
-                  </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPlanMode('SINGLE')}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      selectedPlanMode === 'SINGLE'
+                        ? 'bg-emerald-500/20 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                        : 'bg-black/30 border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    <span className="text-[11px] text-emerald-300 font-bold block">{t.lifetimeBuyout}</span>
+                    <span className="text-xl sm:text-2xl font-black text-white">${currentBook.price_single_usdt} <span className="text-[11px] font-normal text-gray-300">USDT</span></span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPlanMode('MONTHLY')}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      selectedPlanMode === 'MONTHLY'
+                        ? 'bg-pink-500/20 border-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.3)]'
+                        : 'bg-black/30 border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    <span className="text-[11px] text-pink-300 font-bold block">{t.monthlyVip}</span>
+                    <span className="text-xl sm:text-2xl font-black text-pink-300">${currentBook.price_monthly_sub_usdt} <span className="text-[11px] font-normal text-gray-300">{t.perMonth}</span></span>
+                  </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <div className="space-y-2 pt-1">
+                  <PayUniButton
+                    packageId={selectedPlanMode === 'SINGLE' ? 991 : 992}
+                    priceInUSDT={selectedPlanMode === 'SINGLE' ? currentBook.price_single_usdt : currentBook.price_monthly_sub_usdt}
+                    productType="EBOOK_PURCHASE"
+                    productName={`${selectedPlanMode === 'SINGLE' ? '電子書買斷' : 'VIP電子書月閱'}：${currentLoc.title}`}
+                    bookId={currentBook.id}
+                  />
+                  <PayPalButton
+                    packageId={selectedPlanMode === 'SINGLE' ? 991 : 992}
+                    priceInUSDT={selectedPlanMode === 'SINGLE' ? currentBook.price_single_usdt : currentBook.price_monthly_sub_usdt}
+                    productType="EBOOK_PURCHASE"
+                    productName={`${selectedPlanMode === 'SINGLE' ? 'EBook Buyout' : 'VIP EBook Sub'}: ${currentLoc.title}`}
+                    bookId={currentBook.id}
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
                   <button
-                    onClick={() => handleSimulatePurchase('SINGLE')}
-                    disabled={simulatingBuy}
-                    className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:scale-105 cursor-pointer text-center"
+                    type="button"
+                    onClick={() => handleCopyBookShareLink(currentBook)}
+                    className="w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-200 font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                    {t.buySingleBtn(currentBook.price_single_usdt)}
+                    <span>🔗</span>
+                    {copiedShareId === currentBook.id
+                      ? '✅ 已複製本書專屬推廣連結 (自動帶入 25% 分潤碼)！'
+                      : '📣 複製本書專屬推廣連結 (分享即享 25% 推廣分潤)'}
                   </button>
 
-                  <button
-                    onClick={() => handleSimulatePurchase('MONTHLY')}
-                    disabled={simulatingBuy}
-                    className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-black text-xs sm:text-sm shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all hover:scale-105 cursor-pointer text-center"
-                  >
-                    {t.buyMonthlyBtn(currentBook.price_monthly_sub_usdt)}
-                  </button>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleSimulatePurchase('SINGLE')}
+                      disabled={simulatingBuy}
+                      className="w-full py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-bold text-[11px] transition-all cursor-pointer text-center"
+                    >
+                      ⚡ 試算買斷 (${currentBook.price_single_usdt}) 倒抵分潤
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSimulatePurchase('MONTHLY')}
+                      disabled={simulatingBuy}
+                      className="w-full py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-bold text-[11px] transition-all cursor-pointer text-center"
+                    >
+                      ⚡ 試算月閱 (${currentBook.price_monthly_sub_usdt}) 倒抵分潤
+                    </button>
+                  </div>
                 </div>
 
                 <p className="text-[11px] text-gray-300 text-center leading-relaxed pt-1">

@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     let walletAddress = decryptedInfo.CustomField1;
     const refCode = decryptedInfo.CustomField2;
     const rawCustom3 = String(decryptedInfo.CustomField3 || '');
-    const [parsedPkgId, parsedProductType, parsedPriceUsdt] = rawCustom3.split('|');
+    const [parsedPkgId, parsedProductType, parsedPriceUsdt, parsedBookId] = rawCustom3.split('|');
     const packageId = parsedPkgId || rawCustom3;
     const email = decryptedInfo.BuyerMail; // PayUni standard field
 
@@ -189,6 +189,32 @@ export async function POST(req: Request) {
           clientEmailHandled = true;
         } catch (enrollErr) {
           console.error('[PayUni Callback] Error in VIP auto-enroll:', enrollErr);
+        }
+      } else if (pkgData?.product_type === 'EBOOK_PURCHASE' || Number(packageId) === 991 || Number(packageId) === 992) {
+        try {
+          const { settleRealEBookPurchase } = await import('@/lib/ebookSettlement');
+          const ebookSettle = await settleRealEBookPurchase({
+            bookId: parsedBookId || 'ebook-demo-001',
+            amountUsdt: packagePriceUSDT,
+            readerEmail: email
+          });
+          const bookTitle = ebookSettle?.book?.title_zh || pkgData?.name_zh || '精裝雙語電子書';
+          const r2Url = ebookSettle?.r2Url || 'https://1.5208.uk/ebooks/ebook-demo-001/master_bilingual.html';
+          emailSubject = `📖 【WeiXiang AI】電子書購買成功！《${bookTitle}》專屬防盜版閱讀與下載通行證`;
+          emailHtml = `
+            <div style="font-family: sans-serif; max-width: 640px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
+              <h2 style="color: #0f172a; margin-top: 0;">🎉 恭喜您成功解鎖《${bookTitle}》！</h2>
+              <p>您的款項（$${packagePriceUSDT} USDT）已確認收訖，系統已完成加盟商 10% 抽佣抵用金倒抵與 25% 聯盟分潤結算，並為您的信箱 <strong>${email}</strong> 開通永久閱讀與下載授權：</p>
+              <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin: 18px 0; border: 1px solid #cbd5e1;">
+                <p style="margin: 0 0 12px; font-weight: bold; color: #1e293b;">📥 一鍵進入閱讀與下載精裝 PDF：</p>
+                <p style="margin: 8px 0;"><a href="${r2Url}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬 R2 防盜版雙語閱讀器</a></p>
+                <p style="margin: 8px 0;"><a href="${siteUrl}/ebook-store?book=${encodeURIComponent(parsedBookId || 'ebook-demo-001')}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃下載浮水印 PDF</a></p>
+              </div>
+              <p style="font-size: 13px; color: #64748b;">微享 AI-ATM 全球知識自動販賣機 敬上</p>
+            </div>
+          `;
+        } catch (ebErr) {
+          console.error('[PayUni Callback] Error in EBook settlement:', ebErr);
         }
       } else if (pkgData?.product_type === 'SPONSOR') {
         emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";

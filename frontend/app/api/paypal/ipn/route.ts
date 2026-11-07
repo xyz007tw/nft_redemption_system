@@ -106,6 +106,7 @@ export async function POST(req: Request) {
     const email = (parts[3] || params.get('payer_email') || '').toLowerCase().trim();
     const refCode = parts[4] || '';
     let walletAddress = parts[5] || '';
+    const bookId = parts[6] || '';
 
     const pkgNumericId = normalizeCoursePkgId(Number(packageId));
     const expectedMinPrice = MIN_PKG_PRICE_MAP[pkgNumericId] || 0;
@@ -162,8 +163,44 @@ export async function POST(req: Request) {
       }
     }
 
-    // 8. Automated VIP Course Enrollment & Email Delivery
-    if (email && email.includes('@')) {
+    // 8. Automated VIP Course Enrollment OR E-Book Franchise Settlement & Email Delivery
+    if (productType === 'EBOOK_PURCHASE' || Number(packageId) === 991 || Number(packageId) === 992) {
+      try {
+        const { settleRealEBookPurchase } = await import('@/lib/ebookSettlement');
+        const ebookSettle = await settleRealEBookPurchase({
+          bookId: bookId || 'ebook-demo-001',
+          amountUsdt: priceUsdt,
+          readerEmail: email
+        });
+        if (email && email.includes('@') && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+          const nodemailer = await import('nodemailer');
+          const transporter = nodemailer.default.createTransport({
+            service: 'gmail',
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+          });
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+          const bookTitle = ebookSettle?.book?.title_zh || '精裝雙語電子書';
+          const r2Url = ebookSettle?.r2Url || 'https://1.5208.uk/ebooks/ebook-demo-001/master_bilingual.html';
+          await transporter.sendMail({
+            from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: `📖 【WeiXiang AI】PayPal 購書成功！《${bookTitle}》專屬防盜版閱讀與下載通行證`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 640px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
+                <h2 style="color: #0f172a; margin-top: 0;">🎉 恭喜您成功解鎖《${bookTitle}》！</h2>
+                <p>您的 PayPal 款項（$${priceUsdt} USD）已確認收訖，系統已為您的信箱 <strong>${email}</strong> 開通永久閱讀與下載授權：</p>
+                <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin: 18px 0; border: 1px solid #cbd5e1;">
+                  <p style="margin: 8px 0;"><a href="${r2Url}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬 R2 防盜版雙語閱讀器</a></p>
+                  <p style="margin: 8px 0;"><a href="${siteUrl}/ebook-store?book=${encodeURIComponent(bookId || 'ebook-demo-001')}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃下載浮水印 PDF</a></p>
+                </div>
+              </div>
+            `
+          });
+        }
+      } catch (ebErr) {
+        console.error('[PayPal IPN] Error in EBook settlement:', ebErr);
+      }
+    } else if (email && email.includes('@')) {
       try {
         console.log(`[PayPal IPN] Auto enrolling user ${email} into package ${pkgNumericId}...`);
         const enrollResult = await autoEnrollVipStudent(email, pkgNumericId, txnId);

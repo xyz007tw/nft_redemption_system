@@ -9,11 +9,12 @@ interface PayPalButtonProps {
   priceInUSDT: number;
   productType?: string;
   productName?: string;
+  bookId?: string;
 }
 
 export const PAYPAL_RECEIVER_EMAIL = 'qqww11003@gmail.com';
 
-export default function PayPalButton({ packageId, priceInUSDT, productType, productName }: PayPalButtonProps) {
+export default function PayPalButton({ packageId, priceInUSDT, productType, productName, bookId }: PayPalButtonProps) {
   const { address } = useAccount();
   const { lang } = useLanguage();
   const isChinese = lang.includes('zh');
@@ -38,14 +39,15 @@ export default function PayPalButton({ packageId, priceInUSDT, productType, prod
       const refCode = typeof window !== 'undefined' ? (localStorage.getItem('weixiang_referrer') || '') : '';
       const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://nft1314.party';
 
-      // Assemble custom field payload: pkgId|productType|price|email|refCode|address
+      // Assemble custom field payload: pkgId|productType|price|email|refCode|address|bookId
       const customPayload = [
         packageId,
         productType || 'DIRECT_COURSE',
         priceInUSDT,
         email.trim().toLowerCase(),
         refCode,
-        address || ''
+        address || '',
+        bookId || ''
       ].join('|');
 
       const itemName = productName || `WeiXiang AI Package #${packageId}`;
