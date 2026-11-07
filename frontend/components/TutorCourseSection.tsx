@@ -156,7 +156,7 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
       price: 198,
       discount_text: isChinese ? '👑 現省$232・贈2枚NFT(360天權限)＋享25%分潤' : '👑 Save $232 · Incl. 2 NFTs · 25% Affiliate',
       product_type: 'DIRECT_COURSE',
-      course_link: 'https://vip.5208.uk/courses/all-master-bundle',
+      course_link: 'https://vip.5208.uk/dashboard/',
       promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
       promo_html_en: BIGMONEY_PROMO_HTML_EN
     }
@@ -701,15 +701,53 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
               )}
 
               {unlockedLink && (
-                <a
-                  href={unlockedLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 w-full py-3.5 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-black font-black rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
-                >
-                  <span>📥</span>
-                  {isChinese ? '立即點擊下載 / 觀看 AI頂配教材' : 'Click Here to Download / Access AI Master Materials'}
-                </a>
+                <div className="mt-4 space-y-3">
+                  <a
+                    href={unlockedLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-black font-black rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
+                  >
+                    <span>📥</span>
+                    {isChinese ? '立即點擊下載 / 進入 vip.5208.uk 學員教室' : 'Click Here to Download / Enter vip.5208.uk Classroom'}
+                  </a>
+
+                  {downloadLinks && (
+                    <div className="p-4 rounded-xl bg-black/60 border border-emerald-500/40 space-y-2">
+                      <div className="text-xs font-bold text-emerald-300 mb-2">
+                        {isChinese
+                          ? '📚 統一由 VIP 創客實戰學院 (vip.5208.uk) 供檔・點選語系直接下載：'
+                          : '📚 Hosted on VIP Academy (vip.5208.uk) · Select Language to Download:'}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                        <a href={downloadLinks.zh_tw} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 flex items-center justify-between">
+                          <span>🇹🇼 繁體中文 PDF</span>
+                          <span>⬇</span>
+                        </a>
+                        <a href={downloadLinks.zh_cn} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 flex items-center justify-between">
+                          <span>🇨🇳 简体中文 PDF</span>
+                          <span>⬇</span>
+                        </a>
+                        <a href={downloadLinks.en} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 flex items-center justify-between">
+                          <span>🇺🇸 English PDF</span>
+                          <span>⬇</span>
+                        </a>
+                        <a href={downloadLinks.ja} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 flex items-center justify-between">
+                          <span>🇯🇵 日本語版 PDF</span>
+                          <span>⬇</span>
+                        </a>
+                        <a href={downloadLinks.interactive_html} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/50 text-emerald-300 flex items-center justify-between">
+                          <span>🌐 雙語互動閱讀器</span>
+                          <span>↗</span>
+                        </a>
+                        <a href={downloadLinks.code_zip} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-lg bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/50 text-purple-300 flex items-center justify-between">
+                          <span>💻 實戰源碼包 (.zip)</span>
+                          <span>⬇</span>
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>

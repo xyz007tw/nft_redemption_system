@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { normalizeCoursePkgId, autoEnrollVipStudent } from '@/lib/vipEnroll';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     const COURSE_MAP: Record<number, { name: string; link: string }> = {
       100: {
         name: '🏆 全套 10 門課 VIP 終身旗艦合輯（贈 2 枚微享 NFT 憑證）',
-        link: 'https://vip.5208.uk/courses/all-master-bundle'
+        link: 'https://vip.5208.uk/dashboard/'
       },
       101: {
         name: '教材 01｜20年首席架構師 · AI-ATM 自動商業變現大師班',
@@ -131,15 +132,30 @@ export async function POST(req: Request) {
       }
     }
 
-    const effectiveId = packageId ? Number(packageId) : 101;
+    const effectiveId = packageId ? normalizeCoursePkgId(Number(packageId)) : 101;
+    let magicLoginUrl = courseLink;
+    try {
+      const enrollRes = await autoEnrollVipStudent(
+        (buyerEmail && buyerEmail.includes('@')) ? buyerEmail.trim() : targetEmail.trim(),
+        effectiveId,
+        `FORWARD_${Date.now()}`
+      );
+      if (enrollRes.success && enrollRes.magic_login_url) {
+        magicLoginUrl = enrollRes.magic_login_url;
+      }
+    } catch (e) {
+      console.warn('[Course Forward] Magic link generation fallback:', e);
+    }
+
     const downloadLinks = {
-      primary: courseLink,
+      primary: magicLoginUrl,
       zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_tw.pdf`,
       zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_cn.pdf`,
       en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_en.pdf`,
       ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_ja.pdf`,
       code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_source_code.zip`,
-      interactive_html: `https://1.5208.uk/ebooks/material_${effectiveId}/master_bilingual.html`
+      interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}/master_bilingual.html`,
+      magic_classroom: magicLoginUrl
     };
 
     // 3. Send email if SMTP credentials are configured
@@ -174,8 +190,8 @@ export async function POST(req: Request) {
               </ul>
             </div>
             <div style="margin: 28px 0; text-align: center;">
-              <a href="${courseLink}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #10b981, #06b6d4); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px;">
-                🚀 立即進入 VIP 實戰學員教室
+              <a href="${magicLoginUrl}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #10b981, #06b6d4); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px;">
+                🚀 一鍵免密碼進入 VIP 實戰學員教室 (vip.5208.uk)
               </a>
             </div>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
@@ -188,9 +204,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       courseName,
-      courseLink,
+      courseLink: magicLoginUrl,
       downloadLinks,
-      message: `課程教材已成功發送至 ${targetEmail}！各語系版本已同步就緒。`
+      message: `課程教材已成功發送至 ${targetEmail}！各語系版本已於 vip.5208.uk 同步就緒。`
     });
   } catch (error: any) {
     console.error('Course forward error:', error);

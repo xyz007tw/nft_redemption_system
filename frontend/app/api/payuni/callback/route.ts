@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { decryptTradeInfo, generateTradeSha } from '@/lib/payuni';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
-import { autoEnrollVipStudent, sendVipCourseWelcomeEmail } from '@/lib/vipEnroll';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail, normalizeCoursePkgId } from '@/lib/vipEnroll';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -161,10 +161,11 @@ export async function POST(req: Request) {
       let clientEmailHandled = false;
       if (pkgData?.product_type === 'DIRECT_COURSE') {
         try {
-          const enrollResult = await autoEnrollVipStudent(email, Number(packageId), tradeKey);
+          const normPkgId = normalizeCoursePkgId(Number(packageId));
+          const enrollResult = await autoEnrollVipStudent(email, normPkgId, tradeKey);
           await sendVipCourseWelcomeEmail({
             email,
-            pkgId: Number(packageId),
+            pkgId: normPkgId,
             txnId: tradeKey,
             magicLoginUrl: enrollResult.magic_login_url,
             courseName: pkgData.name_zh,

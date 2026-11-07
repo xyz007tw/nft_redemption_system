@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
 import nodemailer from 'nodemailer';
 import { processAffiliateCommissions } from '@/lib/affiliate';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail, normalizeCoursePkgId } from '@/lib/vipEnroll';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -33,8 +34,10 @@ export async function POST(req: Request) {
     let courseLink = '';
     let pkgName = 'AI 生產力憑證 / 頂配教材';
     let pkgPrice = NFT_PRICE;
+    let purchasedPkgId = 101;
 
     if (userData && userData.last_purchased_package) {
+      purchasedPkgId = normalizeCoursePkgId(Number(userData.last_purchased_package));
       const { unpackPackageRow } = await import('@/lib/packageMeta');
       const { data: rawPkgData } = await supabase
         .from('packages')
@@ -90,13 +93,29 @@ export async function POST(req: Request) {
           <p>WeiXiang AI 總指揮中心 敬上</p>
       `;
 
+      let clientEmailHandled = false;
       if (productType === 'DIRECT_COURSE') {
+        try {
+          const web3TxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
+          const enrollResult = await autoEnrollVipStudent(email, purchasedPkgId, web3TxnId);
+          await sendVipCourseWelcomeEmail({
+            email,
+            pkgId: purchasedPkgId,
+            txnId: web3TxnId,
+            magicLoginUrl: enrollResult.magic_login_url,
+            courseName: pkgName,
+            priceUsdt: pkgPrice
+          });
+          clientEmailHandled = true;
+        } catch (enrollErr) {
+          console.error('[Redeem] Error in VIP auto-enroll:', enrollErr);
+        }
         emailSubject = "🎓 【WeiXiang AI】您的 AI頂配教材 已兌換開通！";
         emailHtml = `
           <h2>親愛的學員，恭喜您成功兌換「${pkgName}」！</h2>
           <p>您的 Web3 錢包簽署已確認完畢。請點擊下方連結下載/觀看您的專屬 AI頂配教材：</p>
           <br/>
-          <a href="${courseLink || '#'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即下載 / 觀看 AI頂配教材</a>
+          <a href="${courseLink || 'https://vip.5208.uk/dashboard/'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即下載 / 觀看 AI頂配教材</a>
           <br/><br/>
           <p>（此連結為您的專屬教材，請妥善保存。）</p>
           <p>微享 AI 團隊 敬上</p>
@@ -173,7 +192,9 @@ export async function POST(req: Request) {
       };
 
       try {
-        await transporter.sendMail(mailToClient);
+        if (!clientEmailHandled) {
+          await transporter.sendMail(mailToClient);
+        }
         await transporter.sendMail(mailToAdmin);
         console.log("Emails sent successfully!");
       } catch (err) {

@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 
 export const COURSE_NAMES: Record<number, string> = {
+  100: '🏆 全套 10 門課 VIP 終身旗艦合輯（贈 2 枚微享 NFT 憑證）',
   101: '20年首席架構師 · AI-ATM 自動商業變現大師班',
   102: 'SaaS-AVME 3.0 雙引擎 · AI 短影音自動化大師手冊',
   103: 'WordPress 多語系 · 自動化 SEO 站群變現術',
@@ -22,6 +23,23 @@ export const COURSE_NAMES: Record<number, string> = {
   60: '零成本獲客：AI 尋客 365 天全自動拓客實操指南',
   65: 'Web3 NFT 數位憑證與智能合約商務賦能大師手冊',
 };
+
+export const COURSE_ID_TO_PKG_ID: Record<number, number> = {
+  9: 101,
+  25: 102,
+  30: 103,
+  35: 104,
+  40: 105,
+  45: 106,
+  50: 107,
+  55: 108,
+  60: 109,
+  65: 110,
+};
+
+export function normalizeCoursePkgId(id: number): number {
+  return COURSE_ID_TO_PKG_ID[id] || id;
+}
 
 export interface EnrollResult {
   success: boolean;
@@ -99,15 +117,16 @@ export async function sendVipCourseWelcomeEmail(options: {
     return false;
   }
 
-  const courseTitle = options.courseName || COURSE_NAMES[pkgId] || `實戰專題 #${pkgId}`;
+  const normalizedPkgId = normalizeCoursePkgId(pkgId);
+  const courseTitle = options.courseName || COURSE_NAMES[normalizedPkgId] || COURSE_NAMES[pkgId] || `實戰專題 #${normalizedPkgId}`;
 
   const downloadLinks = {
-    zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgId}_zh_tw.pdf`,
-    zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgId}_zh_cn.pdf`,
-    en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgId}_en.pdf`,
-    ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgId}_ja.pdf`,
-    code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${pkgId}_source_code.zip`,
-    interactive_html: `https://1.5208.uk/ebooks/material_${pkgId}/master_bilingual.html`
+    zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_zh_tw.pdf`,
+    zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_zh_cn.pdf`,
+    en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_en.pdf`,
+    ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_ja.pdf`,
+    code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_source_code.zip`,
+    interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}/master_bilingual.html`
   };
 
   const transporter = nodemailer.createTransport({

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import { isPaymentDuplicate, acquirePaymentLock, releasePaymentLock, markPaymentProcessed } from '@/lib/idempotency';
 import { PAYPAL_RECEIVER_EMAIL } from '@/components/PayPalButton';
-import { autoEnrollVipStudent, sendVipCourseWelcomeEmail } from '@/lib/vipEnroll';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail, normalizeCoursePkgId } from '@/lib/vipEnroll';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       walletAddress = '0x' + hash.substring(0, 40);
     }
 
-    const pkgNumericId = Number(packageId);
+    const pkgNumericId = normalizeCoursePkgId(Number(packageId));
 
     // 1. Upsert buyer into Supabase users table
     const { data: existingUser } = await supabase
