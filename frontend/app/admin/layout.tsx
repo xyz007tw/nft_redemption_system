@@ -304,6 +304,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/franchise" className="block px-4 py-3 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-300 hover:bg-pink-500/20 transition-colors font-bold">
             📚 電子書書審與加盟商
           </Link>
+          <Link href="/admin/ads" className="block px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-colors font-bold">
+            📢 萬商廣告系統管理
+          </Link>
         </nav>
         <div className="p-4 border-t border-gray-700 text-xs text-gray-500 text-center font-mono">
           Wallet: {address?.substring(0, 6)}...{address?.substring(address.length - 4)}

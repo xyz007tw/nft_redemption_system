@@ -217,10 +217,25 @@ export async function POST(req: Request) {
           console.error('[PayUni Callback] Error in EBook settlement:', ebErr);
         }
       } else if (pkgData?.product_type === 'SPONSOR') {
+        try {
+          const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');
+          const adRes = await activateOrExtendSponsorAdAccount({
+            email,
+            paidAmountUsdt: packagePriceUSDT,
+            walletAddress,
+            adminNote: `PayUni 斗內贊助 ($${packagePriceUSDT} USDT)`,
+            sendWelcomeEmail: true
+          });
+          if (adRes.activated) {
+            clientEmailHandled = true;
+          }
+        } catch (adErr) {
+          console.error('[PayUni Callback] AdNetwork activation error:', adErr);
+        }
         emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
         emailHtml = `
           <h2>親愛的贊助者，衷心感謝您對微享 AI 團隊的支持與贊助！</h2>
-          <p>您的贊助款項（${pkgData.name_zh || '斗內贊助方案'}）已確認收訖。</p>
+          <p>您的贊助款項（${pkgData.name_zh || '斗內贊助方案'}）已確認收訖，並已 100% 計入您個人的級差升等累積業績。</p>
           <p>因為有您的支持，我們將持續研發更強大的 AI 自動化工具回饋社群！</p>
           <br/>
           <p>微享 AI 團隊 敬上</p>

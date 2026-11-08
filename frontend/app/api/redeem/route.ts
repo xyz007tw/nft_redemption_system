@@ -161,6 +161,21 @@ export async function POST(req: Request) {
           <p>微享 AI 團隊 敬上</p>
         `;
       } else if (productType === 'SPONSOR') {
+        try {
+          const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');
+          const adRes = await activateOrExtendSponsorAdAccount({
+            email,
+            paidAmountUsdt: pkgPrice,
+            walletAddress,
+            adminNote: `Web3 斗內贊助 ($${pkgPrice} USDT)`,
+            sendWelcomeEmail: true
+          });
+          if (adRes.activated) {
+            clientEmailHandled = true;
+          }
+        } catch (adErr) {
+          console.error('[Redeem] AdNetwork activation error:', adErr);
+        }
         emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
         emailHtml = `
           <h2>親愛的贊助者，衷心感謝您對微享 AI 團隊的支持與贊助！</h2>

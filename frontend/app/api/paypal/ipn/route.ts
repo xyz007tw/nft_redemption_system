@@ -200,6 +200,21 @@ export async function POST(req: Request) {
       } catch (ebErr) {
         console.error('[PayPal IPN] Error in EBook settlement:', ebErr);
       }
+    } else if (productType === 'SPONSOR' || Number(packageId) === 901 || Number(packageId) === 915 || Number(packageId) === 920) {
+      if (email && email.includes('@')) {
+        try {
+          const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');
+          await activateOrExtendSponsorAdAccount({
+            email,
+            paidAmountUsdt: priceUsdt,
+            walletAddress,
+            adminNote: `PayPal 斗內贊助 ($${priceUsdt} USD)`,
+            sendWelcomeEmail: true
+          });
+        } catch (adErr) {
+          console.error('[PayPal IPN] AdNetwork activation error:', adErr);
+        }
+      }
     } else if (email && email.includes('@')) {
       try {
         console.log(`[PayPal IPN] Auto enrolling user ${email} into package ${pkgNumericId}...`);
