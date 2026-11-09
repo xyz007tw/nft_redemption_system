@@ -35,6 +35,9 @@ export default function Dashboard() {
   const [isSavingPayout, setIsSavingPayout] = useState(false);
   const [payoutSaveMsg, setPayoutSaveMsg] = useState('');
 
+  // 萬商自助廣告協播會員狀態
+  const [adMemberInfo, setAdMemberInfo] = useState<any | null>(null);
+
   // 監聽 Web3 錢包連線狀態，或讀取本地 Email 登入紀錄
   useEffect(() => {
     if (isConnected && address) {
@@ -53,7 +56,7 @@ export default function Dashboard() {
     }
   }, [isConnected, address]);
 
-  // 載入會員數據
+  // 載入會員數據 + 萬商廣告剩餘天數與方案狀態
   useEffect(() => {
     if (activeAddress) {
       // 1. 產生該用戶專屬推廣連結 (取錢包前綴作 6 碼推廣碼)
@@ -65,7 +68,7 @@ export default function Dashboard() {
         try {
           const { data: user } = await supabase
             .from('users')
-            .select('total_sales, payout_wallet')
+            .select('total_sales, payout_wallet, email')
             .eq('wallet_address', activeAddress)
             .maybeSingle();
           
@@ -85,13 +88,25 @@ export default function Dashboard() {
             totalSales: Number(user?.total_sales) || 0,
             pendingCommission: pending
           });
+
+          // 3. 查詢萬商自助廣告協播帳號與剩餘使用時間
+          const queryEmail = activeEmail || user?.email || '';
+          const adRes = await fetch(
+            `/api/ads?mode=member_status&email=${encodeURIComponent(queryEmail)}&wallet=${encodeURIComponent(activeAddress)}`
+          );
+          const adData = await adRes.json();
+          if (adData.success && adData.has_account && adData.advertiser) {
+            setAdMemberInfo(adData.advertiser);
+          } else {
+            setAdMemberInfo(null);
+          }
         } catch (err) {
           console.error('Fetch stats error:', err);
         }
       };
       fetchStats();
     }
-  }, [activeAddress]);
+  }, [activeAddress, activeEmail]);
 
   // 處理 Email 免密碼快速登入
   const handleEmailLogin = async (e: React.FormEvent) => {
@@ -173,7 +188,7 @@ export default function Dashboard() {
           </div>
           <h1 className="text-2xl md:text-3xl font-black mb-3 text-white">會員數據中心</h1>
           <p className="text-sm text-gray-400 mb-8">
-            登入以查看您的團隊業績、專屬推廣碼與 25% 業務分潤
+            登入以查看您的團隊業績、專屬推廣碼、25% 業務分潤與萬商廣告可用時間
           </p>
 
           {/* 途徑 1：Web3 錢包登入 */}
@@ -198,7 +213,7 @@ export default function Dashboard() {
             <h3 className="text-sm font-bold text-emerald-400 mb-2 flex items-center gap-2">
               <span>✉️</span> 選項二：信用卡 / 訪客 Email 登入
             </h3>
-            <p className="text-xs text-gray-400 mb-4">輸入您當初刷卡填寫的 Email 即可免密碼直接登入</p>
+            <p className="text-xs text-gray-400 mb-4">輸入您當初刷卡或斗內填寫的 Email 即可免密碼直接登入</p>
             
             <input
               type="email"
@@ -267,7 +282,13 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link 
+              href="/ad-studio" 
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 rounded-xl text-sm font-black transition-all shadow-md"
+            >
+              📢 我的廣告小幫手 (/ad-studio)
+            </Link>
             <Link 
               href="/redeem" 
               className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl text-sm font-bold transition-all shadow-md"
@@ -284,7 +305,7 @@ export default function Dashboard() {
         </div>
         
         {/* 財務數據區塊 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-lg">
             <h3 className="text-gray-400 mb-2 font-medium">{t.dashPendingBonus}</h3>
             <p className="text-5xl font-black text-green-400">${stats.pendingCommission.toFixed(2)}</p>
@@ -304,6 +325,90 @@ export default function Dashboard() {
             </p>
             <p className="text-sm text-gray-500 mt-2">{t.dashNextLevel}</p>
           </div>
+        </div>
+
+        {/* 📢 萬商自助廣告協播系統 · 會員使用時間與續加專區 */}
+        <div className="bg-gradient-to-br from-amber-950/40 via-gray-800 to-gray-900 p-6 md:p-8 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_30px_rgba(251,191,36,0.12)] mb-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-black mb-2 border border-amber-400/40">
+                🤝 斗內一下、回您一把 · 萬商自助廣告協播中心
+              </div>
+              <h2 className="text-xl md:text-2xl font-black text-white">
+                📢 您的「萬商廣告小幫手」可用時間 ＆ 方案等級狀態
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-300 mt-1">
+                凡於 <Link href="/sponsor" className="text-amber-300 underline font-bold">/sponsor 斗內專區</Link> 贊助，即可自動開通或直接累加延長您的全網廣告使用時間！當可用時間結束後，各 WP 站將自動停止輪播。
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5 shrink-0">
+              <Link
+                href="/sponsor"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg"
+              >
+                ➕ 斗內加長可用時間 / 升級方案 ➔
+              </Link>
+              <Link
+                href={adMemberInfo?.magic_studio_url || '/ad-studio'}
+                className="px-4 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-black text-xs sm:text-sm"
+              >
+                🛠️ 進入廣告設定工作台 (/ad-studio) ➔
+              </Link>
+            </div>
+          </div>
+
+          {adMemberInfo ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/10">
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div className="text-xs text-gray-400">目前剩餘可用時間</div>
+                <div className={`text-2xl font-black mt-1 ${adMemberInfo.remaining_days > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {adMemberInfo.remaining_days} 天
+                </div>
+                <div className="text-[11px] text-gray-400 mt-1">
+                  到期日：{adMemberInfo.expires_at?.slice(0, 10)} {adMemberInfo.is_expired ? '（已到期停播）' : '（正常輪播中）'}
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div className="text-xs text-gray-400">當前廣告等級 ＆ 頻率</div>
+                <div className="text-sm font-black text-amber-300 mt-1">{adMemberInfo.tier_name_zh}</div>
+                <div className="text-[11px] text-gray-300 mt-1">
+                  {adMemberInfo.weight}x 優先權重 · 每站日播約 {adMemberInfo.daily_rotations_per_site} 次
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div className="text-xs text-gray-400">可上架廣告件數額度</div>
+                <div className="text-2xl font-black text-cyan-300 mt-1">
+                  {adMemberInfo.active_slots_count} / {adMemberInfo.max_ad_slots} <span className="text-xs font-normal text-gray-400">件</span>
+                </div>
+                <div className="text-[11px] text-gray-400 mt-1">品牌：{adMemberInfo.brand_name}</div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div className="text-xs text-gray-400">累計全網曝光 ＆ 點擊</div>
+                <div className="text-lg font-black text-white mt-1">
+                  {adMemberInfo.impressions_count.toLocaleString()} 曝光 / {adMemberInfo.clicks_count.toLocaleString()} 點擊
+                </div>
+                <div className="text-[11px] text-emerald-300 mt-1">
+                  累計斗內：${adMemberInfo.total_sponsored_usdt} USD (100%計入升等業績)
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-gray-300">
+              <span>
+                💡 您目前尚未開通萬商自助廣告席位（或使用不同信箱開通）。斗內滿 <strong>$15 USD 享 30 天</strong>、滿 <strong>$120 USD（買8送4）享整整 365 天</strong> 全網百站 AI 自動幫您打廣告！
+              </span>
+              <Link
+                href="/sponsor"
+                className="px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-300 font-black whitespace-nowrap"
+              >
+                ⚡ 前往 $15 / $120 開通 ➔
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* 專屬推廣工具區塊 */}
@@ -424,4 +529,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

@@ -200,7 +200,7 @@ export async function POST(req: Request) {
       } catch (ebErr) {
         console.error('[PayPal IPN] Error in EBook settlement:', ebErr);
       }
-    } else if (productType === 'SPONSOR' || Number(packageId) === 901 || Number(packageId) === 915 || Number(packageId) === 920) {
+    } else if (productType === 'SPONSOR' || [901, 915, 920, 925, 927, 960].includes(Number(packageId))) {
       if (email && email.includes('@')) {
         try {
           const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');

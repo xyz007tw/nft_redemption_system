@@ -39,6 +39,7 @@ export default function AdminAdsPage() {
   // Quick create / add days form
   const [newEmail, setNewEmail] = useState('');
   const [newDays, setNewDays] = useState<number>(30);
+  const [newPlanTier, setNewPlanTier] = useState<string>('SPARK_15');
   const [newNote, setNewNote] = useState('管理員後台手動開通 / 追加曝光天數');
   const [sendEmailFlag, setSendEmailFlag] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -70,7 +71,7 @@ export default function AdminAdsPage() {
     fetchAdvertisers();
   }, [fetchAdvertisers]);
 
-  const handleAdjustDays = async (email: string, days: number, note: string, sendWelcome = false) => {
+  const handleAdjustDays = async (email: string, days: number, note: string, sendWelcome = false, planTier?: string) => {
     setSubmitting(true);
     setMessage('');
     setErrorMsg('');
@@ -82,6 +83,7 @@ export default function AdminAdsPage() {
           action: 'admin_adjust_days',
           email,
           days,
+          plan_tier: planTier,
           note,
           send_welcome_email: sendWelcome,
         }),
@@ -230,17 +232,21 @@ export default function AdminAdsPage() {
           </div>
           <div className="flex flex-wrap gap-1.5">
             {[
-              { label: '+7天體驗', days: 7 },
-              { label: '+30天 (1個月/$15)', days: 30 },
-              { label: '+240天 (8個月/$99)', days: 240 },
-              { label: '+365天 (買8送4全年VIP/$120)', days: 365 },
+              { label: '⚡ $15 星火 (+30天/1件/1x)', days: 30, tier: 'SPARK_15' },
+              { label: '🔥 $120 常駐 (+365天/2件/3x)', days: 365, tier: 'RESIDENT_120' },
+              { label: '🥇 $888 黃金 (+365天/5件/8x)', days: 365, tier: 'GOLD_888' },
+              { label: '💎 $2700 皇家 (+365天/12件/20x)', days: 365, tier: 'ROYAL_2700' },
+              { label: '👑 $6000 至尊 (+730天/30件/50x)', days: 730, tier: 'SUPREME_6000' },
             ].map((preset) => (
               <button
-                key={preset.days}
+                key={preset.tier}
                 type="button"
-                onClick={() => setNewDays(preset.days)}
+                onClick={() => {
+                  setNewDays(preset.days);
+                  setNewPlanTier(preset.tier);
+                }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
-                  newDays === preset.days
+                  newPlanTier === preset.tier && newDays === preset.days
                     ? 'bg-amber-500 text-black border-amber-400'
                     : 'bg-gray-800 text-gray-300 border-gray-700 hover:border-amber-500/40'
                 }`}
@@ -252,7 +258,7 @@ export default function AdminAdsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <label className="block text-xs text-gray-400 mb-1 font-bold">客戶登入信箱 (Email)</label>
             <input
               type="email"
@@ -261,6 +267,20 @@ export default function AdminAdsPage() {
               placeholder="client@example.com"
               className="w-full px-3.5 py-2.5 rounded-xl bg-gray-950 border border-gray-700 text-sm text-white focus:border-amber-400 outline-none"
             />
+          </div>
+          <div className="md:col-span-3">
+            <label className="block text-xs text-gray-400 mb-1 font-bold">指定 5 大廣告等級 (頻率/件數)</label>
+            <select
+              value={newPlanTier}
+              onChange={(e) => setNewPlanTier(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-950 border border-gray-700 text-xs text-amber-300 font-bold focus:border-amber-400 outline-none"
+            >
+              <option value="SPARK_15">⚡ $15 星火體驗 (1x · 日播60次 · 1件)</option>
+              <option value="RESIDENT_120">🔥 $120 百站常駐 (3x · 日播180次 · 2件)</option>
+              <option value="GOLD_888">🥇 $888 黃金聚客 (8x · 日播500次 · 5件)</option>
+              <option value="ROYAL_2700">💎 $2,700 皇家霸屏 (20x · 日播1500次 · 12件)</option>
+              <option value="SUPREME_6000">👑 $6,000 萬商至尊 (50x · 無限頂置 · 30件)</option>
+            </select>
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs text-gray-400 mb-1 font-bold">追加/扣減天數 (可負數)</label>
@@ -271,7 +291,7 @@ export default function AdminAdsPage() {
               className="w-full px-3.5 py-2.5 rounded-xl bg-gray-950 border border-gray-700 text-sm text-amber-300 font-bold focus:border-amber-400 outline-none"
             />
           </div>
-          <div className="md:col-span-4">
+          <div className="md:col-span-2">
             <label className="block text-xs text-gray-400 mb-1 font-bold">管理員備註紀錄</label>
             <input
               type="text"
@@ -285,7 +305,7 @@ export default function AdminAdsPage() {
             <button
               type="button"
               disabled={submitting || !newEmail.includes('@') || !newDays}
-              onClick={() => handleAdjustDays(newEmail.trim(), newDays, newNote, sendEmailFlag)}
+              onClick={() => handleAdjustDays(newEmail.trim(), newDays, newNote, sendEmailFlag, newPlanTier)}
               className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black text-sm disabled:opacity-40 transition"
             >
               {submitting ? '處理中...' : `🚀 立即執行 (${newDays > 0 ? `+${newDays}` : newDays}天)`}

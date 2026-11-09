@@ -13,9 +13,13 @@ import {
   validateAdvertiserContent,
   activateOrExtendSponsorAdAccount,
   getRemainingDays,
+  enrichAdvertiserTierFields,
+  getAdTierSpecByTier,
+  AD_TIER_SPECS,
   AD_R2_PRIMARY_URL,
   AD_R2_MIRROR_URL,
-  SponsorAdvertiser
+  SponsorAdvertiser,
+  AdSlotCampaign
 } from '@/lib/adNetwork';
 import { putObjectToDedicatedR2 } from '@/lib/r2Storage';
 import { verifyAdminRequest } from '@/lib/adminAuth';
@@ -35,6 +39,7 @@ export async function OPTIONS() {
 /**
  * GET /api/ads
  * - ?mode=agent_feed (預設)：回傳目前未到期之公開廣告池 (供 100 座 WP 站群、本地端 Python AI Agent 與雲端 Agent 抓取)
+ * - ?mode=member_status&email=...&wallet=...：供會員中心 (/dashboard) 即時查詢該會員的萬商廣告使用天數、方案等級與快捷登入連結
  * - ?mode=admin_list：管理員取得全體廣告主清單（含已過期/暫停/封禁與剩餘天數）
  */
 export async function GET(req: Request) {
@@ -46,15 +51,106 @@ export async function GET(req: Request) {
 
     const store = await loadAdNetworkStore();
 
+    if (mode === 'member_status') {
+      const qEmail = normalizeAdEmail(url.searchParams.get('email') || '');
+      const qWallet = (url.searchParams.get('wallet') || '').trim().toLowerCase();
+
+      let matchedAdv: SponsorAdvertiser | null = null;
+      if (qEmail && store.advertisers[qEmail]) {
+        matchedAdv = store.advertisers[qEmail];
+      } else if (qWallet) {
+        for (const adv of Object.values(store.advertisers || {})) {
+          if ((adv.wallet_address || '').toLowerCase() === qWallet) {
+            matchedAdv = adv;
+            break;
+          }
+        }
+      }
+
+      if (!matchedAdv) {
+        return NextResponse.json(
+          {
+            success: true,
+            has_account: false,
+            tier_specs: Object.values(AD_TIER_SPECS)
+          },
+          { headers: CORS_HEADERS }
+        );
+      }
+
+      const enriched = enrichAdvertiserTierFields(matchedAdv);
+      const spec = getAdTierSpecByTier(enriched.plan_tier, enriched.weight);
+      const remainingDays = getRemainingDays(enriched.expires_at);
+      const magicToken = createAdMagicToken(enriched.email);
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+
+      return NextResponse.json(
+        {
+          success: true,
+          has_account: true,
+          advertiser: {
+            email: enriched.email,
+            brand_name: enriched.brand_name,
+            plan_tier: enriched.plan_tier,
+            tier_name_zh: spec.name_zh,
+            tier_badge_zh: spec.badge_zh,
+            weight: enriched.weight,
+            daily_rotations_per_site: enriched.daily_rotations_per_site || spec.daily_rotations_per_site,
+            max_ad_slots: enriched.max_ad_slots || spec.max_ad_slots,
+            active_slots_count: (enriched.ad_slots || []).filter(s => s.enabled !== false).length,
+            status: enriched.status,
+            expires_at: enriched.expires_at,
+            remaining_days: remainingDays,
+            is_expired: remainingDays <= 0,
+            impressions_count: enriched.impressions_count || 0,
+            clicks_count: enriched.clicks_count || 0,
+            total_sponsored_usdt: enriched.total_sponsored_usdt || 0,
+            magic_studio_url: `${siteUrl}/ad-studio?ad_token=${encodeURIComponent(magicToken)}`
+          }
+        },
+        { headers: CORS_HEADERS }
+      );
+    }
+
     if (mode === 'admin_list') {
       const auth = await verifyAdminRequest(req);
       if (!auth.authorized) {
         return NextResponse.json({ success: false, error: '未授權的管理員請求' }, { status: 401, headers: CORS_HEADERS });
       }
-      const list = Object.values(store.advertisers || {}).map(adv => ({
-        ...adv,
-        remaining_days: getRemainingDays(adv.expires_at)
-      }));
+      const list = Object.values(store.advertisers || {}).map(rawAdv => {
+        const adv = enrichAdvertiserTierFields(rawAdv);
+        const spec = getAdTierSpecByTier(adv.plan_tier, adv.weight);
+        const rem = getRemainingDays(adv.expires_at);
+        return {
+          ...adv,
+          plan_type: spec.name_zh,
+          total_donated_usd: adv.total_sponsored_usdt || 0,
+          remaining_days: rem,
+          is_expired: rem <= 0,
+          category: adv.niche_category || 'ALL',
+          banner_url: adv.banner_image_url || '',
+          headline: {
+            tw: adv.headline_zh || '',
+            cn: adv.headline_cn || adv.headline_zh || '',
+            en: adv.headline_en || adv.headline_zh || '',
+            ja: adv.headline_ja || adv.headline_zh || ''
+          },
+          body: {
+            tw: adv.body_zh || '',
+            cn: adv.body_cn || adv.body_zh || '',
+            en: adv.body_en || adv.body_zh || '',
+            ja: adv.body_ja || adv.body_zh || ''
+          },
+          cta_text: {
+            tw: adv.cta_text_zh || '👉 立即前往了解',
+            cn: adv.cta_text_zh || '👉 立即前往了解',
+            en: adv.cta_text_en || '👉 Learn More',
+            ja: adv.cta_text_ja || '👉 詳細を見る'
+          },
+          impressions: adv.impressions_count || 0,
+          clicks: adv.clicks_count || 0
+        };
+      });
       list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
       return NextResponse.json(
         {
@@ -105,18 +201,6 @@ export async function GET(req: Request) {
   }
 }
 
-/**
- * POST /api/ads
- * Actions:
- * 1. login_advertiser (客戶以 Email + 密碼 或 Magic Token 登入 /ad-studio)
- * 2. send_magic_link (客戶忘記密碼時一鍵重發免密登入信)
- * 3. update_ad_campaign (客戶儲存廣告文案、連結窗口與橫幅圖，自動審核違禁詞並同步 Cloudflare R2)
- * 4. ai_translate_ad (客戶點擊「✨ AI 一鍵翻譯成繁/簡/英/日 4 語系廣告」)
- * 5. upload_ad_banner (客戶上傳廣告圖片至專用 Cloudflare R2 1.5208.uk)
- * 6. record_click / record_impression (統計曝光與點擊數)
- * 7. admin_adjust_days (管理員幫任一客戶手動追加/扣減「曝光時間-依天數計算」或免付款開戶)
- * 8. admin_toggle_status (管理員切換 ACTIVE / PAUSED / BANNED 或強制同步 R2)
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -154,10 +238,12 @@ export async function POST(req: Request) {
         targetEmail = inputEmail;
       }
 
-      const adv = store.advertisers[targetEmail];
-      if (!adv) {
+      const rawAdv = store.advertisers[targetEmail];
+      if (!rawAdv) {
         return NextResponse.json({ success: false, error: '查無此廣告帳號' }, { status: 404, headers: CORS_HEADERS });
       }
+      const adv = enrichAdvertiserTierFields(rawAdv);
+      const spec = getAdTierSpecByTier(adv.plan_tier, adv.weight);
 
       const sessionToken = createAdMagicToken(targetEmail);
       return NextResponse.json(
@@ -166,6 +252,8 @@ export async function POST(req: Request) {
           adToken: sessionToken,
           advertiser: {
             ...adv,
+            tier_name_zh: spec.name_zh,
+            tier_badge_zh: spec.badge_zh,
             remaining_days: getRemainingDays(adv.expires_at)
           }
         },
@@ -226,7 +314,7 @@ export async function POST(req: Request) {
     }
 
     // =========================================================================
-    // 3. 客戶儲存/更新廣告文案與連結窗口 (update_ad_campaign)
+    // 3. 客戶儲存/更新廣告文案、連結窗口與多件廣告槽位 (update_ad_campaign)
     // =========================================================================
     if (action === 'update_ad_campaign') {
       const store = await loadAdNetworkStore();
@@ -237,10 +325,11 @@ export async function POST(req: Request) {
         if (v.valid && v.email) targetEmail = normalizeAdEmail(v.email);
       }
 
-      const adv = store.advertisers[targetEmail];
-      if (!adv) {
+      const rawAdv = store.advertisers[targetEmail];
+      if (!rawAdv) {
         return NextResponse.json({ success: false, error: '找不到廣告主帳號或登入已過期' }, { status: 401, headers: CORS_HEADERS });
       }
+      const adv = enrichAdvertiserTierFields(rawAdv);
 
       if (adv.status === 'BANNED') {
         return NextResponse.json({ success: false, error: '此帳號因違反全球 10 大禁書/禁廣規範已被封禁。' }, { status: 403, headers: CORS_HEADERS });
@@ -261,26 +350,110 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: `🛡️ 廣告合規審核未通過：${check.reason}` }, { status: 400, headers: CORS_HEADERS });
       }
 
-      const updated: SponsorAdvertiser = {
+      const spec = getAdTierSpecByTier(adv.plan_tier, adv.weight);
+      const maxSlots = adv.max_ad_slots || spec.max_ad_slots;
+
+      // 驗證與整理多件廣告槽位 (ad_slots)
+      let updatedSlots: AdSlotCampaign[] = Array.isArray(body.ad_slots) ? body.ad_slots.slice(0, maxSlots) : (adv.ad_slots || []);
+      for (const s of updatedSlots) {
+        const slotCheck = validateAdvertiserContent({
+          brand_name: s.brand_name,
+          headline_zh: s.headline_zh,
+          headline_en: s.headline_en,
+          headline_ja: s.headline_ja,
+          body_zh: s.body_zh,
+          body_en: s.body_en,
+          body_ja: s.body_ja,
+          target_url: s.target_url
+        });
+        if (!slotCheck.valid) {
+          return NextResponse.json({ success: false, error: `🛡️ 廣告槽位審核未通過：${slotCheck.reason}` }, { status: 400, headers: CORS_HEADERS });
+        }
+      }
+
+      const mainBrand = String(body.brand_name || adv.brand_name).slice(0, 60);
+      const mainHlZh = String(body.headline_zh || adv.headline_zh).slice(0, 90);
+      const mainHlCn = String(body.headline_cn || body.headline_zh || adv.headline_cn || adv.headline_zh).slice(0, 90);
+      const mainHlEn = String(body.headline_en || adv.headline_en || body.headline_zh).slice(0, 140);
+      const mainHlJa = String(body.headline_ja || adv.headline_ja || body.headline_zh).slice(0, 100);
+      const mainBdZh = String(body.body_zh || adv.body_zh).slice(0, 260);
+      const mainBdCn = String(body.body_cn || body.body_zh || adv.body_cn || adv.body_zh).slice(0, 260);
+      const mainBdEn = String(body.body_en || adv.body_en || body.body_zh).slice(0, 380);
+      const mainBdJa = String(body.body_ja || adv.body_ja || body.body_zh).slice(0, 280);
+      const mainCtaZh = String(body.cta_text_zh || adv.cta_text_zh || '👉 立即前往了解').slice(0, 35);
+      const mainCtaEn = String(body.cta_text_en || adv.cta_text_en || '👉 Learn More').slice(0, 40);
+      const mainCtaJa = String(body.cta_text_ja || adv.cta_text_ja || '👉 詳細を見る').slice(0, 35);
+      const mainTarget = String(body.target_url || adv.target_url).trim();
+      const mainBanner = typeof body.banner_image_url === 'string' ? body.banner_image_url.trim() : adv.banner_image_url;
+      const mainNiche = body.niche_category || adv.niche_category || 'ALL';
+
+      if (updatedSlots.length === 0) {
+        updatedSlots = [
+          {
+            slot_id: `${adv.id}-slot-1`,
+            brand_name: mainBrand,
+            headline_zh: mainHlZh,
+            headline_cn: mainHlCn,
+            headline_en: mainHlEn,
+            headline_ja: mainHlJa,
+            body_zh: mainBdZh,
+            body_cn: mainBdCn,
+            body_en: mainBdEn,
+            body_ja: mainBdJa,
+            cta_text_zh: mainCtaZh,
+            cta_text_en: mainCtaEn,
+            cta_text_ja: mainCtaJa,
+            target_url: mainTarget,
+            banner_image_url: mainBanner,
+            niche_category: mainNiche,
+            enabled: true
+          }
+        ];
+      } else {
+        // 同步第 1 槽位與頂層主欄位
+        updatedSlots[0] = {
+          ...updatedSlots[0],
+          slot_id: updatedSlots[0].slot_id || `${adv.id}-slot-1`,
+          brand_name: mainBrand,
+          headline_zh: mainHlZh,
+          headline_cn: mainHlCn,
+          headline_en: mainHlEn,
+          headline_ja: mainHlJa,
+          body_zh: mainBdZh,
+          body_cn: mainBdCn,
+          body_en: mainBdEn,
+          body_ja: mainBdJa,
+          cta_text_zh: mainCtaZh,
+          cta_text_en: mainCtaEn,
+          cta_text_ja: mainCtaJa,
+          target_url: mainTarget,
+          banner_image_url: mainBanner,
+          niche_category: mainNiche,
+          enabled: updatedSlots[0].enabled !== false
+        };
+      }
+
+      const updated: SponsorAdvertiser = enrichAdvertiserTierFields({
         ...adv,
-        brand_name: String(body.brand_name || adv.brand_name).slice(0, 60),
-        headline_zh: String(body.headline_zh || adv.headline_zh).slice(0, 90),
-        headline_cn: String(body.headline_cn || body.headline_zh || adv.headline_cn || adv.headline_zh).slice(0, 90),
-        headline_en: String(body.headline_en || adv.headline_en || body.headline_zh).slice(0, 140),
-        headline_ja: String(body.headline_ja || adv.headline_ja || body.headline_zh).slice(0, 100),
-        body_zh: String(body.body_zh || adv.body_zh).slice(0, 260),
-        body_cn: String(body.body_cn || body.body_zh || adv.body_cn || adv.body_zh).slice(0, 260),
-        body_en: String(body.body_en || adv.body_en || body.body_zh).slice(0, 380),
-        body_ja: String(body.body_ja || adv.body_ja || body.body_zh).slice(0, 280),
-        cta_text_zh: String(body.cta_text_zh || adv.cta_text_zh || '👉 立即前往了解').slice(0, 35),
-        cta_text_en: String(body.cta_text_en || adv.cta_text_en || '👉 Learn More').slice(0, 40),
-        cta_text_ja: String(body.cta_text_ja || adv.cta_text_ja || '👉 詳細を見る').slice(0, 35),
-        target_url: String(body.target_url || adv.target_url).trim(),
-        banner_image_url: typeof body.banner_image_url === 'string' ? body.banner_image_url.trim() : adv.banner_image_url,
-        niche_category: body.niche_category || adv.niche_category || 'ALL',
+        brand_name: mainBrand,
+        headline_zh: mainHlZh,
+        headline_cn: mainHlCn,
+        headline_en: mainHlEn,
+        headline_ja: mainHlJa,
+        body_zh: mainBdZh,
+        body_cn: mainBdCn,
+        body_en: mainBdEn,
+        body_ja: mainBdJa,
+        cta_text_zh: mainCtaZh,
+        cta_text_en: mainCtaEn,
+        cta_text_ja: mainCtaJa,
+        target_url: mainTarget,
+        banner_image_url: mainBanner,
+        niche_category: mainNiche,
+        ad_slots: updatedSlots.slice(0, maxSlots),
         status: body.status === 'PAUSED' ? 'PAUSED' : 'ACTIVE',
         updated_at: new Date().toISOString()
-      };
+      });
 
       store.advertisers[targetEmail] = updated;
       const syncResult = await saveAdNetworkStore(store, true);
@@ -288,9 +461,11 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           success: true,
-          message: '✅ 您的廣告介紹與連結已儲存！AI 宣傳小幫手已立即幫您同步至全球百大網站與每日新文章中曝光！',
+          message: `✅ 您的廣告介紹與連結已儲存（共啟用 ${(updated.ad_slots || []).filter(s => s.enabled !== false).length} / ${maxSlots} 件廣告槽位）！AI 宣傳小幫手已立即幫您同步至全球百大網站與每日新文章中曝光！`,
           advertiser: {
             ...updated,
+            tier_name_zh: spec.name_zh,
+            tier_badge_zh: spec.badge_zh,
             remaining_days: getRemainingDays(updated.expires_at)
           },
           r2_primary_url: syncResult.primaryUrl
@@ -388,15 +563,16 @@ export async function POST(req: Request) {
     // =========================================================================
     if (action === 'record_click' || action === 'record_impression') {
       const adId = String(body.adId || '');
+      const baseAdId = adId.replace(/-s\d+$/, '');
       const store = await loadAdNetworkStore();
       for (const key of Object.keys(store.advertisers)) {
-        if (store.advertisers[key].id === adId) {
+        if (store.advertisers[key].id === adId || store.advertisers[key].id === baseAdId) {
           if (action === 'record_click') {
             store.advertisers[key].clicks_count = (store.advertisers[key].clicks_count || 0) + 1;
           } else {
             store.advertisers[key].impressions_count = (store.advertisers[key].impressions_count || 0) + 1;
           }
-          await saveAdNetworkStore(store, false); // 點擊計數僅寫入 DB，免每次重傳 R2
+          await saveAdNetworkStore(store, false);
           break;
         }
       }
@@ -404,7 +580,7 @@ export async function POST(req: Request) {
     }
 
     // =========================================================================
-    // 7. 管理員專屬：手動為任一客戶追加/扣減「曝光時間（依天數計算）」或免付款開戶
+    // 7. 管理員專屬：手動為任一客戶追加/扣減「曝光時間（依天數計算）」或設定 5 大方案等級
     // =========================================================================
     if (action === 'admin_adjust_days') {
       const auth = await verifyAdminRequest(req);
@@ -414,8 +590,9 @@ export async function POST(req: Request) {
 
       const targetEmail = normalizeAdEmail(body.email || '');
       const days = Number(body.days || 0);
-      const note = String(body.adminNote || '管理員手動調整曝光天數');
-      const sendMail = body.sendWelcomeEmail !== false;
+      const note = String(body.note || body.adminNote || '管理員手動調整曝光天數');
+      const sendMail = body.send_welcome_email !== undefined ? Boolean(body.send_welcome_email) : body.sendWelcomeEmail !== false;
+      const explicitPlanTier = body.plan_tier || undefined;
 
       if (!targetEmail || !targetEmail.includes('@') || isNaN(days) || days === 0) {
         return NextResponse.json({ success: false, error: '請提供有效的客戶 Email 與非零之增減天數' }, { status: 400, headers: CORS_HEADERS });
@@ -425,6 +602,7 @@ export async function POST(req: Request) {
         email: targetEmail,
         paidAmountUsdt: Number(body.paidAmountUsdt || 0),
         explicitDaysToAdd: days,
+        explicitPlanTier,
         adminNote: note,
         sendWelcomeEmail: sendMail
       });
@@ -451,9 +629,20 @@ export async function POST(req: Request) {
 
       const store = await loadAdNetworkStore();
       const targetEmail = normalizeAdEmail(body.email || '');
-      if (targetEmail && store.advertisers[targetEmail] && body.newStatus) {
-        store.advertisers[targetEmail].status = body.newStatus;
+      const targetId = String(body.advertiser_id || '');
+      const nextStatus = body.status || body.newStatus;
+
+      if (targetEmail && store.advertisers[targetEmail] && nextStatus) {
+        store.advertisers[targetEmail].status = nextStatus;
         store.advertisers[targetEmail].updated_at = new Date().toISOString();
+      } else if (targetId && nextStatus) {
+        for (const k of Object.keys(store.advertisers)) {
+          if (store.advertisers[k].id === targetId) {
+            store.advertisers[k].status = nextStatus;
+            store.advertisers[k].updated_at = new Date().toISOString();
+            break;
+          }
+        }
       }
       const syncRes = await saveAdNetworkStore(store, true);
       return NextResponse.json(

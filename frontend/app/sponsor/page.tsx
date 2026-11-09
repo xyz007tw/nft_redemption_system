@@ -41,28 +41,28 @@ export default function SponsorPage() {
     : 'Zero tech skills needed! When you support our AI R&D, we thank you by putting our 24/7 AI Marketing Assistants to work promoting your brand, store, or business card worldwide:';
 
   const point1 = isJa
-    ? '⚡ $15 USD 以上の応援：「1ヶ月（30日間）」万商広告アシスタントをプレゼント！専用IDとパスワードがすぐ届き、宣伝文とリンクを貼るだけで完了。'
+    ? '⚡ 入門プラン（$15 スパーク30日 ／ $120 百サイト常駐365日）：専用IDとパスワードがすぐ届き、宣伝文とリンクを貼るだけで最大1〜2枠の広告カードを自動配信！'
     : isCN
-    ? '⚡ 斗内满 $15 USD（体验回礼 30 天）：马上送您「1 个月万商广告小帮手」！专属帐密立刻寄到信箱，像发动态一样贴上您的介绍跟 LINE/网址，AI 就开始天天帮您打广告。'
+    ? '⚡ 入门超值选（$15 星火体验 30天 ／ $120 百站常驻 365天）：专属帐密立刻寄到信箱，像发动态一样贴上介绍跟 LINE/网址，即可上架 1～2 件招牌天天自动曝光！'
     : isChinese
-    ? '⚡ 斗內滿 $15 USD（體驗回禮 30 天）：馬上送您「1 個月萬商廣告小幫手」！專屬帳密立刻寄到信箱，像發動態一樣貼上您的介紹跟 LINE/網址，AI 就開始天天幫您打廣告。'
-    : '⚡ Sponsor $15+ USD (30-Day Gift): Get 1 Month of our Self-Serve Ad Studio! Receive your login instantly—just paste your intro and link, and let our AI spread the word.';
+    ? '⚡ 入門超值選（$15 星火體驗 30天 ／ $120 百站常駐 365天）：專屬帳密立刻寄到信箱，像發動態一樣貼上介紹跟 LINE/網址，即可上架 1～2 件招牌天天自動曝光！'
+    : '⚡ Starter Tiers ($15 Spark 30-Day / $120 Resident 365-Day): Receive your login instantly—paste your intro and link to rotate 1–2 active ad cards daily!';
 
   const point2 = isJa
-    ? '🔥 $120 USD 以上の応援（8ヶ月分に4ヶ月無料進呈＝丸1年365日）：たっぷり365日間＋「VIP 3倍優先露出」で、世界中の多言語サイトと毎日の新着記事にあなたの看板を掲載！'
+    ? '👑 VIPビジネス独占（$888 ゴールド5枠・8x ／ $2,700 ロイヤル12枠・20x ／ $6,000 至高30枠・50x）：複数商品や全ラインナップを圧倒的な高頻度で世界中のサイトに同時展開！'
     : isCN
-    ? '🔥 斗内满 $120 USD（买 8 个月送 4 个月＝365 天全年力挺）：整整一年 365 天免操心！再送「VIP 3 倍优先曝光」，我们每天新写的全球多国语言文章都会主动帮您挂上宣传招牌！'
+    ? '👑 旗舰多件霸屏（$888 黄金聚客 5件·8x ／ $2,700 皇家霸屏 12件·20x ／ $6,000 万商至尊 30件·50x）：多款商品同时轮番上阵，享最高 50 倍速全网优先曝光！'
     : isChinese
-    ? '🔥 斗內滿 $120 USD（買 8 個月送 4 個月＝365 天全年力挺）：整整一年 365 天免操心！再送「VIP 3 倍優先曝光」，我們每天新寫的全球多國語言文章都會主動幫您掛上宣傳招牌！'
-    : '🔥 Sponsor $120+ USD (Buy 8 Months, Get 4 Free = 365 Days): A full year of non-stop exposure + VIP 3x Priority Rotation across our global multilingual sites and daily articles!';
+    ? '👑 旗艦多件霸屏（$888 黃金聚客 5件·8x ／ $2,700 皇家霸屏 12件·20x ／ $6,000 萬商至尊 30件·50x）：多款商品同時輪番上陣，享最高 50 倍速全網優先曝光！'
+    : '👑 VIP Multi-Slot Tiers ($888 Gold 5 Slots / $2,700 Royal 12 Slots / $6,000 Supreme 30 Slots): Promote your entire product line with up to 50x priority rotation!';
 
   const point3 = isJa
-    ? '💝 応援金額は100%あなたの会員ランク実績に加算：すべてのドネーション金額は個人の昇格累計実績に100%カウントされます（純粋な応援返礼ギフトのため、売上額の保証はございません）。'
+    ? '💝 応援金額は100%あなたの会員ランク実績に加算：すべてのドネーション金額は個人の昇格累計実績に100%カウントされます（期間終了後は自動停止、売上額の保証はございません）。'
     : isCN
-    ? '💝 斗内金额 100% 帮您累积会员升等资格：每一笔支持都会 100% 算进您的「个人升等累积业绩」里！（这是我们感谢您赞助研发的纯心意回馈，不保证具体业绩成交额喔）。'
+    ? '💝 斗内金额 100% 帮您累积会员升等资格：每一笔支持都会 100% 算进您的「个人升等累积业绩」里！使用时间结束后各站自动停止轮播，随时可续加时间（纯心意回馈，不保证业绩额喔）。'
     : isChinese
-    ? '💝 斗內金額 100% 幫您累積會員升等資格：每一筆支持都會 100% 算進您的「個人升等累積業績」裡！（這是我們感謝您贊助研發的純心意回饋，不保證具體業績成交額喔）。'
-    : '💝 100% Counted Toward Your VIP Tier Upgrade: Every dollar you sponsor counts 100% toward your personal tier upgrade volume (a heartfelt thank-you perk; no specific sales guarantee).';
+    ? '💝 斗內金額 100% 幫您累積會員升等資格：每一筆支持都會 100% 算進您的「個人升等累積業績」裡！使用時間結束後各站自動停止輪播，隨時可續加時間（純心意回饋，不保證業績額喔）。'
+    : '💝 100% Counted Toward Your VIP Tier Upgrade: Every dollar counts 100% toward your personal tier upgrade volume. Rotation stops automatically upon expiration and can be extended anytime.';
 
   const pitchFooter = isJa
     ? '（決済完了後、すぐに登録メールへ「万商広告スタジオ（/ad-studio）」の専用ID・パスワードをお送りします！）'
@@ -75,26 +75,26 @@ export default function SponsorPage() {
   const selectSponsorTitle = isJa
     ? '🎁 応援プランを選んで、AI宣伝アシスタントを受け取る'
     : isCN
-    ? '🎁 斗内一下、回您一把！选择您的支持与 AI 技能回馈方案'
+    ? '🎁 斗内一下、回您一把！选择您的支持与 5 大等级 AI 广告回馈方案'
     : isChinese
-    ? '🎁 斗內一下、回您一把！選擇您的支持與 AI 技能回饋方案'
+    ? '🎁 斗內一下、回您一把！選擇您的支持與 5 大等級 AI 廣告回饋方案'
     : isKo
-    ? '🎁 후원 플랜 선택 & AI 홍보 어시스턴트 받기'
+    ? '🎁 후원 플랜 선택 & 5단계 AI 홍보 어시스턴트 받기'
     : isVi
-    ? '🎁 Chọn Gói Ủng Hộ & Nhận Trợ Lý Quảng Cáo AI'
+    ? '🎁 Chọn Gói Ủng Hộ & Nhận Trợ Lý Quảng Cáo AI 5 Cấp Độ'
     : isId
-    ? '🎁 Pilih Paket Dukungan & Dapatkan Asisten Iklan AI'
-    : '🎁 Tip & Get Boosted: Choose Your Support & AI Skill Perk';
+    ? '🎁 Pilih Paket Dukungan & Dapatkan Asisten Iklan AI 5 Tingkat'
+    : '🎁 Tip & Get Boosted: Choose Your Support & 5-Tier AI Ad Perk';
 
   const selectSponsorDesc = isJa
-    ? '純粋な応援（$3）、1ヶ月お試し（$15・30日間）、または一番人気の丸1年VIP応援（$120・8ヶ月＋4ヶ月無料＝365日間）から自由に選べます！'
+    ? '純粋な応援（$3）から、入門（$15 / $120）、ビジネス多枠展開（$888 / $2,700 / $6,000）まで自由に選べます！再ドネーションで有効期間をいつでも延長可能！'
     : isCN
-    ? '请总工程师喝杯珍奶 ($3)、小额体验 1 个月 ($15)，或最划算的「买 8 个月送 4 个月＝365 天全年 VIP 力挺 ($120)」自由选！'
+    ? '从纯支持喝珍奶 ($3)、入门体验 ($15 星火 / $120 百站常驻)，到多件广告齐发的商务旗舰 ($888 黄金 / $2,700 皇家 / $6,000 至尊) 自由选！重复斗内可直接累加使用天数！'
     : isChinese
-    ? '請總工程師喝杯珍奶 ($3)、小額體驗 1 個月 ($15)，或最划算的「買 8 個月送 4 個月＝365 天全年 VIP 力挺 ($120)」自由選！'
-    : 'Buy our Chief Engineer a boba ($3), try 1 Month ($15), or grab the best-value 365-Day Full-Year VIP Pack ($120 = Buy 8 Get 4 Months Free)!';
+    ? '從純支持喝珍奶 ($3)、入門體驗 ($15 星火 / $120 百站常駐)，到多件廣告齊發的商務旗艦 ($888 黃金 / $2,700 皇家 / $6,000 至尊) 自由選！重複斗內可直接累加使用天數！'
+    : 'Choose from Pure Boba Support ($3), Starter Tiers ($15 Spark / $120 Resident), or Multi-Slot Business Tiers ($888 Gold / $2,700 Royal / $6,000 Supreme)!';
 
-  // 內建保底的 3 大黃金斗內與萬商廣告方案 ($3 純斗內 / $15 用1個月 / $120 買8送4共365天)
+  // 內建 6 大完整方案 ($3 純支持 + 5 大萬商廣告等級：$15 / $120 / $888 / $2,700 / $6,000)
   const fallbackSponsorPackages = [
     {
       id: 901,
@@ -102,32 +102,71 @@ export default function SponsorPage() {
       name_zh: isCN ? '☕ $3 请喝杯珍奶・纯支持研发' : '☕ $3 請喝杯珍奶・純支持研發',
       name_en: '☕ $3 Buy Us a Boba · Pure Support',
       product_type: 'SPONSOR',
-      badge: isCN ? '温暖纯支持' : isChinese ? '溫暖純支持' : 'Pure Support',
-      daysLabel: isCN ? '累积 $3 个人升等业绩' : isChinese ? '累積 $3 個人升等業績' : '+$3 Tier Volume'
+      tierBadge: isCN ? '温暖纯支持' : isChinese ? '溫暖純支持' : 'Pure Support',
+      freqLabel: isCN ? '不附带广告席位' : isChinese ? '不附帶廣告席位' : 'No Ad Slot',
+      slotsLabel: isCN ? '累积 $3 升等业绩' : isChinese ? '累積 $3 升等業績' : '+$3 Tier Volume',
+      daysLabel: isCN ? '纯赞助支持 AI 研发' : isChinese ? '純贊助支持 AI 研發' : 'Pure R&D Support'
     },
     {
       id: 915,
       price: 15,
-      name_zh: isCN ? '⚡ $15 斗内回礼・AI 帮您打广告 30 天' : '⚡ $15 斗內回禮・AI 幫您打廣告 30 天',
-      name_en: '⚡ $15 AI Ad Assistant · 30 Days',
+      name_zh: isCN ? '⚡ $15 星火体验型・AI 帮打广告 30天' : '⚡ $15 星火體驗型・AI 幫打廣告 30天',
+      name_en: '⚡ $15 Spark Starter · 30 Days (1 Slot)',
       product_type: 'SPONSOR',
-      badge: isCN ? '🌟 新手最爱・送30天AI广告台' : isChinese ? '🌟 新手最愛・送30天AI廣告台' : '🌟 Starter · 30-Day AI Ad Studio',
-      daysLabel: isCN ? '赠 30 天万商自助广告权' : isChinese ? '贈 30 天萬商自助廣告權' : '30 Days Self-Serve AI Ads'
+      tierBadge: isCN ? '入门体验 · 30天' : isChinese ? '入門體驗 · 30天' : 'Starter · 30d',
+      freqLabel: isCN ? '1x 标准频率 (每站日播 60次)' : isChinese ? '1x 標準頻率 (每站日播 60次)' : '1x Freq (60/site/day)',
+      slotsLabel: isCN ? '可上架 1 件广告卡片' : isChinese ? '可上架 1 件廣告卡片' : '1 Active Ad Slot',
+      daysLabel: isCN ? '开通 30 天曝光 (+$15 业绩)' : isChinese ? '開通 30 天曝光 (+$15 業績)' : '30 Days Access (+$15 Vol)'
     },
     {
       id: 920,
       price: 120,
-      name_zh: isCN ? '👑 $120 买8送4・AI 全年帮您打广告 365天' : '👑 $120 買8送4・AI 全年幫您打廣告 365天',
-      name_en: '👑 $120 Full-Year VIP AI Ads (365 Days)',
+      name_zh: isCN ? '🔥 $120 百站常驻型・买8送4共 365天' : '🔥 $120 百站常駐型・買8送4共 365天',
+      name_en: '🔥 $120 100-Site Resident · 365 Days (2 Slots)',
       product_type: 'SPONSOR',
-      badge: isCN ? '👑 最超值・买8送4共365天+3倍曝光' : isChinese ? '👑 最超值・買8送4共365天+3倍曝光' : '👑 Best Value · 365 Days + 3x VIP',
-      daysLabel: isCN ? '赠 365 天全年广告权 (VIP 3倍曝光)' : isChinese ? '贈 365 天全年廣告權 (VIP 3倍曝光)' : '365 Days Full-Year Ads (VIP 3x Boost)'
+      tierBadge: isCN ? '🔥 买8送4 · 365天' : isChinese ? '🔥 買8送4 · 365天' : '🔥 Best Value · 365d',
+      freqLabel: isCN ? '3x 优先频率 (每站日播 180次)' : isChinese ? '3x 優先頻率 (每站日播 180次)' : '3x Freq (180/site/day)',
+      slotsLabel: isCN ? '可同时上架 2 件广告轮播' : isChinese ? '可同時上架 2 件廣告輪播' : '2 Active Ad Slots',
+      daysLabel: isCN ? '整年 365 天曝光 (+$120 业绩)' : isChinese ? '整年 365 天曝光 (+$120 業績)' : '365 Days Access (+$120 Vol)'
+    },
+    {
+      id: 925,
+      price: 888,
+      name_zh: isCN ? '🥇 $888 黄金聚客型・365天 (5件矩阵)' : '🥇 $888 黃金聚客型・365天 (5件矩陣)',
+      name_en: '🥇 $888 Gold Magnet · 365 Days (5 Slots)',
+      product_type: 'SPONSOR',
+      tierBadge: isCN ? '🥇 黄金8倍 · 5件广告' : isChinese ? '🥇 黃金8倍 · 5件廣告' : '🥇 Gold 8x · 5 Slots',
+      freqLabel: isCN ? '8x 高频强播 (每站日播 500次)' : isChinese ? '8x 高頻強播 (每站日播 500次)' : '8x Freq (500/site/day)',
+      slotsLabel: isCN ? '可同时上架 5 件不同广告' : isChinese ? '可同時上架 5 件不同廣告' : '5 Active Ad Slots',
+      daysLabel: isCN ? '365 天黄金聚客 (+$888 升3%级差)' : isChinese ? '365 天黃金聚客 (+$888 升3%級差)' : '365d + Instant 3% Tier!'
+    },
+    {
+      id: 927,
+      price: 2700,
+      name_zh: isCN ? '💎 $2,700 皇家霸屏型・365天 (12件霸屏)' : '💎 $2,700 皇家霸屏型・365天 (12件霸屏)',
+      product_type: 'SPONSOR',
+      name_en: '💎 $2,700 Royal Takeover · 365 Days (12 Slots)',
+      tierBadge: isCN ? '💎 皇家20倍 · 12件广告' : isChinese ? '💎 皇家20倍 · 12件廣告' : '💎 Royal 20x · 12 Slots',
+      freqLabel: isCN ? '20x 极速霸屏 (每站日播 1,500次)' : isChinese ? '20x 極速霸屏 (每站日播 1,500次)' : '20x Freq (1,500/site/day)',
+      slotsLabel: isCN ? '可同时上架 12 件全系列广告' : isChinese ? '可同時上架 12 件全系列廣告' : '12 Active Ad Slots',
+      daysLabel: isCN ? '365 天皇家霸屏 (+$2,700 业绩)' : isChinese ? '365 天皇家霸屏 (+$2,700 業績)' : '365d Royal Takeover'
+    },
+    {
+      id: 960,
+      price: 6000,
+      name_zh: isCN ? '👑 $6,000 万商至尊型・730天双年 (30件旗舰)' : '👑 $6,000 萬商至尊型・730天雙年 (30件旗艦)',
+      name_en: '👑 $6,000 Global Supreme · 730 Days (30 Slots)',
+      product_type: 'SPONSOR',
+      tierBadge: isCN ? '👑 至尊50倍 · 30件 · 2年' : isChinese ? '👑 至尊50倍 · 30件 · 2年' : '👑 Supreme 50x · 30 Slots',
+      freqLabel: isCN ? '50x 全站顶置 (全时段不限次霸屏)' : isChinese ? '50x 全站頂置 (全時段不限次霸屏)' : '50x Pinned (Unlimited/day)',
+      slotsLabel: isCN ? '可同时上架 30 件跨国品牌矩阵' : isChinese ? '可同時上架 30 件跨國品牌矩陣' : '30 Active Ad Slots',
+      daysLabel: isCN ? '整整 730 天双年顶置 (+直达6%级差)' : isChinese ? '整整 730 天雙年頂置 (+直達6%級差)' : '730 Days + Instant 6% Tier!'
     }
   ];
 
   const [packages, setPackages] = useState<any[]>(fallbackSponsorPackages);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPackage, setSelectedPackage] = useState<any>(fallbackSponsorPackages[1]); // 預設選中 $15 方案
+  const [selectedPackage, setSelectedPackage] = useState<any>(fallbackSponsorPackages[2]); // 預設選中 $120 百站常駐型
   const [agreedNoGuarantee, setAgreedNoGuarantee] = useState(true);
 
   useEffect(() => {
@@ -136,16 +175,17 @@ export default function SponsorPage() {
       .then(data => {
         if (data.success && Array.isArray(data.packages)) {
           const activeSponsorPackages = data.packages.filter((pkg: any) => pkg.is_active && pkg.product_type === 'SPONSOR');
-          const merged = [...activeSponsorPackages];
-          for (const fb of fallbackSponsorPackages) {
-            if (!merged.some(p => Number(p.price) === fb.price)) {
-              merged.push(fb);
+          const merged = [...fallbackSponsorPackages];
+          for (const dbPkg of activeSponsorPackages) {
+            const idx = merged.findIndex(p => Number(p.price) === Number(dbPkg.price));
+            if (idx === -1) {
+              merged.push(dbPkg);
             }
           }
           merged.sort((a: any, b: any) => Number(a.price) - Number(b.price));
           setPackages(merged);
-          const default15 = merged.find((p: any) => Number(p.price) === 15) || merged[0];
-          if (default15) setSelectedPackage(default15);
+          const default120 = merged.find((p: any) => Number(p.price) === 120) || merged[1] || merged[0];
+          if (default120) setSelectedPackage(default120);
         }
         setIsLoading(false);
       })
@@ -233,12 +273,12 @@ export default function SponsorPage() {
 
       <p className="text-gray-200 max-w-3xl text-center mb-10 text-sm sm:text-base leading-relaxed">
         {isJa
-          ? 'あなたが私たちの「AI-SKILLS」開発を応援してくださるなら、私たちはその最新AIスキルであなたのビジネスを応援します！$15以上の応援で1ヶ月（30日間）、$120以上の応援（8ヶ月＋4ヶ月無料＝丸1年365日間）でVIP 3倍優先露出！専用IDとパスワードで、初心者でも簡単に広告文とリンクを設置できます（純粋な応援返礼のため、売上額の保証はございません）。'
+          ? 'あなたが私たちの「AI-SKILLS」開発を応援してくださるなら、私たちはその最新AIスキルであなたのビジネスを応援します！入門プラン（$15 / $120）から、複数広告枠＆超高頻度配信のVIPプラン（$888 / $2,700 / $6,000）まで完備。有効期間が終了すると各サイトでの配信は自動停止し、会員マイページからいつでも期間延長が可能です（純粋な応援返礼のため、売上額の保証はございません）。'
           : isCN
-          ? '您出点小力支持我们研发更强大的「AI-SKILLS」，我们就把这套超好用的 AI 宣传技能直接回馈给您！凡斗内满 $15 USD 就送您 1 个月（30 天）万商广告曝光；斗内 $120 USD（买 8 个月送 4 个月）直接帮您宣传整整 365 天＋VIP 3 倍优先曝光！不懂电脑也能 3 分钟轻松贴上您的文案与联络窗口（纯赞助心意回馈，不保证业绩额喔）。'
+          ? '您出点小力支持我们研发更强大的「AI-SKILLS」，我们就把这套超好用的 AI 宣传技能直接回馈给您！依「协播频率、每站轮播次数、广告件数」分为 5 大等级：从入门的 $15 星火体验（30天/1件）、$120 百站常驻（买8送4共365天/2件），到旗舰多件霸屏的 $888 黄金聚客（5件）、$2,700 皇家霸屏（12件）与 $6,000 万商至尊（730天/30件）！可用时间结束后各站自动停播，随时可于会员后台续加时间（纯赞助回馈，不保证业绩额喔）。'
           : isChinese
-          ? '您出點小力支持我們研發更強大的「AI-SKILLS」，我們就把這套超好用的 AI 宣傳技能直接回饋給您！凡斗內滿 $15 USD 就送您 1 個月（30 天）萬商廣告曝光；斗內 $120 USD（買 8 個月送 4 個月）直接幫您宣傳整整 365 天＋VIP 3 倍優先曝光！不懂電腦也能 3 分鐘輕鬆貼上您的文案與聯絡窗口（純贊助心意回饋，不保證業績額喔）。'
-          : 'When you chip in to support our AI-SKILLS development, we gift those exact AI promotion skills right back to you! Sponsor $15+ for 1 Month (30 Days) or $120+ (Buy 8 Months, Get 4 Free = 365 Days Full-Year VIP 3x Boost). Anyone can set up their ad text and contact link in 3 minutes (a heartfelt thank-you perk; no revenue guarantee).'}
+          ? '您出點小力支持我們研發更強大的「AI-SKILLS」，我們就把這套超好用的 AI 宣傳技能直接回饋給您！依「協播頻率、每站輪播次數、廣告件數」分為 5 大等級：從入門的 $15 星火體驗（30天/1件）、$120 百站常駐（買8送4共365天/2件），到旗艦多件霸屏的 $888 黃金聚客（5件）、$2,700 皇家霸屏（12件）與 $6,000 萬商至尊（730天/30件）！可用時間結束後各站自動停播，隨時可於會員後台續加時間（純贊助回饋，不保證業績額喔）。'
+          : 'When you chip in to support our AI-SKILLS R&D, we gift those exact AI promotion skills right back to you! Choose from 5 tiers differentiated by broadcast frequency, daily rotations, and ad slots: Starter ($15 Spark / $120 Resident) up to VIP Multi-Slot ($888 Gold / $2,700 Royal / $6,000 Supreme). Rotation stops automatically when time expires and can be extended anytime!'}
       </p>
 
       {/* 網小白一看秒懂的 3 步輕鬆上手卡片（完全零技術術語） */}
@@ -257,35 +297,35 @@ export default function SponsorPage() {
             </span>
             <h3 className="text-lg sm:text-xl font-black text-white mt-3.5 mb-2">
               {isJa
-                ? '☕ $15 お試し30日 ／ $120 丸1年365日'
+                ? '☕ 5つの応援ランクから自由に選択'
                 : isCN
-                ? '☕ $15 轻松体验 30 天 ／ $120 全年力挺 365 天'
+                ? '☕ 5 大等级自由选 · 天数随时可累加'
                 : isChinese
-                ? '☕ $15 輕鬆體驗 30 天 ／ $120 全年力挺 365 天'
-                : '☕ $15 (30 Days) / $120 (365 Days Full Year)'}
+                ? '☕ 5 大等級自由選 · 天數隨時可累加'
+                : '☕ 5 Flexible Tiers · Extend Time Anytime'}
             </h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
               {isJa
                 ? '応援完了と同時に「万商広告スタジオの専用IDとパスワード」がメールに届きます！さらに応援金額は100%あなたの会員ランク昇格実績に加算されます。'
                 : isCN
-                ? '完成斗内后，信箱立刻收到您的「专属帐号与通行密码」！支持我们的 AI-SKILLS 开发，这笔金额还会 100% 帮您累积个人升等业绩，一举两得！'
+                ? '完成斗内后，信箱立刻收到您的「专属帐号与通行密码」！重复斗内可自动延长会员后台与广告使用时间，且金额 100% 帮您累积个人 25% 分润升等业绩！'
                 : isChinese
-                ? '完成斗內後，信箱立刻收到您的「專屬帳號與通行密碼」！支持我們的 AI-SKILLS 開發，這筆金額還會 100% 幫您累積個人升等業績，一舉兩得！'
-                : 'Right after payment, your personal Ad Studio ID & password land in your inbox! Plus, 100% of your tip counts toward your personal VIP tier upgrade volume.'}
+                ? '完成斗內後，信箱立刻收到您的「專屬帳號與通行密碼」！重複斗內可自動延長會員後台與廣告使用時間，且金額 100% 幫您累積個人 25% 分潤升等業績！'
+                : 'Right after payment, your personal Ad Studio ID & password land in your inbox! Repeat sponsorships automatically extend your active days and count 100% toward your VIP tier upgrade.'}
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-white/10 text-xs text-amber-300 font-bold">
             {isJa
               ? '✔ $120プランは「8ヶ月買えば4ヶ月無料」1日あたり約$0.32！'
               : isCN
-              ? '✔ $120 方案享「买 8 个月送 4 个月」，平均每天只要一杯水钱 ($0.32)！'
+              ? '✔ $120 百站常驻享「买 8 个月送 4 个月」，平均每天只要 $0.32！'
               : isChinese
-              ? '✔ $120 方案享「買 8 個月送 4 個月」，平均每天只要一杯水錢 ($0.32)！'
-              : '✔ $120 Plan = Buy 8 Get 4 Months Free—just $0.32/day!'}
+              ? '✔ $120 百站常駐享「買 8 個月送 4 個月」，平均每天只要 $0.32！'
+              : '✔ $120 Resident Plan = Buy 8 Get 4 Months Free—just $0.32/day!'}
           </div>
         </div>
 
-        {/* Card 2 (原黃框位置：全面改為網小白超有感的貼心大白話) */}
+        {/* Card 2 */}
         <div className="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-pink-400/40 rounded-2xl p-6 flex flex-col justify-between shadow-[0_10px_30px_rgba(236,72,153,0.08)] hover:border-pink-400/70 transition-all">
           <div>
             <span className="text-xs font-black px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40">
@@ -308,12 +348,12 @@ export default function SponsorPage() {
             </h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
               {isJa
-                ? '難しい操作はゼロ！いつでも管理画面から店名・キャッチコピー・写真・連絡先リンクを自由に変更可能。さらに「✨AI ワンクリック4ヶ国語翻訳」付きで海外向けも一瞬！'
+                ? '難しい操作はゼロ！プランに応じて最大1〜30枠の広告を登録可能。さらに「✨AI ワンクリック4ヶ国語翻訳」付きで海外向けも一瞬！'
                 : isCN
-                ? '完全不用懂排版或写程式！登入后只要打几句您想宣传的话、放上您的 LINE 或网址，按一下「✨ AI 帮我翻译成中/英/日文」，连外国客人都能看懂您的招牌！'
+                ? '完全不用懂排版或写程式！依方案最高可同时上架 1～30 件不同商品广告，按一下「✨ AI 帮我翻译成中/英/日文」，连外国客人都能看懂您的招牌！'
                 : isChinese
-                ? '完全不用懂排版或寫程式！登入後只要打幾句您想宣傳的話、放上您的 LINE 或網址，按一下「✨ AI 幫我翻譯成中/英/日文」，連外國客人都能看懂您的招牌！'
-                : 'Zero technical setup! Type a few lines about what you offer, drop your LINE or website link, and tap "✨ 1-Click AI Translate" to speak Chinese, English, and Japanese!'}
+                ? '完全不用懂排版或寫程式！依方案最高可同時上架 1～30 件不同商品廣告，按一下「✨ AI 幫我翻譯成中/英/日文」，連外國客人都能看懂您的招牌！'
+                : 'Zero technical setup! Manage 1 to 30 ad campaigns depending on your tier, and tap "✨ 1-Click AI Translate" to speak Chinese, English, and Japanese!'}
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-white/10 text-xs text-pink-300 font-bold">
@@ -343,52 +383,53 @@ export default function SponsorPage() {
               {isJa
                 ? '🌍 100サイトのメディア群で毎日自動紹介'
                 : isCN
-                ? '🌍 百大网站天天帮您挂招牌、新文章主动带上您'
+                ? '🌍 百大网站天天帮您挂招牌、到期自动停播'
                 : isChinese
-                ? '🌍 百大網站天天幫您掛招牌、新文章主動帶上您'
-                : '🌍 Featured Across 100+ Sites & Daily New Articles'}
+                ? '🌍 百大網站天天幫您掛招牌、到期自動停播'
+                : '🌍 Featured Across 100+ Sites & Auto-Cutoff on Expiry'}
             </h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
               {isJa
-                ? 'あなたが寝ている間も、私たちのAI広報アシスタントが世界中の多言語サイト（100サイトへ拡大中）で毎日新しい記事を書きながら、あなたの広告カードを自動で読者に届けます！'
+                ? 'あなたが寝ている間も、私たちのAI広報アシスタントが世界中の多言語サイト群であなたの広告カードを自動で読者に届けます！有効期間終了後は自動で配信停止されます。'
                 : isCN
-                ? '当您在忙工作或睡觉时，我们的「AI 宣传小帮手」每天在全球多语系网站群（正迈向 100 个主题网站）发表新文章时，都会自动把您的精美名片一起放进去给读者看！'
+                ? '当您在忙工作或睡觉时，我们的「AI 宣传小帮手」每天在全球多语系网站群发表新文章时，都会依您的等级频率（1x～50x）自动把您的名片放进去！可用时间结束后自动停止轮播。'
                 : isChinese
-                ? '當您在忙工作或睡覺時，我們的「AI 宣傳小幫手」每天在全球多語系網站群（正邁向 100 個主題網站）發表新文章時，都會自動把您的精美名片一起放進去給讀者看！'
-                : 'While you sleep or relax, our AI assistants publish fresh articles daily across our growing network of 100+ global sites—automatically showcasing your ad card to readers!'}
+                ? '當您在忙工作或睡覺時，我們的「AI 宣傳小幫手」每天在全球多語系網站群發表新文章時，都會依您的等級頻率（1x～50x）自動把您的名片放進去！可用時間結束後自動停止輪播。'
+                : 'While you sleep, our AI assistants showcase your ad cards across our growing network of 100+ global sites according to your tier frequency (1x–50x), automatically stopping once expired!'}
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-white/10 text-xs text-cyan-300 font-bold">
             {isJa
-              ? '✔ いつでも画面から「見られた回数・クリック数」を確認可能（売上保証なし）'
+              ? '✔ いつでも画面から「見られた回数・クリック数・残り日数」を確認可能'
               : isCN
-              ? '✔ 后台随时看得到「有几个人看过、几个人点过」（纯赞助回馈，不保证业绩额）'
+              ? '✔ 后台随时看得到「剩余天数、曝光与点击次数」（不保证业绩额）'
               : isChinese
-              ? '✔ 後台隨時看得到「有幾個人看過、幾個人點過」（純贊助回饋，不保證業績額）'
-              : '✔ Check your live views & clicks anytime in your dashboard (no sales guarantee)'}
+              ? '✔ 後台隨時看得到「剩餘天數、曝光與點擊次數」（不保證業績額）'
+              : '✔ Check your remaining days, views & clicks anytime in your dashboard'}
           </div>
         </div>
       </div>
 
-      {/* 選購與結帳區（移至上方醒目位置，方便客戶立即操作） */}
-      <div className="w-full max-w-2xl bg-gradient-to-b from-gray-900 to-black border-2 border-amber-400/50 rounded-3xl p-6 sm:p-8 mb-14 relative overflow-hidden shadow-[0_0_50px_rgba(251,191,36,0.16)]">
+      {/* 選購與結帳區（支援 $3 純支持 + 5 大萬商廣告等級：$15 / $120 / $888 / $2,700 / $6,000） */}
+      <div className="w-full max-w-5xl bg-gradient-to-b from-gray-900 to-black border-2 border-amber-400/50 rounded-3xl p-6 sm:p-8 mb-14 relative overflow-hidden shadow-[0_0_50px_rgba(251,191,36,0.16)]">
         <div className="absolute -top-32 -right-32 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <h3 className="text-2xl font-black text-center mb-2">{selectSponsorTitle}</h3>
-        <p className="text-gray-300 text-center mb-6 text-xs sm:text-sm">{selectSponsorDesc}</p>
+        <h3 className="text-2xl sm:text-3xl font-black text-center mb-2">{selectSponsorTitle}</h3>
+        <p className="text-gray-300 text-center mb-6 text-xs sm:text-sm max-w-3xl mx-auto">{selectSponsorDesc}</p>
 
         {isLoading ? (
           <div className="text-center py-10 text-gray-500">Loading...</div>
         ) : (
-          <div className="flex flex-col gap-5 relative z-10">
-            {/* 方案按鈕 */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="flex flex-col gap-6 relative z-10">
+            {/* 6 張方案卡片網格 (1個純支持 + 5大廣告等級) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {packages.map(pkg => {
                 const p = Number(pkg.price);
-                const is120 = p >= 99;
-                const is15 = p >= 15 && p < 99;
                 const isSelected = selectedPackage?.id === pkg.id && Number(selectedPackage?.price) === p;
+                const isVipTier = p >= 888;
+                const is120 = p >= 99 && p < 888;
+                const is15 = p >= 15 && p < 99;
 
                 return (
                   <button
@@ -396,59 +437,131 @@ export default function SponsorPage() {
                     onClick={() => setSelectedPackage(pkg)}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? is120
+                        ? isVipTier
+                          ? 'border-pink-400 bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-amber-500/15 shadow-[0_0_25px_rgba(236,72,153,0.35)] scale-[1.02]'
+                          : is120
                           ? 'border-amber-400 bg-amber-500/15 shadow-[0_0_25px_rgba(251,191,36,0.3)] scale-[1.02]'
                           : 'border-cyan-400 bg-cyan-500/15 shadow-[0_0_20px_rgba(34,211,238,0.25)] scale-[1.02]'
-                        : 'border-white/10 bg-black/40 hover:border-white/30'
+                        : 'border-white/10 bg-black/50 hover:border-white/30'
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className={`text-2xl font-black ${is120 ? 'text-amber-400' : is15 ? 'text-cyan-400' : 'text-pink-400'}`}>
-                          ${pkg.price} <span className="text-xs font-normal text-gray-400">USD</span>
+                      <div className="flex items-center justify-between gap-1 mb-1.5">
+                        <span
+                          className={`text-2xl font-black ${
+                            isVipTier ? 'text-pink-300' : is120 ? 'text-amber-400' : is15 ? 'text-cyan-400' : 'text-gray-300'
+                          }`}
+                        >
+                          ${pkg.price.toLocaleString()} <span className="text-xs font-normal text-gray-400">USD</span>
                         </span>
-                        {is120 && (
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500 text-slate-950">
-                            {isChinese ? (isCN ? '买8送4·365天' : '買8送4·365天') : '365 Days'}
-                          </span>
-                        )}
-                        {is15 && (
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-cyan-500 text-slate-950">
-                            {isChinese ? (isCN ? '回礼30天广告' : '回禮30天廣告') : '30 Days'}
+                        {pkg.tierBadge && (
+                          <span
+                            className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                              isVipTier
+                                ? 'bg-gradient-to-r from-pink-500 to-amber-500 text-white'
+                                : is120
+                                ? 'bg-amber-500 text-slate-950'
+                                : is15
+                                ? 'bg-cyan-500 text-slate-950'
+                                : 'bg-white/15 text-gray-200'
+                            }`}
+                          >
+                            {pkg.tierBadge}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs font-bold text-white mt-1">
+
+                      <div className="text-sm font-black text-white mt-1">
                         {isChinese ? pkg.name_zh : pkg.name_en}
                       </div>
-                    </div>
-                    <div className="mt-3 pt-2 border-t border-white/10 text-[11px] text-gray-300">
-                      {is120
-                        ? isCN
-                          ? '👑 回馈 365 天 AI 广告小帮手 (VIP 3倍曝光)'
-                          : isChinese
-                          ? '👑 回饋 365 天 AI 廣告小幫手 (VIP 3倍曝光)'
-                          : '👑 365-Day AI Ad Assistant (VIP 3x Boost)'
-                        : is15
-                        ? isCN
-                          ? '⚡ 回馈 30 天 AI 广告小帮手 (轻松曝光)'
-                          : isChinese
-                          ? '⚡ 回饋 30 天 AI 廣告小幫手 (輕鬆曝光)'
-                          : '⚡ 30-Day AI Ad Assistant Access'
-                        : isCN
-                        ? '☕ 纯支持我们研发 (+计入升等业绩)'
-                        : isChinese
-                        ? '☕ 純支持我們研發 (+計入升等業績)'
-                        : '☕ Pure Support (+Tier Volume)'}
+
+                      {pkg.freqLabel && (
+                        <div className="mt-2.5 space-y-1 text-[11px] text-gray-300 bg-white/5 rounded-xl p-2.5 border border-white/5">
+                          <div className="flex items-center gap-1.5 text-amber-200 font-bold">
+                            <span>⚡</span>
+                            <span>{pkg.freqLabel}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-cyan-200 font-bold">
+                            <span>📢</span>
+                            <span>{pkg.slotsLabel}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-emerald-300">
+                            <span>⏳</span>
+                            <span>{pkg.daysLabel}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
 
+            {/* 5 大等級優勢一目了然對照表 */}
+            <div className="rounded-2xl bg-slate-950/90 border border-white/10 p-4 sm:p-5 overflow-x-auto">
+              <div className="text-xs sm:text-sm font-black text-amber-300 mb-3 flex items-center justify-between">
+                <span>📊 萬商自助廣告 5 大等級「協播頻率 × 輪播次數 × 廣告件數」規格總覽</span>
+                <span className="text-[11px] text-gray-400 font-normal">* 可用時間結束後自動停止輪播</span>
+              </div>
+              <table className="w-full text-left border-collapse text-xs min-w-[600px]">
+                <thead>
+                  <tr className="border-b border-white/15 text-gray-400">
+                    <th className="py-2 px-2">方案等級</th>
+                    <th className="py-2 px-2">斗內金額</th>
+                    <th className="py-2 px-2">可用時間</th>
+                    <th className="py-2 px-2">協播頻率權重</th>
+                    <th className="py-2 px-2">每站每日輪播上限</th>
+                    <th className="py-2 px-2">可上架廣告件數</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10 text-gray-200">
+                  <tr>
+                    <td className="py-2 px-2 font-bold text-cyan-300">⚡ 星火體驗型 (入門)</td>
+                    <td className="py-2 px-2 font-bold">$15 USD</td>
+                    <td className="py-2 px-2">30 天 (1個月)</td>
+                    <td className="py-2 px-2">1x 標準頻率</td>
+                    <td className="py-2 px-2">約 60 次/站/日</td>
+                    <td className="py-2 px-2 font-bold text-white">1 件廣告</td>
+                  </tr>
+                  <tr className="bg-amber-500/5">
+                    <td className="py-2 px-2 font-bold text-amber-300">🔥 百站常駐型 (進階人氣)</td>
+                    <td className="py-2 px-2 font-bold text-amber-300">$120 USD</td>
+                    <td className="py-2 px-2 font-bold text-amber-200">365 天 (買8送4)</td>
+                    <td className="py-2 px-2 font-bold text-amber-300">3x 優先頻率</td>
+                    <td className="py-2 px-2">約 180 次/站/日</td>
+                    <td className="py-2 px-2 font-bold text-amber-300">2 件廣告 (A/B輪播)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-2 font-bold text-yellow-300">🥇 黃金聚客型 (商務多品)</td>
+                    <td className="py-2 px-2 font-bold">$888 USD</td>
+                    <td className="py-2 px-2">365 天 (整年)</td>
+                    <td className="py-2 px-2 font-bold text-yellow-300">8x 高頻強播</td>
+                    <td className="py-2 px-2">約 500 次/站/日</td>
+                    <td className="py-2 px-2 font-bold text-yellow-300">5 件廣告矩陣</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-2 font-bold text-pink-300">💎 皇家霸屏型 (品牌旗艦)</td>
+                    <td className="py-2 px-2 font-bold">$2,700 USD</td>
+                    <td className="py-2 px-2">365 天 (整年)</td>
+                    <td className="py-2 px-2 font-bold text-pink-300">20x 極速霸屏</td>
+                    <td className="py-2 px-2">約 1,500 次/站/日</td>
+                    <td className="py-2 px-2 font-bold text-pink-300">12 件廣告矩陣</td>
+                  </tr>
+                  <tr className="bg-pink-500/10">
+                    <td className="py-2 px-2 font-bold text-rose-300">👑 萬商至尊型 (全球帝王)</td>
+                    <td className="py-2 px-2 font-bold text-rose-300">$6,000 USD</td>
+                    <td className="py-2 px-2 font-bold text-rose-200">730 天 (整整2年)</td>
+                    <td className="py-2 px-2 font-bold text-rose-300">50x 全站頂置</td>
+                    <td className="py-2 px-2 font-bold text-rose-200">全時段不限次頂置</td>
+                    <td className="py-2 px-2 font-bold text-rose-300">30 件跨國廣告矩陣</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             {/* 事前公開免責聲明確認框（不保證業績額） */}
             {Number(selectedPackage?.price) >= 15 && (
-              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 leading-relaxed max-w-3xl mx-auto">
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
@@ -459,19 +572,19 @@ export default function SponsorPage() {
                   <span>
                     {isJa ? (
                       <>
-                        <strong>【応援返礼・ご利用規約（売上保証なし）】</strong>：$15以上で30日間、$120以上で365日間「万商広告スタジオ」をご利用いただけます。本特典はAI-SKILLS開発応援への感謝ギフトであり、<strong>期間中のサイト群での表示を提供しますが、特定のクリック数や売上成約額を保証するものではありません（違法・詐欺・アダルト等の掲載は即時停止・返金不可）</strong>。
+                        <strong>【応援返礼・ご利用規約（売上保証なし・期限終了時自動停止）】</strong>：各プランの有効日数および広告枠数（1〜30枠）に応じて「万商広告スタジオ」をご利用いただけます。有効期間が終了すると各WPサイトでの広告輪播は自動的に停止します。本特典はAI-SKILLS開発応援への感謝ギフトであり、<strong>特定のクリック数や売上成約額を保証するものではありません（違法・詐欺・アダルト等の掲載は即時停止・返金不可）</strong>。
                       </>
                     ) : isCN ? (
                       <>
-                        <strong>【斗内一下、回您一把 · 贴心约定（不保证业绩额）】</strong>：我了解斗内满 $15 可使用 1 个月（30天）、满 $120（买 8 个月送 4 个月）可使用 365 天「万商广告小帮手」自由张贴介绍文案与联络连结。这份 AI 技能是感谢我赞助 AI-SKILLS 开发的回礼，<strong>系统会在天数内帮我全网轮播曝光，但不保证一定会有多少人点击或保证成交业绩额，且不能放违法/诈骗/色情内容喔（违规会下架且不退费）</strong>。
+                        <strong>【斗内一下、回您一把 · 贴心约定（不保证业绩额 ＆ 到期自动停播）】</strong>：我了解斗内后可依方案等级享有对应之「曝光天数（30天～730天）、协播频率（1x～50x）与可上架广告件数（1～30件）」，并可在会员后台累积延长使用时间；当可使用时间结束后，即无法在各 WP 站间轮播广告。这份 AI 技能是感谢我赞助 AI-SKILLS 开发的回礼，<strong>系统会在天数内帮我全网轮播曝光，但不保证一定会有多少人点击或保证成交业绩额，且不能放违法/诈骗/色情内容喔（违规会下架且不退费）</strong>。
                       </>
                     ) : isChinese ? (
                       <>
-                        <strong>【斗內一下、回您一把 · 貼心約定（不保證業績額）】</strong>：我了解斗內滿 $15 可使用 1 個月（30天）、滿 $120（買 8 個月送 4 個月）可使用 365 天「萬商廣告小幫手」自由張貼介紹文案與聯絡連結。這份 AI 技能是感謝我贊助 AI-SKILLS 開發的回禮，<strong>系統會在天數內幫我全網輪播曝光，但不保證一定會有多少人點擊或保證成交業績額，且不能放違法/詐騙/色情內容喔（違規會下架且不退費）</strong>。
+                        <strong>【斗內一下、回您一把 · 貼心約定（不保證業績額 ＆ 到期自動停播）】</strong>：我了解斗內後可依方案等級享有對應之「曝光天數（30天～730天）、協播頻率（1x～50x）與可上架廣告件數（1～30件）」，並可在會員後台累積延長使用時間；當可使用時間結束後，即無法在各 WP 站間輪播廣告。這份 AI 技能是感謝我贊助 AI-SKILLS 開發的回禮，<strong>系統會在天數內幫我全網輪播曝光，但不保證一定會有多少人點擊或保證成交業績額，且不能放違法/詐騙/色情內容喔（違規會下架且不退費）</strong>。
                       </>
                     ) : (
                       <>
-                        <strong>[Sponsor Perk Agreement (No Revenue Guarantee)]</strong>: I understand that sponsoring $15+ grants 30 days and $120+ grants 365 days of Self-Serve Ad Studio access as a thank-you gift for supporting AI-SKILLS R&D. <strong>While our network rotates your ad during the active period, we do not guarantee specific click counts or sales revenue, and illegal/scam/adult content will be removed without refund.</strong>
+                        <strong>[Sponsor Perk Agreement (No Revenue Guarantee & Auto-Cutoff on Expiry)]</strong>: I understand that sponsoring grants Self-Serve Ad Studio access according to the selected tier’s active days, frequency (1x–50x), and ad slots (1–30). Once active time expires, ad rotation across all WP sites stops automatically. <strong>We do not guarantee specific click counts or sales revenue, and illegal/scam/adult content will be removed without refund.</strong>
                       </>
                     )}
                   </span>
@@ -480,49 +593,51 @@ export default function SponsorPage() {
             )}
 
             {/* 結帳區 */}
-            {selectedPackage && (Number(selectedPackage.price) < 15 || agreedNoGuarantee) ? (
-              <div className="mt-2 flex flex-col gap-3.5">
-                <PayUniButton
-                  packageId={selectedPackage.id}
-                  priceInUSDT={selectedPackage.price}
-                  productType="SPONSOR"
-                  productName={isChinese ? selectedPackage.name_zh : selectedPackage.name_en}
-                />
+            <div className="max-w-xl mx-auto w-full">
+              {selectedPackage && (Number(selectedPackage.price) < 15 || agreedNoGuarantee) ? (
+                <div className="mt-2 flex flex-col gap-3.5">
+                  <PayUniButton
+                    packageId={selectedPackage.id}
+                    priceInUSDT={selectedPackage.price}
+                    productType="SPONSOR"
+                    productName={isChinese ? selectedPackage.name_zh : selectedPackage.name_en}
+                  />
 
-                <PayPalButton
-                  packageId={selectedPackage.id}
-                  priceInUSDT={selectedPackage.price}
-                  productType="SPONSOR"
-                  productName={isChinese ? selectedPackage.name_zh : selectedPackage.name_en}
-                />
+                  <PayPalButton
+                    packageId={selectedPackage.id}
+                    priceInUSDT={selectedPackage.price}
+                    productType="SPONSOR"
+                    productName={isChinese ? selectedPackage.name_zh : selectedPackage.name_en}
+                  />
 
-                <div className="relative flex items-center py-1">
-                  <div className="flex-grow border-t border-white/10"></div>
-                  <span className="flex-shrink-0 mx-4 text-white/40 text-xs">
-                    {isChinese ? (isCN ? '或使用数字钱包 USDT 斗内支持' : '或使用數位錢包 USDT 斗內支持') : 'Or sponsor with Web3 USDT Wallet'}
-                  </span>
-                  <div className="flex-grow border-t border-white/10"></div>
+                  <div className="relative flex items-center py-1">
+                    <div className="flex-grow border-t border-white/10"></div>
+                    <span className="flex-shrink-0 mx-4 text-white/40 text-xs">
+                      {isChinese ? (isCN ? '或使用数字钱包 USDT 斗内支持' : '或使用數位錢包 USDT 斗內支持') : 'Or sponsor with Web3 USDT Wallet'}
+                    </span>
+                    <div className="flex-grow border-t border-white/10"></div>
+                  </div>
+
+                  <BuyNFTButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
                 </div>
-
-                <BuyNFTButton packageId={selectedPackage.id} priceInUSDT={selectedPackage.price} />
-              </div>
-            ) : (
-              <div className="p-4 rounded-xl bg-gray-800 text-amber-300 text-center text-xs font-bold">
-                {isChinese
-                  ? '☝️ 請先勾選上方「斗內一下、回您一把 · 貼心約定（不保證業績額）」即可按下付款按鈕喔！'
-                  : '☝️ Please check the Sponsor Perk Agreement box above to proceed with payment.'}
-              </div>
-            )}
+              ) : (
+                <div className="p-4 rounded-xl bg-gray-800 text-amber-300 text-center text-xs font-bold">
+                  {isChinese
+                    ? '☝️ 請先勾選上方「斗內一下、回您一把 · 貼心約定（不保證業績額）」即可按下付款按鈕喔！'
+                    : '☝️ Please check the Sponsor Perk Agreement box above to proceed with payment.'}
+                </div>
+              )}
+            </div>
 
             <div className="text-center pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
               <span>
                 {isJa
-                  ? '* 決済完了後、専用IDとパスワードが即座にメールへ届きます'
+                  ? '* 決済完了後、専用IDとパスワードが即座にメールへ届きます（既存会員様は有効日数が自動加算されます）'
                   : isCN
-                  ? '* 斗内成功后，系统会立刻把专属帐号密码寄到您的信箱'
+                  ? '* 斗内成功后，系统会立刻寄发专属帐密（已开通会员将直接累加延长广告使用天数）'
                   : isChinese
-                  ? '* 斗內成功後，系統會立刻把專屬帳號密碼寄到您的信箱'
-                  : '* Login credentials will be emailed to you immediately after payment'}
+                  ? '* 斗內成功後，系統會立刻寄發專屬帳密（已開通會員將直接累加延長廣告使用天數）'
+                  : '* Login credentials emailed immediately after payment (existing accounts automatically extend active days)'}
               </span>
               <Link href="/ad-studio" className="text-amber-300 hover:underline font-bold">
                 {isJa

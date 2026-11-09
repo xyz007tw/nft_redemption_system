@@ -4,7 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { SponsorAdvertiser } from '@/lib/adNetwork';
+import { SponsorAdvertiser, AdSlotCampaign } from '@/lib/adNetwork';
+
+type EnrichedAdvertiser = SponsorAdvertiser & {
+  remaining_days?: number;
+  tier_name_zh?: string;
+  tier_badge_zh?: string;
+};
 
 export default function AdStudioPage() {
   const { lang } = useLanguage();
@@ -18,8 +24,12 @@ export default function AdStudioPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [magicSentMsg, setMagicSentMsg] = useState<string | null>(null);
 
-  // Advertiser profile & campaign states
-  const [advertiser, setAdvertiser] = useState<(SponsorAdvertiser & { remaining_days?: number }) | null>(null);
+  // Advertiser profile & multi-slot campaign states
+  const [advertiser, setAdvertiser] = useState<EnrichedAdvertiser | null>(null);
+  const [adSlots, setAdSlots] = useState<AdSlotCampaign[]>([]);
+  const [activeSlotIdx, setActiveSlotIdx] = useState<number>(0);
+
+  // Current slot form fields
   const [brandName, setBrandName] = useState('');
   const [headlineZh, setHeadlineZh] = useState('');
   const [headlineCn, setHeadlineCn] = useState('');
@@ -35,6 +45,7 @@ export default function AdStudioPage() {
   const [targetUrl, setTargetUrl] = useState('');
   const [bannerImageUrl, setBannerImageUrl] = useState('');
   const [nicheCategory, setNicheCategory] = useState<'ALL' | 'PARENTING' | 'MARKETING_SEO' | 'MINDFULNESS' | 'CAREER_BIZ'>('ALL');
+  const [slotEnabled, setSlotEnabled] = useState<boolean>(true);
   const [campaignStatus, setCampaignStatus] = useState<'ACTIVE' | 'PAUSED' | 'BANNED'>('ACTIVE');
 
   const [saving, setSaving] = useState(false);
@@ -43,24 +54,114 @@ export default function AdStudioPage() {
   const [statusNotice, setStatusNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [previewLang, setPreviewLang] = useState<'ZH' | 'CN' | 'EN' | 'JA'>('ZH');
 
-  const populateForm = (adv: SponsorAdvertiser & { remaining_days?: number }) => {
+  const loadSlotIntoForm = (slot: AdSlotCampaign) => {
+    setBrandName(slot.brand_name || '');
+    setHeadlineZh(slot.headline_zh || '');
+    setHeadlineCn(slot.headline_cn || slot.headline_zh || '');
+    setHeadlineEn(slot.headline_en || '');
+    setHeadlineJa(slot.headline_ja || '');
+    setBodyZh(slot.body_zh || '');
+    setBodyCn(slot.body_cn || slot.body_zh || '');
+    setBodyEn(slot.body_en || '');
+    setBodyJa(slot.body_ja || '');
+    setCtaTextZh(slot.cta_text_zh || '👉 立即前往了解詳情');
+    setCtaTextEn(slot.cta_text_en || '👉 Learn More Now');
+    setCtaTextJa(slot.cta_text_ja || '👉 今すぐ詳細を見る');
+    setTargetUrl(slot.target_url || 'https://');
+    setBannerImageUrl(slot.banner_image_url || '');
+    setNicheCategory(slot.niche_category || 'ALL');
+    setSlotEnabled(slot.enabled !== false);
+  };
+
+  const populateForm = (adv: EnrichedAdvertiser, keepSlotIdx = 0) => {
     setAdvertiser(adv);
-    setBrandName(adv.brand_name || '');
-    setHeadlineZh(adv.headline_zh || '');
-    setHeadlineCn(adv.headline_cn || adv.headline_zh || '');
-    setHeadlineEn(adv.headline_en || '');
-    setHeadlineJa(adv.headline_ja || '');
-    setBodyZh(adv.body_zh || '');
-    setBodyCn(adv.body_cn || adv.body_zh || '');
-    setBodyEn(adv.body_en || '');
-    setBodyJa(adv.body_ja || '');
-    setCtaTextZh(adv.cta_text_zh || '👉 立即前往了解詳情');
-    setCtaTextEn(adv.cta_text_en || '👉 Learn More Now');
-    setCtaTextJa(adv.cta_text_ja || '👉 今すぐ詳細を見る');
-    setTargetUrl(adv.target_url || 'https://');
-    setBannerImageUrl(adv.banner_image_url || '');
-    setNicheCategory(adv.niche_category || 'ALL');
     setCampaignStatus(adv.status || 'ACTIVE');
+    const slots: AdSlotCampaign[] =
+      Array.isArray(adv.ad_slots) && adv.ad_slots.length > 0
+        ? adv.ad_slots
+        : [
+            {
+              slot_id: `${adv.id}-slot-1`,
+              brand_name: adv.brand_name || '',
+              headline_zh: adv.headline_zh || '',
+              headline_cn: adv.headline_cn || adv.headline_zh || '',
+              headline_en: adv.headline_en || '',
+              headline_ja: adv.headline_ja || '',
+              body_zh: adv.body_zh || '',
+              body_cn: adv.body_cn || adv.body_zh || '',
+              body_en: adv.body_en || '',
+              body_ja: adv.body_ja || '',
+              cta_text_zh: adv.cta_text_zh || '👉 立即前往了解詳情',
+              cta_text_en: adv.cta_text_en || '👉 Learn More Now',
+              cta_text_ja: adv.cta_text_ja || '👉 今すぐ詳細を見る',
+              target_url: adv.target_url || 'https://',
+              banner_image_url: adv.banner_image_url || '',
+              niche_category: adv.niche_category || 'ALL',
+              enabled: true
+            }
+          ];
+    setAdSlots(slots);
+    const safeIdx = Math.min(keepSlotIdx, slots.length - 1);
+    setActiveSlotIdx(safeIdx);
+    loadSlotIntoForm(slots[safeIdx]);
+  };
+
+  const buildCurrentEditedSlots = (): AdSlotCampaign[] => {
+    const next = [...adSlots];
+    const currentSlot: AdSlotCampaign = {
+      slot_id: next[activeSlotIdx]?.slot_id || `slot-${activeSlotIdx + 1}`,
+      brand_name: brandName,
+      headline_zh: headlineZh,
+      headline_cn: headlineCn || headlineZh,
+      headline_en: headlineEn || headlineZh,
+      headline_ja: headlineJa || headlineZh,
+      body_zh: bodyZh,
+      body_cn: bodyCn || bodyZh,
+      body_en: bodyEn || bodyZh,
+      body_ja: bodyJa || bodyZh,
+      cta_text_zh: ctaTextZh,
+      cta_text_en: ctaTextEn,
+      cta_text_ja: ctaTextJa,
+      target_url: targetUrl,
+      banner_image_url: bannerImageUrl,
+      niche_category: nicheCategory,
+      enabled: slotEnabled
+    };
+    next[activeSlotIdx] = currentSlot;
+    return next;
+  };
+
+  const handleSwitchSlot = (targetIdx: number) => {
+    if (!advertiser) return;
+    const maxAllowed = advertiser.max_ad_slots || 1;
+    if (targetIdx >= maxAllowed) return;
+
+    const synced = buildCurrentEditedSlots();
+    while (synced.length <= targetIdx) {
+      synced.push({
+        slot_id: `${advertiser.id}-slot-${synced.length + 1}`,
+        brand_name: brandName || advertiser.brand_name || '',
+        headline_zh: `🔥 【主打推薦 #${synced.length + 1}】歡迎造訪我們的精選服務與最新優惠！`,
+        headline_cn: `🔥 【主打推荐 #${synced.length + 1}】欢迎造访我们的精选服务与最新优惠！`,
+        headline_en: `🔥 [Featured #${synced.length + 1}] Discover Our Exclusive Services & Offers!`,
+        headline_ja: `🔥 【注目おすすめ #${synced.length + 1}】厳選サービスと最新特典はこちら！`,
+        body_zh: bodyZh || advertiser.body_zh || '',
+        body_cn: bodyCn || advertiser.body_cn || '',
+        body_en: bodyEn || advertiser.body_en || '',
+        body_ja: bodyJa || advertiser.body_ja || '',
+        cta_text_zh: ctaTextZh || '👉 立即前往了解詳情',
+        cta_text_en: ctaTextEn || '👉 Learn More Now',
+        cta_text_ja: ctaTextJa || '👉 今すぐ詳細を見る',
+        target_url: targetUrl || advertiser.target_url || 'https://',
+        banner_image_url: bannerImageUrl || '',
+        niche_category: nicheCategory || 'ALL',
+        enabled: true
+      });
+    }
+    setAdSlots(synced);
+    setActiveSlotIdx(targetIdx);
+    loadSlotIntoForm(synced[targetIdx]);
+    setStatusNotice(null);
   };
 
   // Auto-login if ?ad_token= is in URL or saved in localStorage
@@ -83,7 +184,7 @@ export default function AdStudioPage() {
           if (data.success && data.advertiser) {
             setAdToken(data.adToken || tokenToUse);
             localStorage.setItem('wx_ad_studio_token', data.adToken || tokenToUse);
-            populateForm(data.advertiser);
+            populateForm(data.advertiser, 0);
           } else if (urlToken) {
             setAuthError(data.error || '登入連結已失效');
           }
@@ -116,7 +217,7 @@ export default function AdStudioPage() {
       }
       setAdToken(data.adToken);
       localStorage.setItem('wx_ad_studio_token', data.adToken);
-      populateForm(data.advertiser);
+      populateForm(data.advertiser, 0);
     } catch (err: any) {
       setAuthError(err.message || '連線異常');
     } finally {
@@ -192,7 +293,7 @@ export default function AdStudioPage() {
         if (tr.cta_text_ja) setCtaTextJa(tr.cta_text_ja);
         setStatusNotice({
           type: 'success',
-          text: '✨ AI 已自動將您的廣告翻譯並潤飾為「繁中 / 簡中 / 英文 / 日文」4 大語系！請記得點擊底部「儲存並發佈至全網協播池」按鈕。'
+          text: '✨ AI 已自動將您的廣告翻譯並潤飾為「繁中 / 簡中 / 英文 / 日文」4 大語系！請記得點擊底部「儲存並立即讓 AI 幫我全網打廣告」按鈕。'
         });
       }
     } catch (err: any) {
@@ -237,13 +338,32 @@ export default function AdStudioPage() {
     }
   };
 
-  // 儲存廣告並同步發佈至 Cloudflare R2 與 AI Agent Feed
+  // 儲存廣告並同步發佈
   const handleSaveCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!advertiser) return;
     setSaving(true);
     setStatusNotice(null);
     try {
+      const finalSlots = buildCurrentEditedSlots();
+      const mainSlot = finalSlots[0] || {
+        brand_name: brandName,
+        headline_zh: headlineZh,
+        headline_cn: headlineCn || headlineZh,
+        headline_en: headlineEn || headlineZh,
+        headline_ja: headlineJa || headlineZh,
+        body_zh: bodyZh,
+        body_cn: bodyCn || bodyZh,
+        body_en: bodyEn || bodyZh,
+        body_ja: bodyJa || bodyZh,
+        cta_text_zh: ctaTextZh,
+        cta_text_en: ctaTextEn,
+        cta_text_ja: ctaTextJa,
+        target_url: targetUrl,
+        banner_image_url: bannerImageUrl,
+        niche_category: nicheCategory
+      };
+
       const res = await fetch('/api/ads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -251,21 +371,22 @@ export default function AdStudioPage() {
           action: 'update_ad_campaign',
           adToken,
           email: advertiser.email,
-          brand_name: brandName,
-          headline_zh: headlineZh,
-          headline_cn: headlineCn || headlineZh,
-          headline_en: headlineEn || headlineZh,
-          headline_ja: headlineJa || headlineZh,
-          body_zh: bodyZh,
-          body_cn: bodyCn || bodyZh,
-          body_en: bodyEn || bodyZh,
-          body_ja: bodyJa || bodyZh,
-          cta_text_zh: ctaTextZh,
-          cta_text_en: ctaTextEn,
-          cta_text_ja: ctaTextJa,
-          target_url: targetUrl,
-          banner_image_url: bannerImageUrl,
-          niche_category: nicheCategory,
+          brand_name: mainSlot.brand_name,
+          headline_zh: mainSlot.headline_zh,
+          headline_cn: mainSlot.headline_cn || mainSlot.headline_zh,
+          headline_en: mainSlot.headline_en || mainSlot.headline_zh,
+          headline_ja: mainSlot.headline_ja || mainSlot.headline_zh,
+          body_zh: mainSlot.body_zh,
+          body_cn: mainSlot.body_cn || mainSlot.body_zh,
+          body_en: mainSlot.body_en || mainSlot.body_zh,
+          body_ja: mainSlot.body_ja || mainSlot.body_zh,
+          cta_text_zh: mainSlot.cta_text_zh,
+          cta_text_en: mainSlot.cta_text_en,
+          cta_text_ja: mainSlot.cta_text_ja,
+          target_url: mainSlot.target_url,
+          banner_image_url: mainSlot.banner_image_url,
+          niche_category: mainSlot.niche_category,
+          ad_slots: finalSlots,
           status: campaignStatus
         })
       });
@@ -274,7 +395,7 @@ export default function AdStudioPage() {
         setStatusNotice({ type: 'error', text: data.error || '儲存失敗' });
         return;
       }
-      if (data.advertiser) populateForm(data.advertiser);
+      if (data.advertiser) populateForm(data.advertiser, activeSlotIdx);
       setStatusNotice({ type: 'success', text: data.message });
     } catch (err: any) {
       setStatusNotice({ type: 'error', text: err.message });
@@ -289,6 +410,9 @@ export default function AdStudioPage() {
     previewLang === 'EN' ? bodyEn || bodyZh : previewLang === 'JA' ? bodyJa || bodyZh : previewLang === 'CN' ? bodyCn || bodyZh : bodyZh;
   const previewCta = previewLang === 'EN' ? ctaTextEn || ctaTextZh : previewLang === 'JA' ? ctaTextJa || ctaTextZh : ctaTextZh;
 
+  const maxSlotsAllowed = advertiser?.max_ad_slots || 1;
+  const dailyRotations = advertiser?.daily_rotations_per_site || (advertiser?.weight && advertiser.weight >= 3 ? 180 : 60);
+
   return (
     <div className="min-h-screen bg-[#07090f] text-white font-sans pb-24">
       {/* 頂部導覽列 */}
@@ -299,7 +423,7 @@ export default function AdStudioPage() {
               ← 回斗內開通頁 (/sponsor)
             </Link>
             <h1 className="text-base sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-cyan-300 to-purple-400">
-              📢 微享「萬商自助廣告協播系統」客戶工作台 (/ad-studio)
+              📢 微享「萬商廣告小幫手」自助工作台 (/ad-studio)
             </h1>
           </div>
           <div className="flex items-center gap-2.5">
@@ -325,7 +449,7 @@ export default function AdStudioPage() {
                 📢
               </div>
               <h2 className="text-2xl font-black text-white">
-                {isChinese ? '登入「萬商廣告系統」自助工作台' : 'Advertiser Studio Login'}
+                {isChinese ? '登入「萬商廣告小幫手」工作台' : 'Advertiser Studio Login'}
               </h2>
               <p className="text-xs sm:text-sm text-gray-400 mt-2 leading-relaxed">
                 請輸入您於 <Link href="/sponsor" className="text-cyan-400 underline">/sponsor 斗內贊助</Link> 時填寫的 Email 帳號與開通信中的專屬密碼（WX 開頭 8 碼）。
@@ -406,24 +530,25 @@ export default function AdStudioPage() {
                 <div className="text-3xl font-black text-white">
                   {advertiser.remaining_days ?? 0} <span className="text-sm font-normal text-gray-300">天</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">到期日：{advertiser.expires_at?.slice(0, 10)}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  到期日：{advertiser.expires_at?.slice(0, 10)}（到期自動停播）
+                </p>
                 <Link
                   href="/sponsor"
                   className="mt-3 inline-block px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 text-xs font-bold hover:bg-cyan-500/30"
                 >
-                  ➕ 續約加購天數 ($15 / $120)
+                  ➕ 續加曝光天數 / 升級廣告件數
                 </Link>
               </div>
 
               <div className="bg-gradient-to-br from-amber-950/60 to-purple-950/50 border border-amber-500/40 rounded-2xl p-5">
-                <div className="text-xs text-amber-300 font-bold mb-1">👑 當前方案與輪播權重</div>
-                <div className="text-xl font-black text-amber-300 mt-1">
-                  {advertiser.weight >= 3 ? '🔥 VIP 365天霸屏 (3倍權重)' : '⚡ 標準協播方案 (1倍權重)'}
+                <div className="text-xs text-amber-300 font-bold mb-1">👑 當前等級 · 頻率 · 廣告件數</div>
+                <div className="text-base sm:text-lg font-black text-amber-300 mt-1">
+                  {advertiser.tier_name_zh || (advertiser.weight >= 3 ? '🔥 $120 百站常駐型' : '⚡ $15 星火體驗型')}
                 </div>
-                <p className="text-xs text-gray-300 mt-1.5">
-                  登入帳號：<code className="text-cyan-300">{advertiser.email}</code>
-                  <br />
-                  專屬密碼：<code className="text-amber-300 font-bold">{advertiser.password_code}</code>
+                <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                  • 協播頻率：<strong className="text-amber-200">{advertiser.weight}x 權重</strong>（每站每日約 {dailyRotations} 次）<br />
+                  • 廣告件數上限：<strong className="text-pink-300">可上架 {maxSlotsAllowed} 件不同廣告</strong>
                 </p>
               </div>
 
@@ -440,21 +565,78 @@ export default function AdStudioPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-gray-400 mt-2">
-                  * 含 WordPress 矩陣全站輪播與本地/雲端 AI Agent 每日發文嵌入（不保證業績額）
+                  * 含全球百站矩陣輪播與每日新文章自動帶上您（不保證業績額）
                 </p>
               </div>
 
               <div className="bg-gradient-to-br from-purple-950/60 to-pink-950/50 border border-purple-500/40 rounded-2xl p-5">
                 <div className="text-xs text-purple-300 font-bold mb-1">🤖 AI 宣傳小幫手狀態</div>
                 <div className="text-lg font-black text-white flex items-center gap-2 mt-1">
-                  <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  <span className={`w-3 h-3 rounded-full inline-block ${advertiser.remaining_days && advertiser.remaining_days > 0 && advertiser.status === 'ACTIVE' ? 'bg-emerald-400 animate-ping' : 'bg-red-500'}`} />
                   {advertiser.remaining_days && advertiser.remaining_days > 0 && advertiser.status === 'ACTIVE'
                     ? '24H 自動幫您曝光中'
-                    : '已到期或已暫停'}
+                    : '已到期停播或已暫停'}
                 </div>
                 <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                  🤝 斗內一下、回您一把！感謝贊助 AI-SKILLS 開發
+                  帳號：<code className="text-cyan-300">{advertiser.email}</code> | 密碼：<code className="text-amber-300 font-bold">{advertiser.password_code}</code>
                 </p>
+              </div>
+            </div>
+
+            {/* 5 大等級「廣告件數槽位切換器 (Multi-Slot Switcher)」 */}
+            <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-amber-400/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div>
+                  <span className="text-xs font-black text-amber-300">
+                    🎯 您的方案可同時上架 【{maxSlotsAllowed} 件】不同廣告輪番曝光（目前正在編輯：第 {activeSlotIdx + 1} 件）
+                  </span>
+                  <p className="text-[11px] text-gray-400 mt-0.5">
+                    升級更高方案可解鎖更多廣告件數與更高頻率：$15 星火(1件/1x) ➔ $120 常駐(2件/3x) ➔ $888 黃金(5件/8x) ➔ $2,700 皇家(12件/20x) ➔ $6,000 至尊(30件/50x)
+                  </p>
+                </div>
+                <Link
+                  href="/sponsor"
+                  className="text-xs font-black text-amber-300 bg-amber-500/20 border border-amber-400/50 px-3 py-1.5 rounded-xl hover:bg-amber-500/30 whitespace-nowrap self-start sm:self-auto"
+                >
+                  🚀 升級方案解鎖更多廣告件數 ➔
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: Math.max(maxSlotsAllowed, 5) }).map((_, idx) => {
+                  const isUnlocked = idx < maxSlotsAllowed;
+                  const isCurrent = idx === activeSlotIdx;
+                  const existingSlot = adSlots[idx];
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        if (isUnlocked) {
+                          handleSwitchSlot(idx);
+                        } else {
+                          setStatusNotice({
+                            type: 'error',
+                            text: `🔒 第 ${idx + 1} 件廣告槽位需升級更高方案解鎖！（$120 享 2 件、$888 享 5 件、$2,700 享 12 件、$6,000 享 30 件）`
+                          });
+                        }
+                      }}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer border ${
+                        isCurrent
+                          ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.4)] scale-105'
+                          : isUnlocked
+                          ? 'bg-slate-800 hover:bg-slate-700 text-white border-white/15'
+                          : 'bg-slate-950/60 text-gray-500 border-white/5 opacity-70'
+                      }`}
+                    >
+                      <span>{isUnlocked ? '📢' : '🔒'}</span>
+                      <span>廣告 #{idx + 1}</span>
+                      {isUnlocked && existingSlot?.headline_zh && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" title="已設定內容" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -475,8 +657,12 @@ export default function AdStudioPage() {
               <form onSubmit={handleSaveCampaign} className="lg:col-span-7 bg-slate-900/90 border border-white/15 rounded-3xl p-6 sm:p-8 space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/10">
                   <div>
-                    <span className="text-xs font-black text-cyan-400">SELF-SERVE AD CAMPAIGN BUILDER</span>
-                    <h2 className="text-xl font-black text-white mt-0.5">🛠️ 自助架設您的廣告文案 ＆ 導流連結窗口</h2>
+                    <span className="text-xs font-black text-cyan-400">
+                      AD SLOT #{activeSlotIdx + 1} OF {maxSlotsAllowed}
+                    </span>
+                    <h2 className="text-xl font-black text-white mt-0.5">
+                      🛠️ 設定您的「第 {activeSlotIdx + 1} 件」廣告文案 ＆ 導流連結窗口
+                    </h2>
                   </div>
                   <button
                     type="button"
@@ -651,7 +837,7 @@ export default function AdStudioPage() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="text-gray-400">投放狀態：</span>
+                    <span className="text-gray-400">全帳號投放狀態：</span>
                     <button
                       type="button"
                       onClick={() => setCampaignStatus(campaignStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE')}
@@ -679,7 +865,9 @@ export default function AdStudioPage() {
               <div className="lg:col-span-5 space-y-6">
                 <div className="bg-slate-900/90 border border-cyan-500/30 rounded-3xl p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-black text-cyan-400">👁️ 您的廣告招牌即時預覽</span>
+                    <span className="text-xs font-black text-cyan-400">
+                      👁️ 第 {activeSlotIdx + 1} 件廣告招牌即時預覽
+                    </span>
                     <div className="flex gap-1 bg-black/50 p-1 rounded-xl border border-white/10 text-[11px] font-bold">
                       {(['ZH', 'CN', 'EN', 'JA'] as const).map(l => (
                         <button
@@ -704,9 +892,9 @@ export default function AdStudioPage() {
                   <div className="rounded-2xl bg-gradient-to-br from-slate-950 via-indigo-950/90 to-slate-900 border-2 border-amber-400/50 p-5 shadow-2xl">
                     <div className="flex items-center justify-between gap-2 mb-2.5">
                       <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
-                        📢 萬商精選推薦 · {brandName || '合作夥伴'}
+                        {advertiser.tier_badge_zh || '📢 萬商精選推薦'} · {brandName || '合作夥伴'}
                       </span>
-                      <span className="text-[10px] text-gray-400">Sponsored · WeiXiang AdNetwork</span>
+                      <span className="text-[10px] text-gray-400">Slot #{activeSlotIdx + 1}</span>
                     </div>
 
                     {bannerImageUrl && (
@@ -741,7 +929,7 @@ export default function AdStudioPage() {
                     1. <strong>1 秒即時生效、隨時都能改</strong>：當您按下「儲存」後，我們的 AI 宣傳小幫手就會在每天發表全球多國語言新文章時，自動幫您掛上這張漂亮的名片招牌！想換活動或改台詞隨時都能上來改。
                   </p>
                   <p>
-                    2. <strong>曝光天數清清楚楚</strong>：斗內 $15 享 30 天（1個月）、斗內 $120（買 8 個月送 4 個月）享整整 365 天＋VIP 3 倍優先曝光。到期後自動停止，隨時再次斗內就能直接把天數往上加！
+                    2. <strong>曝光天數與到期自動停播規則</strong>：您的廣告會在可用天數內全網輪播；當可用時間結束後，各 WordPress 網站將自動停止輪播您的廣告。您隨時可至 <Link href="/sponsor" className="text-amber-300 underline">/sponsor</Link> 或 <Link href="/dashboard" className="text-cyan-300 underline">/dashboard 會員後台</Link> 續加時間！
                   </p>
                   <p>
                     3. <strong>安心合規與免責約定</strong>：這套 AI 宣傳技能是感謝您贊助我們 AI-SKILLS 開發的回禮，<strong>保證在天數內幫您全網輪播曝光，但不保證具體點擊數或實際成交業績額喔</strong>。嚴禁放色情、賭博、詐騙或誇大醫療偏方（違規將下架且不退費）。

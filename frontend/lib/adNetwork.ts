@@ -18,7 +18,180 @@ export const AD_R2_MIRROR_URL = `${R2_DEV_PUBLIC_DOMAIN}/${AD_R2_POOL_KEY}`;
 
 const AD_TOKEN_SECRET = process.env.ADMIN_SECRET_KEY || 'wx_ad_network_secret_2026_xyz007';
 
-export type AdPlanTier = 'MONTHLY_15' | 'YEARLY_120' | 'CUSTOM_ADMIN';
+/**
+ * 5 大萬商自助廣告等級：
+ * - SPARK_15    : ⚡ $15 星火體驗型 (30天 / 1x 頻率 / 每站每日 60 次 / 1 件廣告)
+ * - RESIDENT_120: 🔥 $120 百站常駐型 (365天 / 3x 頻率 / 每站每日 180 次 / 2 件廣告)
+ * - GOLD_888    : 🥇 $888 黃金聚客型 (365天 / 8x 頻率 / 每站每日 500 次 / 5 件廣告)
+ * - ROYAL_2700  : 💎 $2,700 皇家霸屏型 (365天 / 20x 頻率 / 每站每日 1,500 次 / 12 件廣告)
+ * - SUPREME_6000: 👑 $6,000 萬商至尊型 (730天 / 50x 頻率 / 全時段無限頂置 / 30 件廣告)
+ * (向下相容舊標記 MONTHLY_15 / YEARLY_120 / CUSTOM_ADMIN)
+ */
+export type AdPlanTier =
+  | 'SPARK_15'
+  | 'RESIDENT_120'
+  | 'GOLD_888'
+  | 'ROYAL_2700'
+  | 'SUPREME_6000'
+  | 'MONTHLY_15'
+  | 'YEARLY_120'
+  | 'CUSTOM_ADMIN';
+
+export interface AdTierSpec {
+  tier: AdPlanTier;
+  price_usdt: number;
+  name_zh: string;
+  name_cn: string;
+  name_en: string;
+  name_ja: string;
+  badge_zh: string;
+  badge_en: string;
+  days: number;
+  weight: number;                // 協播頻率權重 (1x / 3x / 8x / 20x / 50x)
+  daily_rotations_per_site: number; // 單站每日輪播次數上限
+  max_ad_slots: number;          // 可同時上架輪播之廣告件數上限 (1 / 2 / 5 / 12 / 30)
+  perks_zh: string[];
+  perks_en: string[];
+}
+
+export const AD_TIER_SPECS: Record<string, AdTierSpec> = {
+  SPARK_15: {
+    tier: 'SPARK_15',
+    price_usdt: 15,
+    name_zh: '⚡ $15 星火體驗型（入門 30 天）',
+    name_cn: '⚡ $15 星火体验型（入门 30 天）',
+    name_en: '⚡ $15 Spark Starter (30 Days)',
+    name_ja: '⚡ $15 スパーク体験プラン（30日間）',
+    badge_zh: '⚡ 星火體驗 · 1x 頻率 · 1 件廣告',
+    badge_en: '⚡ Spark 1x · 1 Ad Slot',
+    days: 30,
+    weight: 1,
+    daily_rotations_per_site: 60,
+    max_ad_slots: 1,
+    perks_zh: ['開通 30 天全網曝光', '1x 標準協播頻率（每站每日約 60 次）', '可上架 1 件精選廣告卡片'],
+    perks_en: ['30 Days Global Exposure', '1x Standard Frequency (~60 rotations/site/day)', '1 Active Ad Slot']
+  },
+  RESIDENT_120: {
+    tier: 'RESIDENT_120',
+    price_usdt: 120,
+    name_zh: '🔥 $120 百站常駐型（買8送4 · 365天）',
+    name_cn: '🔥 $120 百站常驻型（买8送4 · 365天）',
+    name_en: '🔥 $120 100-Site Resident (365 Days)',
+    name_ja: '🔥 $120 百サイト常駐プラン（365日間）',
+    badge_zh: '🔥 百站常駐 · 3x 優先 · 2 件廣告',
+    badge_en: '🔥 Resident 3x · 2 Ad Slots',
+    days: 365,
+    weight: 3,
+    daily_rotations_per_site: 180,
+    max_ad_slots: 2,
+    perks_zh: ['買 8 個月送 4 個月（共 365 天）', '3x 優先協播頻率（每站每日約 180 次）', '可同時上架 2 件不同主打廣告輪播'],
+    perks_en: ['Full 365 Days (Buy 8 Get 4 Free)', '3x Priority Frequency (~180 rotations/site/day)', '2 Active Ad Slots (A/B Rotation)']
+  },
+  GOLD_888: {
+    tier: 'GOLD_888',
+    price_usdt: 888,
+    name_zh: '🥇 $888 黃金聚客型（365天 · 5件矩陣）',
+    name_cn: '🥇 $888 黄金聚客型（365天 · 5件矩阵）',
+    name_en: '🥇 $888 Gold Magnet (365 Days · 5 Slots)',
+    name_ja: '🥇 $888 ゴールド集客プラン（365日・5枠）',
+    badge_zh: '🥇 黃金聚客 · 8x 高頻 · 5 件廣告',
+    badge_en: '🥇 Gold 8x · 5 Ad Slots',
+    days: 365,
+    weight: 8,
+    daily_rotations_per_site: 500,
+    max_ad_slots: 5,
+    perks_zh: ['365 天黃金高亮邊框認證', '8x 高頻強勢協播（每站每日約 500 次）', '可同時上架 5 件產品/服務廣告輪番轟炸'],
+    perks_en: ['365 Days Gold Highlight Badge', '8x High-Frequency Rotation (~500/site/day)', 'Up to 5 Active Ad Campaigns']
+  },
+  ROYAL_2700: {
+    tier: 'ROYAL_2700',
+    price_usdt: 2700,
+    name_zh: '💎 $2,700 皇家霸屏型（365天 · 12件霸屏）',
+    name_cn: '💎 $2,700 皇家霸屏型（365天 · 12件霸屏）',
+    name_en: '💎 $2,700 Royal Takeover (365 Days · 12 Slots)',
+    name_ja: '💎 $2,700 ロイヤル独占プラン（365日・12枠）',
+    badge_zh: '💎 皇家霸屏 · 20x 極速 · 12 件廣告',
+    badge_en: '💎 Royal 20x · 12 Ad Slots',
+    days: 365,
+    weight: 20,
+    daily_rotations_per_site: 1500,
+    max_ad_slots: 12,
+    perks_zh: ['365 天雙卡連播與首屏優先權', '20x 皇家極速頻率（每站每日約 1,500 次）', '可同時上架 12 件全產品線廣告矩陣'],
+    perks_en: ['365 Days Dual-Card Priority Placement', '20x Royal Velocity (~1,500/site/day)', 'Up to 12 Active Ad Campaigns']
+  },
+  SUPREME_6000: {
+    tier: 'SUPREME_6000',
+    price_usdt: 6000,
+    name_zh: '👑 $6,000 萬商至尊型（730天雙年 · 30件旗艦）',
+    name_cn: '👑 $6,000 万商至尊型（730天双年 · 30件旗舰）',
+    name_en: '👑 $6,000 Global Supreme (730 Days · 30 Slots)',
+    name_ja: '👑 $6,000 万商至高プラン（730日・30枠）',
+    badge_zh: '👑 萬商至尊 · 50x 頂置 · 30 件廣告',
+    badge_en: '👑 Supreme 50x · 30 Ad Slots',
+    days: 730,
+    weight: 50,
+    daily_rotations_per_site: 9999,
+    max_ad_slots: 30,
+    perks_zh: ['整整 2 年（730 天）全站頂置帝王位', '50x 至尊頂置權重（全時段不限次霸屏）', '可同時上架 30 件跨國品牌廣告矩陣'],
+    perks_en: ['Full 2 Years (730 Days) Top Pinned Placement', '50x Supreme Pinned Weight (Unlimited Daily)', 'Up to 30 Active Ad Campaigns']
+  }
+};
+
+export function getAdTierSpecByTier(tier?: string, weight?: number): AdTierSpec {
+  if (tier && AD_TIER_SPECS[tier]) return AD_TIER_SPECS[tier];
+  if (tier === 'YEARLY_120') return AD_TIER_SPECS.RESIDENT_120;
+  if (tier === 'MONTHLY_15') return AD_TIER_SPECS.SPARK_15;
+  const w = Number(weight || 1);
+  if (w >= 50) return AD_TIER_SPECS.SUPREME_6000;
+  if (w >= 20) return AD_TIER_SPECS.ROYAL_2700;
+  if (w >= 8) return AD_TIER_SPECS.GOLD_888;
+  if (w >= 3) return AD_TIER_SPECS.RESIDENT_120;
+  return AD_TIER_SPECS.SPARK_15;
+}
+
+export function resolveAdTierFromAmount(paidAmountUsdt: number): {
+  spec: AdTierSpec;
+  daysToAdd: number;
+} {
+  const amt = Number(paidAmountUsdt || 0);
+  if (amt >= 5500) {
+    return { spec: AD_TIER_SPECS.SUPREME_6000, daysToAdd: 730 };
+  }
+  if (amt >= 2500) {
+    return { spec: AD_TIER_SPECS.ROYAL_2700, daysToAdd: 365 };
+  }
+  if (amt >= 800) {
+    return { spec: AD_TIER_SPECS.GOLD_888, daysToAdd: 365 };
+  }
+  if (amt >= 115) {
+    return { spec: AD_TIER_SPECS.RESIDENT_120, daysToAdd: 365 };
+  }
+  if (amt >= 95) {
+    return { spec: AD_TIER_SPECS.RESIDENT_120, daysToAdd: 240 };
+  }
+  const months = Math.max(1, Math.floor(amt / 15));
+  return { spec: AD_TIER_SPECS.SPARK_15, daysToAdd: months * 30 };
+}
+
+export interface AdSlotCampaign {
+  slot_id: string;
+  brand_name: string;
+  headline_zh: string;
+  headline_cn?: string;
+  headline_en?: string;
+  headline_ja?: string;
+  body_zh: string;
+  body_cn?: string;
+  body_en?: string;
+  body_ja?: string;
+  cta_text_zh: string;
+  cta_text_en?: string;
+  cta_text_ja?: string;
+  target_url: string;
+  banner_image_url?: string;
+  niche_category: 'ALL' | 'PARENTING' | 'MARKETING_SEO' | 'MINDFULNESS' | 'CAREER_BIZ';
+  enabled: boolean;
+}
 
 export interface SponsorAdvertiser {
   id: string;
@@ -26,7 +199,7 @@ export interface SponsorAdvertiser {
   password_code: string; // 客戶專屬登入密碼 (預設自動生成 8 碼易讀通行碼，亦可免密魔術連結登入)
   wallet_address?: string;
   brand_name: string;
-  // 多語系廣告標題與內文 (支援一鍵 AI 翻譯成繁/簡/英/日)
+  // 主廣告欄位 (Slot #1 預設主廣告，同時保留完整向下相容)
   headline_zh: string;
   headline_cn?: string;
   headline_en?: string;
@@ -42,7 +215,10 @@ export interface SponsorAdvertiser {
   banner_image_url?: string;
   niche_category: 'ALL' | 'PARENTING' | 'MARKETING_SEO' | 'MINDFULNESS' | 'CAREER_BIZ';
   plan_tier: AdPlanTier;
-  weight: number; // MONTHLY_15 = 1, YEARLY_120 = 3 (VIP 3倍輪播權重)
+  weight: number;                   // 協播頻率權重: 1 / 3 / 8 / 20 / 50
+  daily_rotations_per_site?: number; // 單站每日輪播上限: 60 / 180 / 500 / 1500 / 9999
+  max_ad_slots?: number;             // 可上架廣告件數上限: 1 / 2 / 5 / 12 / 30
+  ad_slots?: AdSlotCampaign[];       // 多件廣告槽位清單 (依等級最高支援 30 件同時輪播)
   status: 'ACTIVE' | 'PAUSED' | 'BANNED';
   total_sponsored_usdt: number;
   impressions_count: number;
@@ -56,6 +232,11 @@ export interface SponsorAdvertiser {
 
 export interface PublicAdItem {
   id: string;
+  advertiser_id: string;
+  slot_index: number;
+  plan_tier: AdPlanTier;
+  tier_badge_zh: string;
+  tier_badge_en: string;
   brand_name: string;
   headline_zh: string;
   headline_cn: string;
@@ -72,7 +253,14 @@ export interface PublicAdItem {
   banner_image_url?: string;
   niche_category: string;
   weight: number;
+  daily_rotations_per_site: number;
+  max_ad_slots: number;
   expires_at: string;
+  // 相容別名欄位 (供 100 站 WordPress 02-wx-floating-suite.php 與本地端 v2_axis_b_article.py 無縫讀取)
+  headline: { tw: string; cn: string; en: string; ja: string };
+  body: { tw: string; cn: string; en: string; ja: string };
+  cta_text: { tw: string; cn: string; en: string; ja: string };
+  banner_url: string;
 }
 
 export interface AdNetworkCloudStore {
@@ -104,10 +292,12 @@ const DEFAULT_AD_STORE: AdNetworkCloudStore = {
       target_url: 'https://nft1314.party/',
       banner_image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80',
       niche_category: 'ALL',
-      plan_tier: 'YEARLY_120',
-      weight: 3,
+      plan_tier: 'SUPREME_6000',
+      weight: 50,
+      daily_rotations_per_site: 9999,
+      max_ad_slots: 30,
       status: 'ACTIVE',
-      total_sponsored_usdt: 120,
+      total_sponsored_usdt: 6000,
       impressions_count: 1280,
       clicks_count: 196,
       agreed_no_guarantee_at: '2026-11-01T00:00:00Z',
@@ -170,6 +360,48 @@ export function getRemainingDays(expiresAt: string): number {
   return Math.ceil(diffMs / (24 * 60 * 60 * 1000));
 }
 
+export function enrichAdvertiserTierFields(adv: SponsorAdvertiser): SponsorAdvertiser {
+  const spec = getAdTierSpecByTier(adv.plan_tier, adv.weight);
+  const maxSlots = adv.max_ad_slots || spec.max_ad_slots;
+  const dailyRot = adv.daily_rotations_per_site || spec.daily_rotations_per_site;
+  const weight = adv.weight || spec.weight;
+
+  // 確保至少有第 1 個主槽位
+  let slots = Array.isArray(adv.ad_slots) && adv.ad_slots.length > 0 ? [...adv.ad_slots] : [];
+  if (slots.length === 0) {
+    slots = [
+      {
+        slot_id: `${adv.id}-slot-1`,
+        brand_name: adv.brand_name || '微享萬商推薦夥伴',
+        headline_zh: adv.headline_zh || '',
+        headline_cn: adv.headline_cn || adv.headline_zh || '',
+        headline_en: adv.headline_en || adv.headline_zh || '',
+        headline_ja: adv.headline_ja || adv.headline_en || adv.headline_zh || '',
+        body_zh: adv.body_zh || '',
+        body_cn: adv.body_cn || adv.body_zh || '',
+        body_en: adv.body_en || adv.body_zh || '',
+        body_ja: adv.body_ja || adv.body_en || adv.body_zh || '',
+        cta_text_zh: adv.cta_text_zh || '👉 立即前往了解詳情',
+        cta_text_en: adv.cta_text_en || '👉 Learn More Now',
+        cta_text_ja: adv.cta_text_ja || '👉 今すぐ詳細を見る',
+        target_url: adv.target_url || 'https://nft1314.party',
+        banner_image_url: adv.banner_image_url || '',
+        niche_category: adv.niche_category || 'ALL',
+        enabled: true
+      }
+    ];
+  }
+
+  return {
+    ...adv,
+    plan_tier: spec.tier,
+    weight,
+    daily_rotations_per_site: dailyRot,
+    max_ad_slots: maxSlots,
+    ad_slots: slots.slice(0, maxSlots)
+  };
+}
+
 export async function loadAdNetworkStore(): Promise<AdNetworkCloudStore> {
   try {
     const { data, error } = await supabase
@@ -184,42 +416,90 @@ export async function loadAdNetworkStore(): Promise<AdNetworkCloudStore> {
         if (!parsed.advertisers['xyz007tw@gmail.com']) {
           parsed.advertisers['xyz007tw@gmail.com'] = DEFAULT_AD_STORE.advertisers['xyz007tw@gmail.com'];
         }
+        for (const k of Object.keys(parsed.advertisers)) {
+          parsed.advertisers[k] = enrichAdvertiserTierFields(parsed.advertisers[k]);
+        }
         return parsed;
       }
     }
   } catch (e) {
     console.warn('[AdNetwork] Load fallback to default:', e);
   }
-  return JSON.parse(JSON.stringify(DEFAULT_AD_STORE));
+  const clone: AdNetworkCloudStore = JSON.parse(JSON.stringify(DEFAULT_AD_STORE));
+  for (const k of Object.keys(clone.advertisers)) {
+    clone.advertisers[k] = enrichAdvertiserTierFields(clone.advertisers[k]);
+  }
+  return clone;
 }
 
+/**
+ * 建構公開活躍廣告池：
+ * 1. 嚴格過濾已到期 (`expires_at <= now`) 或非 ACTIVE 之廣告主（到期 0 秒自動斷電停播）
+ * 2. 展開該廣告主在 `max_ad_slots` 額度內啟用的所有廣告槽位 (1 / 2 / 5 / 12 / 30 件)
+ */
 export function buildPublicAdPool(store: AdNetworkCloudStore): {
   updated_at: string;
   total_active: number;
   ads: PublicAdItem[];
 } {
   const activeAds: PublicAdItem[] = [];
-  for (const adv of Object.values(store.advertisers || {})) {
+  for (const rawAdv of Object.values(store.advertisers || {})) {
+    const adv = enrichAdvertiserTierFields(rawAdv);
     if (!isAdvertiserCurrentlyActive(adv)) continue;
-    activeAds.push({
-      id: adv.id,
-      brand_name: adv.brand_name || '微享萬商推薦夥伴',
-      headline_zh: adv.headline_zh,
-      headline_cn: adv.headline_cn || adv.headline_zh,
-      headline_en: adv.headline_en || adv.headline_zh,
-      headline_ja: adv.headline_ja || adv.headline_en || adv.headline_zh,
-      body_zh: adv.body_zh,
-      body_cn: adv.body_cn || adv.body_zh,
-      body_en: adv.body_en || adv.body_zh,
-      body_ja: adv.body_ja || adv.body_en || adv.body_zh,
-      cta_text_zh: adv.cta_text_zh || '👉 立即前往了解',
-      cta_text_en: adv.cta_text_en || '👉 Learn More',
-      cta_text_ja: adv.cta_text_ja || '👉 詳細を見る',
-      target_url: adv.target_url,
-      banner_image_url: adv.banner_image_url || '',
-      niche_category: adv.niche_category || 'ALL',
-      weight: adv.weight || 1,
-      expires_at: adv.expires_at
+
+    const spec = getAdTierSpecByTier(adv.plan_tier, adv.weight);
+    const maxSlots = adv.max_ad_slots || spec.max_ad_slots;
+    const slots = (adv.ad_slots || []).slice(0, maxSlots);
+
+    slots.forEach((slot, idx) => {
+      if (slot.enabled === false) return;
+      const hlZh = slot.headline_zh || adv.headline_zh;
+      const bdZh = slot.body_zh || adv.body_zh;
+      const tUrl = slot.target_url || adv.target_url;
+      if (!hlZh || !tUrl || !tUrl.startsWith('http')) return;
+
+      const hlCn = slot.headline_cn || hlZh;
+      const hlEn = slot.headline_en || hlZh;
+      const hlJa = slot.headline_ja || hlEn || hlZh;
+      const bdCn = slot.body_cn || bdZh;
+      const bdEn = slot.body_en || bdZh;
+      const bdJa = slot.body_ja || bdEn || bdZh;
+      const ctaZh = slot.cta_text_zh || adv.cta_text_zh || '👉 立即前往了解';
+      const ctaEn = slot.cta_text_en || adv.cta_text_en || '👉 Learn More';
+      const ctaJa = slot.cta_text_ja || adv.cta_text_ja || '👉 詳細を見る';
+      const bannerUrl = slot.banner_image_url !== undefined ? slot.banner_image_url : (adv.banner_image_url || '');
+
+      activeAds.push({
+        id: idx === 0 ? adv.id : `${adv.id}-s${idx + 1}`,
+        advertiser_id: adv.id,
+        slot_index: idx + 1,
+        plan_tier: spec.tier,
+        tier_badge_zh: spec.badge_zh,
+        tier_badge_en: spec.badge_en,
+        brand_name: slot.brand_name || adv.brand_name || '微享萬商推薦夥伴',
+        headline_zh: hlZh,
+        headline_cn: hlCn,
+        headline_en: hlEn,
+        headline_ja: hlJa,
+        body_zh: bdZh,
+        body_cn: bdCn,
+        body_en: bdEn,
+        body_ja: bdJa,
+        cta_text_zh: ctaZh,
+        cta_text_en: ctaEn,
+        cta_text_ja: ctaJa,
+        target_url: tUrl,
+        banner_image_url: bannerUrl,
+        niche_category: slot.niche_category || adv.niche_category || 'ALL',
+        weight: adv.weight || spec.weight,
+        daily_rotations_per_site: adv.daily_rotations_per_site || spec.daily_rotations_per_site,
+        max_ad_slots: maxSlots,
+        expires_at: adv.expires_at,
+        headline: { tw: hlZh, cn: hlCn, en: hlEn, ja: hlJa },
+        body: { tw: bdZh, cn: bdCn, en: bdEn, ja: bdJa },
+        cta_text: { tw: ctaZh, cn: ctaZh, en: ctaEn, ja: ctaJa },
+        banner_url: bannerUrl || ''
+      });
     });
   }
   return {
@@ -323,17 +603,14 @@ export function validateAdvertiserContent(input: {
 }
 
 /**
- * 金流回呼或管理員手動開通/追加萬商廣告曝光天數
- * 規則：
- * - 斗內 $15 ~ $98：+30 天（1個月，1x 標準權重）
- * - 斗內 >= $99（推薦 $120 買8個月送4個月）：+365 天（若 $99~$119 給 240 天；>=$120 給 365 天整年霸屏 + 3x VIP 權重）
- * - 管理員手動指定 explicitDaysToAdd：直接依指定天數增減
+ * 金流回呼或管理員手動開通/追加萬商廣告曝光天數與 5 大等級權限
  */
 export async function activateOrExtendSponsorAdAccount(params: {
   email: string;
   paidAmountUsdt: number;
   walletAddress?: string;
   explicitDaysToAdd?: number;
+  explicitPlanTier?: AdPlanTier;
   adminNote?: string;
   sendWelcomeEmail?: boolean;
 }): Promise<{
@@ -348,62 +625,69 @@ export async function activateOrExtendSponsorAdAccount(params: {
   }
 
   let daysToAdd = 0;
-  let planTier: AdPlanTier = 'MONTHLY_15';
-  let weight = 1;
+  let chosenSpec: AdTierSpec = AD_TIER_SPECS.SPARK_15;
 
   if (typeof params.explicitDaysToAdd === 'number') {
     daysToAdd = Math.round(params.explicitDaysToAdd);
-    planTier = daysToAdd >= 240 ? 'YEARLY_120' : 'CUSTOM_ADMIN';
-    weight = daysToAdd >= 240 ? 3 : 1;
+    if (params.explicitPlanTier && AD_TIER_SPECS[params.explicitPlanTier]) {
+      chosenSpec = AD_TIER_SPECS[params.explicitPlanTier];
+    } else if (Number(params.paidAmountUsdt || 0) >= 15) {
+      chosenSpec = resolveAdTierFromAmount(Number(params.paidAmountUsdt)).spec;
+    } else if (daysToAdd >= 700) {
+      chosenSpec = AD_TIER_SPECS.SUPREME_6000;
+    } else if (daysToAdd >= 240) {
+      chosenSpec = AD_TIER_SPECS.RESIDENT_120;
+    } else {
+      chosenSpec = AD_TIER_SPECS.SPARK_15;
+    }
   } else {
     const amt = Number(params.paidAmountUsdt || 0);
-    if (amt >= 115) {
-      // $120 斗內 8 個月送 4 個月 ＝ 共 365 天整年霸屏
-      daysToAdd = 365;
-      planTier = 'YEARLY_120';
-      weight = 3;
-    } else if (amt >= 95) {
-      // 相容 $99 方案 (8個月 = 240天)
-      daysToAdd = 240;
-      planTier = 'YEARLY_120';
-      weight = 3;
-    } else if (amt >= 14) {
-      // $15 斗內 1 個月 = 30天
-      const months = Math.max(1, Math.floor(amt / 15));
-      daysToAdd = months * 30;
-      planTier = 'MONTHLY_15';
-      weight = 1;
-    } else {
+    if (amt < 14) {
       // 小於 $15 之純小額斗內（如 $3），不開通萬商廣告系統
       return { activated: false, daysAdded: 0 };
     }
+    const resolved = resolveAdTierFromAmount(amt);
+    chosenSpec = resolved.spec;
+    daysToAdd = resolved.daysToAdd;
   }
 
   const store = await loadAdNetworkStore();
-  const existing = store.advertisers[cleanEmail];
+  const existing = store.advertisers[cleanEmail] ? enrichAdvertiserTierFields(store.advertisers[cleanEmail]) : undefined;
   const now = new Date();
   const currentExpMs = existing ? new Date(existing.expires_at).getTime() : 0;
   const baseMs = !isNaN(currentExpMs) && currentExpMs > now.getTime() ? currentExpMs : now.getTime();
   const newExpDate = new Date(baseMs + daysToAdd * 24 * 60 * 60 * 1000);
 
+  // 若累積斗內金額達到更高階門檻，自動晉升為對應高階方案 (例如累積滿 $888 / $2700 / $6000)
+  const newTotalSponsored = Number((existing?.total_sponsored_usdt || 0) + (params.paidAmountUsdt || 0));
+  const cumulativeSpec = resolveAdTierFromAmount(newTotalSponsored).spec;
+  const finalSpec =
+    cumulativeSpec.weight > chosenSpec.weight && cumulativeSpec.weight > (existing?.weight || 1)
+      ? cumulativeSpec
+      : chosenSpec.weight >= (existing?.weight || 1)
+      ? chosenSpec
+      : getAdTierSpecByTier(existing?.plan_tier, existing?.weight);
+
   const passwordCode = existing?.password_code || generateAdPasswordCode(cleanEmail);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
 
   const updatedAdv: SponsorAdvertiser = existing
-    ? {
+    ? enrichAdvertiserTierFields({
         ...existing,
         wallet_address: params.walletAddress || existing.wallet_address,
-        plan_tier: weight >= existing.weight ? planTier : existing.plan_tier,
-        weight: Math.max(existing.weight || 1, weight),
+        plan_tier: finalSpec.tier,
+        weight: finalSpec.weight,
+        daily_rotations_per_site: finalSpec.daily_rotations_per_site,
+        max_ad_slots: finalSpec.max_ad_slots,
         status: existing.status === 'BANNED' ? 'BANNED' : 'ACTIVE',
-        total_sponsored_usdt: Number((existing.total_sponsored_usdt || 0) + (params.paidAmountUsdt || 0)),
+        total_sponsored_usdt: newTotalSponsored,
         updated_at: now.toISOString(),
         expires_at: newExpDate.toISOString(),
         admin_notes: params.adminNote
-          ? `${existing.admin_notes ? existing.admin_notes + ' | ' : ''}[${now.toISOString().slice(0, 10)}] ${params.adminNote} (${daysToAdd >= 0 ? '+' : ''}${daysToAdd}天)`
+          ? `${existing.admin_notes ? existing.admin_notes + ' | ' : ''}[${now.toISOString().slice(0, 10)}] ${params.adminNote} (${daysToAdd >= 0 ? '+' : ''}${daysToAdd}天, 等級:${finalSpec.tier})`
           : existing.admin_notes
-      }
-    : {
+      })
+    : enrichAdvertiserTierFields({
         id: 'ad-' + Date.now().toString(36) + '-' + crypto.randomBytes(2).toString('hex'),
         email: cleanEmail,
         password_code: passwordCode,
@@ -423,18 +707,20 @@ export async function activateOrExtendSponsorAdAccount(params: {
         target_url: siteUrl,
         banner_image_url: '',
         niche_category: 'ALL',
-        plan_tier: planTier,
-        weight,
+        plan_tier: finalSpec.tier,
+        weight: finalSpec.weight,
+        daily_rotations_per_site: finalSpec.daily_rotations_per_site,
+        max_ad_slots: finalSpec.max_ad_slots,
         status: 'ACTIVE',
-        total_sponsored_usdt: Number(params.paidAmountUsdt || 0),
+        total_sponsored_usdt: newTotalSponsored,
         impressions_count: 0,
         clicks_count: 0,
         agreed_no_guarantee_at: now.toISOString(),
         created_at: now.toISOString(),
         updated_at: now.toISOString(),
         expires_at: newExpDate.toISOString(),
-        admin_notes: params.adminNote || `首次開通 (+${daysToAdd}天)`
-      };
+        admin_notes: params.adminNote || `首次開通 ${finalSpec.name_zh} (+${daysToAdd}天)`
+      });
 
   store.advertisers[cleanEmail] = updatedAdv;
   await saveAdNetworkStore(store, true);
@@ -457,38 +743,38 @@ export async function activateOrExtendSponsorAdAccount(params: {
         from: `"WeiXiang 萬商廣告中心" <${process.env.EMAIL_USER}>`,
         to: cleanEmail,
         cc: 'qqww0614@gmail.com',
-        subject: `📢 【WeiXiang 萬商廣告系統】您的自助廣告帳號密碼已開通！（有效曝光：${remainingTotalDays} 天）`,
+        subject: `📢 【WeiXiang 萬商廣告系統】您的「${finalSpec.name_zh}」已開通！（有效曝光：${remainingTotalDays} 天 · 可上架 ${finalSpec.max_ad_slots} 件廣告）`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 640px; margin: 0 auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 18px; background: #ffffff; color: #0f172a;">
             <div style="display: inline-block; background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 12px; padding: 5px 12px; border-radius: 999px; margin-bottom: 12px;">
-              📢 WEIXIANG GLOBAL AD NETWORK · 萬商自助廣告協播系統
+              📢 WEIXIANG GLOBAL AD NETWORK · 斗內一下、回您一把！
             </div>
-            <h2 style="margin: 0 0 12px; color: #0f172a; font-size: 22px;">🎉 感謝您的溫暖斗內贊助！您的「萬商廣告系統」已正式開通！</h2>
+            <h2 style="margin: 0 0 12px; color: #0f172a; font-size: 22px;">🎉 感謝您的支持！您的「${finalSpec.name_zh}」已正式開通！</h2>
             <p style="font-size: 14.5px; line-height: 1.7; color: #334155;">
-              親愛的贊助夥伴您好，系統已為您的信箱增加 <strong>+${daysToAdd} 天</strong> 萬商全網廣告協播權限（目前累計有效剩餘：<strong>${remainingTotalDays} 天</strong>，到期日：<strong>${updatedAdv.expires_at.slice(0, 10)}</strong>）。
+              親愛的夥伴您好，系統已為您的信箱增加 <strong>+${daysToAdd} 天</strong> 萬商全網廣告協播權限（目前累計有效剩餘：<strong>${remainingTotalDays} 天</strong>，到期日：<strong>${updatedAdv.expires_at.slice(0, 10)}</strong>）。
             </p>
 
+            <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 14px 18px; border-radius: 12px; margin: 16px 0; font-size: 13.5px; color: #166534;">
+              <strong>🌟 您的專屬廣告方案等級權益：</strong><br/>
+              • 方案等級：<strong>${finalSpec.name_zh}</strong><br/>
+              • 協播頻率權重：<strong>${finalSpec.weight}x 倍速優先曝光</strong>（單站每日最高輪播約 ${finalSpec.daily_rotations_per_site} 次）<br/>
+              • 可同時上架廣告件數：<strong>最多 ${finalSpec.max_ad_slots} 件不同廣告卡片輪番放送</strong>
+            </div>
+
             <div style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #ffffff; padding: 22px; border-radius: 14px; margin: 20px 0;">
-              <h3 style="margin: 0 0 12px; color: #38bdf8; font-size: 16px;">🔑 您的「萬商廣告系統」專屬登入憑證：</h3>
+              <h3 style="margin: 0 0 12px; color: #38bdf8; font-size: 16px;">🔑 您的「萬商廣告小幫手」專屬登入憑證：</h3>
               <p style="margin: 6px 0; font-size: 14px;">• <strong>自助廣告後台網址</strong>：<a href="${siteUrl}/ad-studio" style="color: #6ee7b7; font-weight: bold;">${siteUrl}/ad-studio</a></p>
               <p style="margin: 6px 0; font-size: 14px;">• <strong>登入帳號 (Email)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047;">${cleanEmail}</code></p>
               <p style="margin: 6px 0; font-size: 14px;">• <strong>專屬密碼 (Password)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${updatedAdv.password_code}</code></p>
               <div style="margin-top: 18px;">
                 <a href="${magicLoginUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 10px;">
-                  🚀 點此免輸入密碼「一鍵直達萬商廣告後台」架設廣告 ➔
+                  🚀 點此免輸入密碼「一鍵進入我的廣告小幫手」設定廣告 ➔
                 </a>
               </div>
             </div>
 
-            <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 14px 18px; border-radius: 8px; font-size: 13.5px; color: #334155; line-height: 1.65;">
-              <strong>💡 如何在系統內架設您的廣告文案與連結窗口？</strong><br/>
-              1. 點擊上方綠色按鈕（或使用帳號密碼登入 <a href="${siteUrl}/ad-studio">${siteUrl}/ad-studio</a>）。<br/>
-              2. 填寫您的<strong>「品牌名稱」、「廣告標題」、「宣傳短文」與「導流連結窗口（如 LINE 連結、官網或賣場）」</strong>。<br/>
-              3. 點擊<strong>「✨ AI 一鍵翻譯多語系」</strong>並按下儲存，您的廣告將於 1 秒內同步發佈至微享全球 WordPress 矩陣站群與 AI Agent 每日發文產線中協播曝光！
-            </div>
-
             <p style="font-size: 12px; color: #64748b; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-              📌 備註：您的斗內贊助金額已 100% 併入您個人的「級差分潤升等累積業績」。本廣告協播系統為斗內贊助之附加回饋贈禮，提供全網真實文章協播曝光，惟不保證具體點擊數或實際成交業績額。
+              📌 備註：您的斗內贊助金額已 100% 併入您個人的「級差分潤升等累積業績」。當可用天數到期後，各站將自動停止輪播；您隨時可至會員後台 (/dashboard) 或斗內專區 (/sponsor) 續加天數（純贊助回饋，不保證具體業績額）。
             </p>
           </div>
         `
