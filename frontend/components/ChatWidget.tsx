@@ -63,8 +63,9 @@ export default function ChatWidget() {
                          lang === 'zh-CN' ? '您好！我是微享 AI 专属客服 🤖 欢迎咨询 25% 分润、$990 电子书自动贩卖机，或点击参观全新成立的【AI 云教室 / 微享商学院】(https://vip.5208.uk/courses/) 免费试读第 1 讲与【🧭 AI-ATM实战百科】(https://vip.5208.uk/learning-zone/)！请问有什么可以协助您？' :
                          lang === 'en-US' ? 'Hello! I am the WeiXiang AI Assistant 🤖 Ask me about our 25% Affiliate Program, E-Book SaaS, or visit our newly launched [AI Cloud Classroom](https://vip.5208.uk/courses/) (Lesson 1 Free Preview!) and [🧭 AI-ATM Master Hub](https://vip.5208.uk/learning-zone/). How can I help you today?' :
                          lang === 'ja-JP' ? 'こんにちは！WeiXiang AIアシスタントです 🤖 25%アフィリエイトや電子書籍SaaSのご相談、または新設の【AIクラウド教室】(https://vip.5208.uk/courses/)（第1講無料試読）＆【🧭 AI-ATM実践百科】(https://vip.5208.uk/learning-zone/)へぜひお越しください！' :
-                         lang === 'ko-KR' ? '안녕하세요! WeiXiang AI 어시스턴트입니다. 무엇을 도와드릴까요? [AI Cloud Classroom](https://vip.5208.uk/courses/)' :
-                         'Xin chào! Tôi là Trợ lý AI WeiXiang. Tôi có thể giúp gì cho bạn? [AI Cloud Classroom](https://vip.5208.uk/courses/)';
+                         lang === 'ko-KR' ? '안녕하세요! WeiXiang AI 어시스턴트입니다 🤖 25% 제휴 프로그램, $990 지식 자판기 AI-ATM 또는 [AI 클라우드 클래스룸](https://vip.5208.uk/courses/) (제1강 무료 시독) 및 [🧭 AI-ATM 실전 백과](https://vip.5208.uk/learning-zone/)에 대해 무엇이든 물어보세요!' :
+                         lang === 'id-ID' ? 'Halo! Saya Asisten AI WeiXiang 🤖 Tanyakan tentang Komisi Afiliasi 25%, Mesin Penjual E-Book $990, atau kunjungi [Kelas Cloud AI](https://vip.5208.uk/courses/) (Bab 1 Gratis!) dan [🧭 Ensiklopedia AI-ATM](https://vip.5208.uk/learning-zone/). Ada yang bisa saya bantu?' :
+                         'Xin chào! Tôi là Trợ lý AI WeiXiang 🤖 Hãy hỏi tôi về Hoa hồng 25%, Máy bán E-Book $990 hoặc ghé thăm [Lớp Học Đám Mây AI](https://vip.5208.uk/courses/) và [🧭 Bách Khoa Thực Chiến AI-ATM](https://vip.5208.uk/learning-zone/)!';
 
   useEffect(() => {
     scrollToBottom();
@@ -168,6 +169,7 @@ export default function ChatWidget() {
                    lang === 'ja-JP' ? '知識の自動販売機｜初年度$990 AI-ATM' :
                    lang === 'ko-KR' ? '지식 자판기｜$990 AI-ATM' :
                    lang === 'vi-VN' ? 'Máy Bán Tri Thức｜$990 AI-ATM' :
+                   lang === 'id-ID' ? 'Mesin Penjual Pengetahuan｜$990 AI-ATM' :
                    'Knowledge Vending | $990 AI-ATM'}
                 </span>
                 <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.2 rounded-full font-black animate-pulse">
@@ -187,6 +189,7 @@ export default function ChatWidget() {
                    lang === 'ja-JP' ? '20年の実績｜AI-ATM受託開発' :
                    lang === 'ko-KR' ? '20년 경력｜AI-ATM 맞춤개발' :
                    lang === 'vi-VN' ? '20 Năm Kinh Nghiệm｜AI-ATM' :
+                   lang === 'id-ID' ? 'Arsitek 20 Tahun｜Kustom AI-ATM' :
                    '20-Yr Architect | AI-ATM Bespoke'}
                 </span>
                 <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full font-black animate-pulse">
@@ -203,6 +206,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '🛒 01｜AI動画コマース構築' :
                  lang === 'ko-KR' ? '🛒 01｜AI 영상 쇼핑 시스템' :
                  lang === 'vi-VN' ? '🛒 01｜Video Mua sắm AI' :
+                 lang === 'id-ID' ? '🛒 01｜Video Belanja AI' :
                  '🛒 01 | AI Video Shoppable'}
               </a>
               <a
@@ -215,6 +219,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '⚡ 02｜LiveGood 代行＆AI協播' :
                  lang === 'ko-KR' ? '⚡ 02｜LiveGood 대행 & AI홍보' :
                  lang === 'vi-VN' ? '⚡ 02｜LiveGood & AI Tự động' :
+                 lang === 'id-ID' ? '⚡ 02｜LiveGood & Siaran AI' :
                  '⚡ 02 | LiveGood & AI Co-Broadcast'}
               </a>
               <a
@@ -227,6 +232,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '🚀 03｜AI集客365日無料 ($660)' :
                  lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료 ($660)' :
                  lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($660)' :
+                 lang === 'id-ID' ? '🚀 03｜AI Cari Klien 365 Hari ($660)' :
                  '🚀 03 | AI 365-Day Free Plan ($660)'}
               </a>
               <a
@@ -236,6 +242,9 @@ export default function ChatWidget() {
                 {lang === 'zh-TW' ? '📝 創客實戰部落格 (每日SEO專欄)' :
                  lang === 'zh-CN' ? '📝 创客实战部落格 (每日SEO专栏)' :
                  lang === 'ja-JP' ? '📝 クリエイター実践ブログ (SEO)' :
+                 lang === 'ko-KR' ? '📝 크리에이터 실전 블로그 (SEO)' :
+                 lang === 'vi-VN' ? '📝 Blog Thực Chiến SEO' :
+                 lang === 'id-ID' ? '📝 Blog Praktis Kreator (SEO)' :
                  '📝 Creator SEO Blog (Daily)'}
               </a>
             </div>
@@ -252,6 +261,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? 'AIカスタム開発' :
                  lang === 'ko-KR' ? 'AI 맞춤 서비스' :
                  lang === 'vi-VN' ? 'Dịch vụ AI Tùy chỉnh' :
+                 lang === 'id-ID' ? 'Layanan Kustom AI' :
                  'AI Custom Services'}
               </span>
             </a>
@@ -272,6 +282,7 @@ export default function ChatWidget() {
                lang === 'ja-JP' ? 'AIマスター教材' :
                lang === 'ko-KR' ? 'AI 마스터 교재' :
                lang === 'vi-VN' ? 'Giáo trình AI' :
+               lang === 'id-ID' ? 'Kursus Master AI' :
                'AI Master Courses'}
             </span>
           </a>
@@ -287,6 +298,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? 'チャットする ✨' :
                  lang === 'ko-KR' ? '채팅하기 ✨' :
                  lang === 'vi-VN' ? 'Trò chuyện ✨' :
+                 lang === 'id-ID' ? 'Ngobrol Yuk ✨' :
                  lang === 'zh-CN' ? '欢迎聊聊 ✨' :
                  '歡迎聊聊 ✨'}
               </div>
@@ -315,8 +327,12 @@ export default function ChatWidget() {
           <div className="mx-3 mb-2 p-2.5 rounded-2xl bg-slate-950/95 border border-sky-400/50 shadow-[0_-8px_30px_rgba(0,0,0,0.75)] backdrop-blur-xl flex flex-col gap-1.5 max-h-[75vh] overflow-y-auto">
             <div className="flex items-center justify-between px-2 pb-1 border-b border-white/10">
               <span className="text-[11px] font-black text-sky-300">
-                {lang.includes('zh') ? '🛠️ 選擇欲前往的 AI 客製與協辦方案：' :
+                {lang === 'zh-TW' ? '🛠️ 選擇欲前往的 AI 客製與協辦方案：' :
+                 lang === 'zh-CN' ? '🛠️ 选择欲前往的 AI 客制与协办方案：' :
                  lang === 'ja-JP' ? '🛠️ ご希望のAIカスタム＆協播プランを選択：' :
+                 lang === 'ko-KR' ? '🛠️ 이동할 AI 맞춤 솔루션을 선택하세요:' :
+                 lang === 'vi-VN' ? '🛠️ Chọn gói giải pháp AI tùy chỉnh:' :
+                 lang === 'id-ID' ? '🛠️ Pilih Paket Layanan Kustom AI:' :
                  '🛠️ Select AI Custom / Concierge Plan:'}
               </span>
               <button
@@ -341,6 +357,7 @@ export default function ChatWidget() {
                    lang === 'ja-JP' ? '知識の自動販売機 AI-ATM' :
                    lang === 'ko-KR' ? '지식 자판기 AI-ATM' :
                    lang === 'vi-VN' ? 'Máy Bán Tri Thức AI-ATM' :
+                   lang === 'id-ID' ? 'Mesin Penjual Pengetahuan AI-ATM' :
                    'Knowledge Vending AI-ATM'}
                 </span>
                 <span className="text-[9px] bg-pink-500 text-white px-1 rounded font-black">HOT</span>
@@ -361,6 +378,7 @@ export default function ChatWidget() {
                    lang === 'ja-JP' ? '20年の実績｜AI-ATM受託開発' :
                    lang === 'ko-KR' ? '20년 경력｜AI-ATM 맞춤개발' :
                    lang === 'vi-VN' ? '20 Năm Kinh Nghiệm｜AI-ATM' :
+                   lang === 'id-ID' ? 'Arsitek 20 Thn｜Kustom AI-ATM' :
                    '20-Yr Architect | AI-ATM Bespoke'}
                 </span>
                 <span className="text-[9px] bg-amber-400 text-slate-950 px-1 rounded font-black">NEW</span>
@@ -382,9 +400,10 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '🛒 01｜AI動画コマース構築' :
                  lang === 'ko-KR' ? '🛒 01｜AI 영상 쇼핑 시스템' :
                  lang === 'vi-VN' ? '🛒 01｜Video Mua sắm AI' :
+                 lang === 'id-ID' ? '🛒 01｜Video Belanja AI' :
                  '🛒 01 | AI Video Shoppable'}
               </span>
-              <span className="text-amber-300 font-black text-[11px]">$300 起 →</span>
+              <span className="text-amber-300 font-black text-[11px]">$300 →</span>
             </a>
             <a
               href="/#video-shoppable-service"
@@ -397,6 +416,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '⚡ 02｜LiveGood 代行＆AI協播' :
                  lang === 'ko-KR' ? '⚡ 02｜LiveGood 대행 & AI홍보' :
                  lang === 'vi-VN' ? '⚡ 02｜LiveGood & AI Tự động' :
+                 lang === 'id-ID' ? '⚡ 02｜LiveGood & Siaran AI' :
                  '⚡ 02 | LiveGood & AI'}
               </span>
               <span className="text-amber-300 font-black text-[11px]">$139.95 / $180 →</span>
@@ -412,6 +432,7 @@ export default function ChatWidget() {
                  lang === 'ja-JP' ? '🚀 03｜AI集客365日無料' :
                  lang === 'ko-KR' ? '🚀 03｜AI 모객 365일 무료' :
                  lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày' :
+                 lang === 'id-ID' ? '🚀 03｜AI Cari Klien 365 Hari' :
                  '🚀 03 | AI 365-Day Free'}
               </span>
               <span className="text-amber-300 font-black text-[11px]">$660 USD →</span>
@@ -425,9 +446,12 @@ export default function ChatWidget() {
                 {lang === 'zh-TW' ? '📝 創客實戰部落格｜每日SEO專欄' :
                  lang === 'zh-CN' ? '📝 创客实战部落格｜每日SEO专栏' :
                  lang === 'ja-JP' ? '📝 クリエイター実践ブログ' :
+                 lang === 'ko-KR' ? '📝 크리에이터 실전 블로그' :
+                 lang === 'vi-VN' ? '📝 Blog Thực Chiến SEO' :
+                 lang === 'id-ID' ? '📝 Blog Praktis Kreator' :
                  '📝 Creator SEO Blog'}
               </span>
-              <span className="text-amber-300 font-black text-[11px]">閱讀 →</span>
+              <span className="text-amber-300 font-black text-[11px]">→</span>
             </a>
           </div>
         )}
@@ -447,6 +471,7 @@ export default function ChatWidget() {
                lang === 'ja-JP' ? 'AI教材' :
                lang === 'ko-KR' ? 'AI교재' :
                lang === 'vi-VN' ? 'Giáo trình' :
+               lang === 'id-ID' ? 'Kursus AI' :
                'AI Courses'}
             </span>
           </a>
@@ -467,6 +492,7 @@ export default function ChatWidget() {
                lang === 'ja-JP' ? 'AIカスタム' :
                lang === 'ko-KR' ? 'AI맞춤' :
                lang === 'vi-VN' ? 'Dịch vụ AI' :
+               lang === 'id-ID' ? 'Kustom AI' :
                'AI Services'}
             </span>
             <span className="text-[10px] opacity-90">{mobileMenuOpen ? '▼' : '▲'}</span>
@@ -484,11 +510,12 @@ export default function ChatWidget() {
             <span>{isOpen ? '✕' : '💬'}</span>
             <span>
               {isOpen
-                ? (lang.includes('zh') ? '關閉客服' : 'Close')
+                ? (lang === 'zh-TW' ? '關閉客服' : lang === 'zh-CN' ? '关闭客服' : 'Close')
                 : lang === 'en-US' ? 'AI Chat ✨' :
                   lang === 'ja-JP' ? 'AI相談 ✨' :
                   lang === 'ko-KR' ? 'AI상담 ✨' :
                   lang === 'vi-VN' ? 'Tư vấn ✨' :
+                  lang === 'id-ID' ? 'Chat AI ✨' :
                   lang === 'zh-CN' ? 'AI客服 ✨' :
                   'AI客服 ✨'}
             </span>
@@ -509,7 +536,7 @@ export default function ChatWidget() {
               onClick={(e) => handleJumpToSection(e, 'video-shoppable-service')}
               className="text-[11px] font-black bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-full border border-white/30 transition-all whitespace-nowrap"
             >
-              {lang.includes('zh') ? '🌍 全球化作品展示區 →' : '🌍 Global Showcase →'}
+              {lang === 'zh-TW' ? '🌍 全球化作品展示區 →' : lang === 'zh-CN' ? '🌍 全球化作品展示区 →' : '🌍 Global Showcase →'}
             </a>
           </div>
 

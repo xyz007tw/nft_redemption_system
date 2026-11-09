@@ -433,12 +433,18 @@ export default function FranchiseEBookSection() {
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[11px] font-black mb-1">
                 {lang === 'ja-JP' ? '👑 AI-ATM 加盟店限定・ダブルトラフィック特典' :
                  lang === 'zh-CN' ? '👑 AI-ATM 加盟商王牌优势・双黄金流量池赋能' :
+                 lang === 'ko-KR' ? '👑 AI-ATM 가맹점 독점 혜택 · 더블 트래픽 풀' :
+                 lang === 'vi-VN' ? '👑 Ưu thế Đối tác AI-ATM · Hai Nguồn Lưu lượng Vàng' :
+                 lang === 'id-ID' ? '👑 Keunggulan Mitra AI-ATM · Dua Kolam Trafik Emas' :
                  lang === 'en-US' ? '👑 AI-ATM Franchisee Exclusive · Dual-Traffic Powerhouse' :
                  '👑 AI-ATM 加盟商王牌優勢・雙黃金流量池賦能'}
               </div>
               <h3 className="text-base sm:text-lg font-black text-white">
                 {lang === 'ja-JP' ? 'AIクラウド教室 (vip.5208.uk) × 微享公式サイト (nft1314.party) 「2サイト共同展示販売」！' :
-                 lang === 'zh-CN' ? 'AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 雙站聯合展售！' :
+                 lang === 'zh-CN' ? 'AI 云教室 (vip.5208.uk) × 微享官网 (nft1314.party) 双站联合展售！' :
+                 lang === 'ko-KR' ? 'AI 클라우드 교실 (vip.5208.uk) × 공식 사이트 (nft1314.party) 양대 사이트 공동 전시·판매!' :
+                 lang === 'vi-VN' ? 'AI Cloud Classroom (vip.5208.uk) × Website Chính thức (nft1314.party) Triển lãm & Bán sách Liên hợp!' :
+                 lang === 'id-ID' ? 'AI Cloud Classroom (vip.5208.uk) × Situs Resmi (nft1314.party) Pameran & Penjualan Gabungan 2 Situs!' :
                  lang === 'en-US' ? 'AI Cloud Classroom (vip.5208.uk) × WeiXiang Official Site (nft1314.party) Dual-Site Joint Exhibition!' :
                  'AI 雲教室 (vip.5208.uk) × 微享官網 (nft1314.party) 雙站聯合展售！'}
               </h3>
@@ -447,6 +453,12 @@ export default function FranchiseEBookSection() {
                   ? '審査を通過した加盟店の電子書籍は、公式サイトの本棚だけでなく「AIクラウド教室 (vip.5208.uk)」にもリアルタイム同時掲載！単品専用25%アフィリエイトリンクとPayUni/PayPal即時決済により、2つの巨大トラフィックから24時間自動販売されます！'
                   : lang === 'zh-CN'
                   ? '加盟商电子书通过书审后，不仅上架微享官网首页读者书柜与独立书城，更透过跨网域 API 即时同步展售于「AI 云教室 / 微享商学院 (vip.5208.uk)」！搭配「单书专属 25% 分润推广链接」与真实双金流秒级发货，让官网访客与商学院高净值学员同时为您买单！'
+                  : lang === 'ko-KR'
+                  ? '심사를 통과한 가맹점 전자책은 공식 사이트뿐만 아니라 「AI 클라우드 교실 (vip.5208.uk)」에도 실시간 동시 전시·판매됩니다! 도서별 전용 25% 추천 링크와 PayUni/PayPal 즉시 결제로 24시간 자동 판매됩니다!'
+                  : lang === 'vi-VN'
+                  ? 'Sau khi vượt qua kiểm duyệt, sách điện tử của đối tác được trưng bày và bán đồng thời trên cả Website Chính thức (nft1314.party) và AI Cloud Classroom (vip.5208.uk) kèm link chia sẻ 25% hoa hồng riêng cho từng cuốn sách!'
+                  : lang === 'id-ID'
+                  ? 'Setelah lolos peninjauan, e-book mitra dipamerkan & dijual secara bersamaan di Situs Resmi (nft1314.party) dan AI Cloud Classroom (vip.5208.uk) lengkap dengan tautan afiliasi 25% per buku dan pembayaran instan!'
                   : lang === 'en-US'
                   ? 'Approved franchisee e-books are simultaneously exhibited & sold on both the WeiXiang Official Site (nft1314.party) and the AI Cloud Classroom (vip.5208.uk) with per-book 25% referral links and instant PayUni/PayPal checkout!'
                   : '加盟商電子書通過書審後，不僅上架微享官網首頁讀者書櫃與獨立書城，更透過跨網域 API 即時同步展售於「AI 雲教室 / 微享商學院 (vip.5208.uk)」！搭配「單書專屬 25% 分潤推廣連結」與真實雙金流秒級發貨，讓官網訪客與商學院高淨值學員同時為您買單！'}
@@ -461,6 +473,9 @@ export default function FranchiseEBookSection() {
           >
             {lang === 'ja-JP' ? '🏫 クラウド教室の共同本棚を見る ↗' :
              lang === 'zh-CN' ? '🏫 查看云教室双站联合书柜 ↗' :
+             lang === 'ko-KR' ? '🏫 클라우드 교실 공동 서재 보기 ↗' :
+             lang === 'vi-VN' ? '🏫 Xem Tủ sách Liên hợp ↗' :
+             lang === 'id-ID' ? '🏫 Lihat Rak Buku Gabungan ↗' :
              lang === 'en-US' ? '🏫 View Dual-Site Showcase ↗' :
              '🏫 查看雲教室雙站聯合書櫃 ↗'}
           </a>

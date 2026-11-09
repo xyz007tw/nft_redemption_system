@@ -33,7 +33,8 @@ export default function Home() {
   const connectLabel =
     lang === 'zh-TW' ? '連接錢包' :
     lang === 'zh-CN' ? '连接钱包' :
-    lang === 'ja-JP' ? 'ウォレットを接続' :
+    lang === 'ja-JP' ? 'ウォレット接続' :
+    lang === 'id-ID' ? 'Hubungkan Dompet' :
     lang === 'ko-KR' ? '지갑 연결' :
     lang === 'vi-VN' ? 'Kết nối ví' :
     'Connect Wallet';
@@ -213,13 +214,13 @@ export default function Home() {
       {/* 頂部導覽列：手機版高度收納 56px，點擊展開主題抽屜；電腦版優雅橫向一體化 */}
       <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10 transition-all">
         {/* 電腦版 (md+)：優雅橫向排版 */}
-        <div className="hidden md:flex w-full max-w-7xl mx-auto justify-between items-center px-6 py-3.5">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="hidden md:flex w-full max-w-7xl mx-auto justify-between items-center px-4 lg:px-6 py-3 gap-2">
+          <Link href="/" className="flex items-center gap-2 shrink-0 whitespace-nowrap">
             <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
               WeiXiang AI
             </h1>
           </Link>
-          <div className="flex items-center gap-2 lg:gap-3">
+          <div className="flex items-center gap-1.5 lg:gap-2 flex-wrap justify-end">
             <a
               href="#author-coop"
               className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-500/25 via-purple-500/25 to-indigo-500/25 hover:from-pink-500/40 hover:to-indigo-500/40 border border-pink-400/60 text-pink-200 font-black text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(236,72,153,0.35)] hover:scale-105 whitespace-nowrap flex items-center gap-1.5"
@@ -249,7 +250,7 @@ export default function Home() {
               href="/blog"
               className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-rose-500/25 hover:from-amber-500/40 hover:to-rose-500/40 border border-amber-400/60 text-amber-200 font-black text-xs lg:text-sm transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:scale-105 whitespace-nowrap"
             >
-              {lang === 'en-US' ? '📝 Creator Blog' : lang === 'ja-JP' ? '📝 実践ブログ' : '📝 創客專欄'}
+              {lang === 'en-US' ? '📝 Creator Blog' : lang === 'ja-JP' ? '📝 実践ブログ' : lang === 'ko-KR' ? '📝 실전 블로그' : lang === 'vi-VN' ? '📝 Blog Thực Chiến' : lang === 'id-ID' ? '📝 Blog Kreator' : lang === 'zh-CN' ? '📝 创客专栏' : '📝 創客專欄'}
             </Link>
             <Link
               href="/sponsor"
@@ -257,8 +258,12 @@ export default function Home() {
             >
               {navSponsorText}
             </Link>
-            <LanguageSwitcher />
-            <ConnectButton label={connectLabel} />
+            <div className="shrink-0">
+              <LanguageSwitcher />
+            </div>
+            <div className="shrink-0 whitespace-nowrap [&_button]:!whitespace-nowrap">
+              <ConnectButton label={connectLabel} showBalance={false} chainStatus="icon" />
+            </div>
           </div>
         </div>
 

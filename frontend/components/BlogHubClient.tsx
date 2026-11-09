@@ -75,6 +75,14 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
                 ? 'WeiXiang Official SEO Creator Blog · Daily Automated Insights'
                 : lang === 'ja-JP'
                 ? 'WeiXiang 公式クリエイター実践ブログ · 毎日自動更新'
+                : lang === 'ko-KR'
+                ? 'WeiXiang 공식 SEO 크리에이터 실전 블로그 · 매일 자동 업데이트'
+                : lang === 'vi-VN'
+                ? 'Blog Thực Chiến SEO Chính Thức WeiXiang · Cập Nhật Tự Động Hàng Ngày'
+                : lang === 'id-ID'
+                ? 'Blog Kreator SEO Resmi WeiXiang · Wawasan Otomatis Harian'
+                : lang === 'zh-CN'
+                ? '微享官网 SEO 创客实战部落格 · 每日自动更新专栏'
                 : '微享官網 SEO 創客實戰部落格 · 每日自動更新專欄'}
             </span>
           </div>
@@ -84,12 +92,30 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
               ? 'Side-Hustle & AI-ATM Blogger Playbooks'
               : lang === 'ja-JP'
               ? '初心者・副業クリエイターのための「AI-ATM 自動収益化」実践ノート'
+              : lang === 'ko-KR'
+              ? '초보자 & 부업 크리에이터를 위한 "AI-ATM 자동 수익화" 실전 플레이북'
+              : lang === 'vi-VN'
+              ? 'Cẩm Nang Thực Chiến "AI-ATM Thu Nhập Thụ Động" Cho Người Mới'
+              : lang === 'id-ID'
+              ? 'Panduan Praktis "AI-ATM Penghasilan Pasif" untuk Pemula & Kreator'
+              : lang === 'zh-CN'
+              ? '专为「网络小白 & 下班创客」打造的 AI-ATM 睡后收入实战笔记'
               : '專為「網路小白 & 下班創客」打造的 AI-ATM 睡後收入實戰筆記'}
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-6">
             {lang === 'en-US'
               ? 'Plain-English reviews and step-by-step guides covering our Knowledge Vending Machine AI-ATM ($990 w/ 100% credit), 20-Yr CTO Bespoke Systems, AI Master Courses, VIP E-Books, and 25% Viral Affiliate Network.'
+              : lang === 'ja-JP'
+              ? '難しい専門用語はゼロ！知識の自動販売機 AI-ATM（初年度$990・100%相殺）、20年CTOカスタム開発、AIマスター教材、VIP電子書籍、25%アフィリエイトまで、初心者目線でわかりやすく解説します。'
+              : lang === 'ko-KR'
+              ? '어려운 기술 용어 없이 쉽게 풀어쓴 실전 리뷰! 지식 자판기 AI-ATM($990 100% 차감), 20년 경력 CTO 맞춤 개발, AI 마스터 교재, VIP 전자책, 25% 제휴 네트워크를 한눈에 확인하세요.'
+              : lang === 'vi-VN'
+              ? 'Không dùng thuật ngữ phức tạp! Khám phá góc nhìn thực tế về Máy Bán Tri Thức AI-ATM ($990 khấu trừ 100%), Hệ thống CTO 20 năm, Giáo trình AI, Sách điện tử VIP và Mạng lưới hoa hồng 25%.'
+              : lang === 'id-ID'
+              ? 'Tanpa istilah teknis yang rumit! Ulasan lengkap Mesin Penjual Pengetahuan AI-ATM ($990 kredit 100%), Sistem Kustom CTO 20 Tahun, Kursus Master AI, E-Book VIP, dan Komisi Afiliasi 25%.'
+              : lang === 'zh-CN'
+              ? '不讲生硬难懂的工程术语！这里用最白话的部落客开箱视角，带您一次看懂微享官网「🏪 知识自动贩卖机 AI-ATM」、「👑 总工程师20年客制系统」、「🎓 AI顶配教材」、「📚 读者书柜」与「💰 25% 人推人脉复利」如何帮您在睡觉时持续创造收入。'
               : '不講生硬難懂的工程術語！這裡用最白話的部落客開箱視角，帶您一次看懂微享官網「🏪 知識自動販賣機 AI-ATM」、「👑 總工程師20年客製系統」、「🎓 AI頂配教材」、「📚 讀者書櫃」與「💰 25% 人推人脈複利」如何幫您在睡覺時持續創造收入。'}
           </p>
 
@@ -103,6 +129,16 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
                 placeholder={
                   lang === 'en-US'
                     ? 'Search keywords (e.g., AI-ATM, $990, 25% commission, course)...'
+                    : lang === 'ja-JP'
+                    ? '🔍 キーワード検索（例：AI-ATM、$990、25%報酬、教材）...'
+                    : lang === 'ko-KR'
+                    ? '🔍 키워드 검색 (예: AI-ATM, $990, 25% 커미션, 교재)...'
+                    : lang === 'vi-VN'
+                    ? '🔍 Tìm kiếm từ khóa (VD: AI-ATM, $990, hoa hồng 25%)...'
+                    : lang === 'id-ID'
+                    ? '🔍 Cari kata kunci (mis: AI-ATM, $990, komisi 25%)...'
+                    : lang === 'zh-CN'
+                    ? '🔍 搜索文章关键字（例：知识自动贩卖机、$990倒抵、25%分润、顶配教材）...'
                     : '🔍 搜尋文章關鍵字（例：知識自動販賣機、$990倒抵、25%分潤、頂配教材）...'
                 }
                 className="w-full px-4 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 transition-all"
@@ -114,7 +150,21 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
               disabled={isGenerating}
               className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 hover:from-amber-400 hover:to-purple-500 text-white font-black text-xs sm:text-sm whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.4)] disabled:opacity-50 cursor-pointer transition-all"
             >
-              {isGenerating ? '⏳ AI 撰寫發布中...' : '✨ 立即產出今日新文章'}
+              {isGenerating
+                ? '⏳ AI Writing...'
+                : lang === 'en-US'
+                ? '✨ Generate Today’s New Article'
+                : lang === 'ja-JP'
+                ? '✨ 今日の新しい記事をAI生成'
+                : lang === 'ko-KR'
+                ? '✨ 오늘의 새 칼럼 AI 생성'
+                : lang === 'vi-VN'
+                ? '✨ Tạo Bài Viết Mới Hôm Nay'
+                : lang === 'id-ID'
+                ? '✨ Buat Artikel Baru Hari Ini'
+                : lang === 'zh-CN'
+                ? '✨ 立即产出今日新文章'
+                : '✨ 立即產出今日新文章'}
             </button>
           </div>
 
@@ -141,7 +191,7 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
                 }`}
               >
                 <span>{cat.icon}</span>
-                <span>{lang === 'en-US' ? cat.name_en : lang === 'ja-JP' ? cat.name_ja : cat.name_zh}</span>
+                <span>{lang === 'ja-JP' ? cat.name_ja : lang.includes('zh') ? cat.name_zh : cat.name_en}</span>
               </button>
             );
           })}
@@ -214,13 +264,37 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
                     href={`/blog/${post.slug}`}
                     className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500/25 to-purple-500/25 hover:from-pink-500 hover:to-purple-600 border border-pink-400/50 text-pink-200 hover:text-white font-black text-xs text-center transition-all"
                   >
-                    {lang === 'en-US' ? '📖 Read Full Review →' : lang === 'ja-JP' ? '📖 実戦レビューを読む →' : lang === 'ko-KR' ? '📖 칼럼 전문 읽기 →' : lang === 'vi-VN' ? '📖 Đọc bài đánh giá →' : '📖 閱讀部落客開箱全文 →'}
+                    {lang === 'en-US'
+                      ? '📖 Read Full Review →'
+                      : lang === 'ja-JP'
+                      ? '📖 実戦レビューを読む →'
+                      : lang === 'ko-KR'
+                      ? '📖 칼럼 전문 읽기 →'
+                      : lang === 'vi-VN'
+                      ? '📖 Đọc bài đánh giá →'
+                      : lang === 'id-ID'
+                      ? '📖 Baca Ulasan Lengkap →'
+                      : lang === 'zh-CN'
+                      ? '📖 阅读部落客开箱全文 →'
+                      : '📖 閱讀部落客開箱全文 →'}
                   </Link>
                   <Link
                     href={post.target_section_href}
                     className="py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-300 font-black text-xs whitespace-nowrap transition-all"
                   >
-                    {lang === 'en-US' ? '⚡ Try Now' : lang === 'ja-JP' ? '⚡ 今すぐ体験' : lang === 'ko-KR' ? '⚡ 바로가기' : lang === 'vi-VN' ? '⚡ Trải nghiệm ngay' : '⚡ 直達該項目'}
+                    {lang === 'en-US'
+                      ? '⚡ Try Now'
+                      : lang === 'ja-JP'
+                      ? '⚡ 今すぐ体験'
+                      : lang === 'ko-KR'
+                      ? '⚡ 바로가기'
+                      : lang === 'vi-VN'
+                      ? '⚡ Trải nghiệm ngay'
+                      : lang === 'id-ID'
+                      ? '⚡ Coba Sekarang'
+                      : lang === 'zh-CN'
+                      ? '⚡ 直达该项目'
+                      : '⚡ 直達該項目'}
                   </Link>
                 </div>
               </article>
@@ -237,12 +311,32 @@ export function BlogHubClient({ initialPosts }: BlogHubClientProps) {
             <span>
               {lang === 'en-US'
                 ? 'Quick Jump to WeiXiang Official Core Systems'
+                : lang === 'ja-JP'
+                ? 'WeiXiang 公式 7大コアシステム・クイックナビ'
+                : lang === 'ko-KR'
+                ? 'WeiXiang 공식 7대 핵심 자동 수익화 시스템 바로가기'
+                : lang === 'vi-VN'
+                ? 'Truy Cập Nhanh 7 Hệ Thống Tự Động Hóa Cốt Lõi WeiXiang'
+                : lang === 'id-ID'
+                ? 'Akses Cepat 7 Sistem Monetisasi Otomatis WeiXiang'
+                : lang === 'zh-CN'
+                ? '微享官网 7 大核心自动变现系统・一键快速导览'
                 : '微享官網 7 大核心自動變現系統・一鍵快速導覽'}
             </span>
           </h3>
           <p className="text-slate-300 text-xs sm:text-sm mb-6">
             {lang === 'en-US'
               ? 'Click any module below or use the bottom-right AI assistant to start your 24/7 passive income journey.'
+              : lang === 'ja-JP'
+              ? '気になる項目をクリックするか、右下の「💬 チャットする ✨」から24時間AIアシスタントにお気軽にご相談ください！'
+              : lang === 'ko-KR'
+              ? '아래 핵심 모듈을 클릭하거나 우측 하단의 "💬 채팅하기 ✨"를 눌러 24시간 AI 어시스턴트에게 문의하세요!'
+              : lang === 'vi-VN'
+              ? 'Nhấp vào bất kỳ mục nào bên dưới hoặc nhấn "💬 Trò chuyện ✨" ở góc dưới bên phải để được Trợ lý AI 24/7 hỗ trợ!'
+              : lang === 'id-ID'
+              ? 'Klik modul di bawah atau gunakan tombol "💬 Chat ✨" di kanan bawah untuk berkonsultasi dengan Asisten AI 24/7 kami!'
+              : lang === 'zh-CN'
+              ? '看完部落客实战文章后，您可以直接点击下方任一核心专区，或随时点击右下角「💬 欢迎聊聊 ✨」唤起 24H AI 客服为您解答！'
               : '看完部落客實戰文章後，您可以直接點擊下方任一核心專區，或隨時點擊右下角「💬 歡迎聊聊 ✨」喚起 24H AI 客服為您解答！'}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

@@ -150,8 +150,12 @@ export function SiteNavbar() {
           >
             {navSponsorText}
           </Link>
-          <LanguageSwitcher />
-          <ConnectButton label={connectLabel} />
+          <div className="shrink-0">
+            <LanguageSwitcher />
+          </div>
+          <div className="shrink-0 whitespace-nowrap [&_button]:!whitespace-nowrap">
+            <ConnectButton label={connectLabel} showBalance={false} chainStatus="icon" />
+          </div>
         </div>
       </div>
 

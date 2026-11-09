@@ -12,3 +12,10 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
 }
+
+/* 強制 RainbowKit ConnectButton 及所有導覽按鈕單行不換行，防止日文/韓文/越南文擠壓成直排溢出 */
+[data-rk] button {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+}

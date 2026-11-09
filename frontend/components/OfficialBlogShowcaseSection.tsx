@@ -1,15 +1,13 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { BlogPost, SEED_BLOG_POSTS, getLocalizedPost } from '@/lib/blogEngine';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export function OfficialBlogShowcaseSection() {
   const { lang } = useLanguage();
-  const [posts, setPosts] = useState<BlogPost[]>(SEED_BLOG_POSTS.slice(0, 6));
+  const [posts, setPosts] = React.useState<BlogPost[]>(SEED_BLOG_POSTS.slice(0, 6));
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetch('/api/blog')
       .then((r) => r.json())
       .then((data) => {
@@ -34,6 +32,14 @@ export function OfficialBlogShowcaseSection() {
                 ? 'Official SEO Creator Blog · Updated Daily'
                 : lang === 'ja-JP'
                 ? '公式SEOクリエイター実践コラム・毎日更新'
+                : lang === 'ko-KR'
+                ? '공식 SEO 크리에이터 실전 블로그 · 매일 자동 업데이트'
+                : lang === 'vi-VN'
+                ? 'Blog Thực Chiến SEO Chính Thức · Cập Nhật Hàng Ngày'
+                : lang === 'id-ID'
+                ? 'Blog Kreator SEO Resmi · Diperbarui Setiap Hari'
+                : lang === 'zh-CN'
+                ? '微享官网 SEO 创客实战部落格・每日自动更新'
                 : '微享官網 SEO 創客實戰部落格・每日自動更新'}
             </span>
           </div>
@@ -42,11 +48,29 @@ export function OfficialBlogShowcaseSection() {
               ? 'Plain-English Side-Hustle & AI-ATM Blogger Reviews'
               : lang === 'ja-JP'
               ? '初心者・副業族のための「知識の自販機 AI-ATM」実践開箱コラム'
+              : lang === 'ko-KR'
+              ? '초보자 & 부업 크리에이터를 위한 "AI-ATM 자동 수익화" 실전 칼럼'
+              : lang === 'vi-VN'
+              ? 'Chuyên Mục Thực Chiến "AI-ATM Thu Nhập Thụ Động" Cho Người Mới'
+              : lang === 'id-ID'
+              ? 'Ulasan Praktis "Mesin Penjual Pengetahuan AI-ATM" untuk Pemula'
+              : lang === 'zh-CN'
+              ? '网络小白 & 下班创客必看！「AI-ATM 睡后收入」实战开箱专栏'
               : '網路小白 & 下班創客必看！「AI-ATM 睡後收入」實戰開箱專欄'}
           </h2>
           <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-3xl">
             {lang === 'en-US'
               ? 'Explore daily automated articles covering Knowledge Vending Machine AI-ATM, 20-Yr CTO Bespoke Systems, AI Master Courses, VIP E-Books, and 25% Viral Commissions.'
+              : lang === 'ja-JP'
+              ? '知識の自販機 AI-ATM（初年度$990・100%相殺）、20年CTO受託開発、AIマスター教材、VIP電子書籍、25%紹介報酬まで、毎日わかりやすく徹底解説！'
+              : lang === 'ko-KR'
+              ? '지식 자판기 AI-ATM($990 100% 차감), 20년 경력 CTO 맞춤 개발, AI 마스터 교재, VIP 전자책, 25% 제휴 보상까지 매일 알기 쉽게 분석해 드립니다!'
+              : lang === 'vi-VN'
+              ? 'Khám phá các bài viết thực chiến mỗi ngày về Máy Bán Tri Thức AI-ATM ($990 khấu trừ 100%), Hệ thống tùy chỉnh CTO 20 năm, Giáo trình AI, Sách điện tử VIP và Hoa hồng 25%.'
+              : lang === 'id-ID'
+              ? 'Pelajari panduan harian tentang Mesin Penjual Pengetahuan AI-ATM ($990 kredit 100%), Sistem Kustom CTO 20 Tahun, Kursus Master AI, E-Book VIP, dan Komisi Afiliasi 25%.'
+              : lang === 'zh-CN'
+              ? '针对官网所有核心项目（知识自动贩卖机 AI-ATM、总工程师 20 年客制接案、AI 顶配教材、VIP 读者书柜、25% 分润），每日自动产出深入浅出的部落客实测文章！'
               : '針對官網所有核心項目（知識自動販賣機 AI-ATM、總工程師 20 年客製接案、AI 頂配教材、VIP 讀者書櫃、25% 分潤），每日自動產出深入淺出的部落客實測文章！'}
           </p>
         </div>
@@ -55,7 +79,19 @@ export function OfficialBlogShowcaseSection() {
           href="/blog"
           className="self-start md:self-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 hover:from-amber-400 hover:to-purple-500 text-white font-black text-xs sm:text-sm whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.35)] transition-all"
         >
-          {lang === 'en-US' ? '📚 View All Blogger Articles →' : '📚 進入創客部落格看全部文章 →'}
+          {lang === 'en-US'
+            ? '📚 View All Blogger Articles →'
+            : lang === 'ja-JP'
+            ? '📚 実践ブログの全記事を見る →'
+            : lang === 'ko-KR'
+            ? '📚 크리에이터 블로그 전체보기 →'
+            : lang === 'vi-VN'
+            ? '📚 Xem Tất Cả Bài Viết Blog →'
+            : lang === 'id-ID'
+            ? '📚 Lihat Semua Artikel Blog →'
+            : lang === 'zh-CN'
+            ? '📚 进入创客部落格看全部文章 →'
+            : '📚 進入創客部落格看全部文章 →'}
         </Link>
       </div>
 
@@ -100,13 +136,37 @@ export function OfficialBlogShowcaseSection() {
                   href={`/blog/${post.slug}`}
                   className="text-xs font-black text-pink-300 hover:text-pink-200"
                 >
-                  {lang === 'en-US' ? '📖 Read Article →' : lang === 'ja-JP' ? '📖 記事を読む →' : lang === 'ko-KR' ? '📖 칼럼 읽기 →' : lang === 'vi-VN' ? '📖 Đọc bài viết →' : '📖 閱讀開箱全文 →'}
+                  {lang === 'en-US'
+                    ? '📖 Read Article →'
+                    : lang === 'ja-JP'
+                    ? '📖 記事を読む →'
+                    : lang === 'ko-KR'
+                    ? '📖 칼럼 읽기 →'
+                    : lang === 'vi-VN'
+                    ? '📖 Đọc bài viết →'
+                    : lang === 'id-ID'
+                    ? '📖 Baca Artikel →'
+                    : lang === 'zh-CN'
+                    ? '📖 阅读开箱全文 →'
+                    : '📖 閱讀開箱全文 →'}
                 </Link>
                 <Link
                   href={post.target_section_href}
                   className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/40 px-2.5 py-1 rounded-lg hover:bg-amber-500/30"
                 >
-                  {lang === 'en-US' ? '⚡ Go to Feature' : lang === 'ja-JP' ? '⚡ 該当エリア' : lang === 'ko-KR' ? '⚡ 바로가기' : lang === 'vi-VN' ? '⚡ Đến mục' : '⚡ 前往該專區'}
+                  {lang === 'en-US'
+                    ? '⚡ Go to Feature'
+                    : lang === 'ja-JP'
+                    ? '⚡ 該当エリア'
+                    : lang === 'ko-KR'
+                    ? '⚡ 바로가기'
+                    : lang === 'vi-VN'
+                    ? '⚡ Đến mục'
+                    : lang === 'id-ID'
+                    ? '⚡ Lihat Fitur'
+                    : lang === 'zh-CN'
+                    ? '⚡ 前往该专区'
+                    : '⚡ 前往該專區'}
                 </Link>
               </div>
             </article>
