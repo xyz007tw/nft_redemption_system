@@ -100,7 +100,7 @@ export default function ChatWidget() {
   const handleJumpToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
     sectionId: string,
-    serviceTab?: 'architecture' | 'shoppable' | 'livegood' | 'free365'
+    serviceTab?: 'architecture' | 'shoppable' | 'livegood' | 'free365' | 'beauty'
   ) => {
     setMobileMenuOpen(false);
     setIsOpen(false);
@@ -234,6 +234,22 @@ export default function ChatWidget() {
                  lang === 'vi-VN' ? '🚀 03｜AI Tìm Khách 365 Ngày ($660)' :
                  lang === 'id-ID' ? '🚀 03｜AI Cari Klien 365 Hari ($660)' :
                  '🚀 03 | AI 365-Day Free Plan ($660)'}
+              </a>
+              <a
+                href="/#video-shoppable-service"
+                onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'beauty')}
+                className="px-3.5 py-1.5 rounded-full bg-slate-900/95 hover:bg-pink-600 text-pink-200 hover:text-white border border-pink-400/60 text-xs font-extrabold shadow-lg whitespace-nowrap transition-all flex items-center gap-1.5"
+              >
+                <span>
+                  {lang === 'zh-TW' ? '💄 04｜萬商客集・AI全球美業 ($0入會)' :
+                   lang === 'zh-CN' ? '💄 04｜万商客集・AI全球美业 ($0入会)' :
+                   lang === 'ja-JP' ? '💄 04｜AIグローバル美容 ($0無料登録)' :
+                   lang === 'ko-KR' ? '💄 04｜AI 글로벌 뷰티 ($0 무료가입)' :
+                   lang === 'vi-VN' ? '💄 04｜AI Làm Đẹp Toàn Cầu ($0)' :
+                   lang === 'id-ID' ? '💄 04｜Kecantikan AI Global ($0)' :
+                   '💄 04 | Global AI Beauty ($0 Join)'}
+                </span>
+                <span className="text-[9px] bg-pink-500 text-white px-1 rounded font-black">NEW</span>
               </a>
               <a
                 href="/blog"
@@ -436,6 +452,22 @@ export default function ChatWidget() {
                  '🚀 03 | AI 365-Day Free'}
               </span>
               <span className="text-amber-300 font-black text-[11px]">$660 USD →</span>
+            </a>
+            <a
+              href="/#video-shoppable-service"
+              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service', 'beauty')}
+              className="px-3 py-2 rounded-xl bg-pink-950/80 hover:bg-pink-600 text-pink-200 border border-pink-400/40 text-xs font-extrabold flex items-center justify-between"
+            >
+              <span>
+                {lang === 'zh-TW' ? '💄 04｜萬商客集・AI全球美業' :
+                 lang === 'zh-CN' ? '💄 04｜万商客集・AI全球美业' :
+                 lang === 'ja-JP' ? '💄 04｜万商客集・AIグローバル美容' :
+                 lang === 'ko-KR' ? '💄 04｜AI 글로벌 뷰티' :
+                 lang === 'vi-VN' ? '💄 04｜AI Làm Đẹp Toàn Cầu' :
+                 lang === 'id-ID' ? '💄 04｜Kecantikan AI Global' :
+                 '💄 04 | Global AI Beauty'}
+              </span>
+              <span className="text-amber-300 font-black text-[11px]">$0 FREE →</span>
             </a>
             <a
               href="/blog"

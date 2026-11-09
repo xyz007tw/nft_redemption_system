@@ -5,16 +5,17 @@ import { useLanguage, Lang } from '@/lib/LanguageContext';
 import { LIVEGOOD_PROMO_HTML } from '@/lib/livegoodPromoHtml';
 import { AI_FREE365_PROMO_HTML } from '@/lib/aiFree365PromoHtml';
 import CustomArchitectureSection from './CustomArchitectureSection';
+import HuadryBeautySection from './HuadryBeautySection';
 
 export default function VideoShoppableSection() {
   const { lang, setLang } = useLanguage();
   const isZh = lang.includes('zh');
   const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [activeServiceTab, setActiveServiceTab] = useState<'architecture' | 'shoppable' | 'livegood' | 'free365'>('architecture');
+  const [activeServiceTab, setActiveServiceTab] = useState<'architecture' | 'shoppable' | 'livegood' | 'free365' | 'beauty'>('architecture');
   const livegoodContainerRef = useRef<HTMLDivElement | null>(null);
   const free365ContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSelectTab = (tab: 'architecture' | 'shoppable' | 'livegood' | 'free365') => {
+  const handleSelectTab = (tab: 'architecture' | 'shoppable' | 'livegood' | 'free365' | 'beauty') => {
     setActiveServiceTab(tab);
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', `/#video-shoppable-service?tab=${tab}`);
@@ -25,7 +26,13 @@ export default function VideoShoppableSection() {
     if (typeof window === 'undefined') return;
     const handleSwitchTab = (e: any) => {
       const targetTab = e?.detail?.tab;
-      if (targetTab === 'architecture' || targetTab === 'shoppable' || targetTab === 'livegood' || targetTab === 'free365') {
+      if (
+        targetTab === 'architecture' ||
+        targetTab === 'shoppable' ||
+        targetTab === 'livegood' ||
+        targetTab === 'free365' ||
+        targetTab === 'beauty'
+      ) {
         setActiveServiceTab(targetTab);
         window.history.replaceState(null, '', `/#video-shoppable-service?tab=${targetTab}`);
       }
@@ -37,9 +44,20 @@ export default function VideoShoppableSection() {
     const params = new URLSearchParams(window.location.search);
     const tabParam = (params.get('tab') || params.get('service') || '').toLowerCase();
 
-    let initialTab: 'architecture' | 'shoppable' | 'livegood' | 'free365' | null = null;
+    let initialTab: 'architecture' | 'shoppable' | 'livegood' | 'free365' | 'beauty' | null = null;
 
     if (
+      tabParam === 'beauty' ||
+      tabParam === 'huadry' ||
+      tabParam === '04' ||
+      tabParam === 'p01' ||
+      hash.includes('beauty') ||
+      hash.includes('huadry') ||
+      hash.includes('service-04') ||
+      hash.includes('tab=beauty')
+    ) {
+      initialTab = 'beauty';
+    } else if (
       tabParam === 'livegood' ||
       tabParam === '02' ||
       hash.includes('livegood') ||
@@ -183,7 +201,7 @@ export default function VideoShoppableSection() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               {/* Tab 0: 👑 20年首席架構師 · AI-ATM 自動商業變現系統客製接案 */}
               <button
                 type="button"
@@ -340,6 +358,46 @@ export default function VideoShoppableSection() {
                   </div>
                   <div className="text-[11px] text-slate-300 font-bold">
                     {activeServiceTab === 'free365' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
+                  </div>
+                </div>
+              </button>
+
+              {/* Tab 4: 💄 萬商客集 · AI 全球美業 (花緹生技 × 60天AI純服務陪跑) */}
+              <button
+                type="button"
+                onClick={() => handleSelectTab('beauty')}
+                className={`text-left cursor-pointer rounded-2xl p-4 border transition-all flex items-center justify-between gap-3 ${
+                  activeServiceTab === 'beauty'
+                    ? 'bg-gradient-to-r from-pink-900/95 via-fuchsia-900/95 to-rose-900/95 border-pink-400 shadow-[0_0_25px_rgba(236,72,153,0.45)]'
+                    : 'bg-slate-800/70 border-slate-700 hover:border-pink-400/50'
+                }`}
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                      activeServiceTab === 'beauty' ? 'bg-pink-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {isZh ? '💄 客製與協辦 04' : '💄 Service 04'}
+                    </span>
+                    <span className="text-[11px] font-bold text-pink-300">
+                      {isZh ? '60天AI純服務+$15協播' : '60-Day AI + $15 Ad'}
+                    </span>
+                  </div>
+                  <div className="font-black text-white text-sm md:text-base leading-snug">
+                    {lang === 'zh-TW' ? '萬商客集・AI全球美業｜美麗又有全球副業收入' :
+                     lang === 'zh-CN' ? '万商客集・AI全球美业｜美丽又有全球副业收入' :
+                     lang === 'ja-JP' ? '万商客集・AIグローバル美容｜美しさと世界副業収入' :
+                     lang === 'ko-KR' ? '만상객집 · AI 글로벌 뷰티｜아름다움과 글로벌 부업' :
+                     lang === 'vi-VN' ? 'AI Làm Đẹp Toàn Cầu｜Đẹp & Thu Nhập Phụ Toàn Cầu' :
+                     'Global AI Beauty | Look Great & Earn Global Side Income'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm md:text-base font-black text-amber-400">
+                    {isZh ? '$0 免費入會' : '$0 Free Join'}
+                  </div>
+                  <div className="text-[11px] text-pink-200 font-bold">
+                    {activeServiceTab === 'beauty' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
               </button>
@@ -948,6 +1006,9 @@ export default function VideoShoppableSection() {
             />
           </div>
         )}
+
+        {/* 服務 04：萬商客集 · AI 全球美業（花緹生技免費加入 × 60天AI純服務輔導 × $15萬商廣告協播） */}
+        {activeServiceTab === 'beauty' && <HuadryBeautySection />}
 
         {/* 共用底部聯絡中心與免責聲明 */}
         <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
