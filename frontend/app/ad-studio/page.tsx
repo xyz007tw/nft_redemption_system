@@ -226,7 +226,7 @@ export default function AdStudioPage() {
       const data = await res.json();
       if (data.success && data.primaryUrl) {
         setBannerImageUrl(data.primaryUrl);
-        setStatusNotice({ type: 'success', text: `☁️ 廣告圖片已上傳至專用 Cloudflare R2：${data.primaryUrl}` });
+        setStatusNotice({ type: 'success', text: `✨ 您的宣傳圖片已上傳成功！` });
       } else {
         setStatusNotice({ type: 'error', text: data.error || '圖片上傳失敗' });
       }
@@ -445,15 +445,15 @@ export default function AdStudioPage() {
               </div>
 
               <div className="bg-gradient-to-br from-purple-950/60 to-pink-950/50 border border-purple-500/40 rounded-2xl p-5">
-                <div className="text-xs text-purple-300 font-bold mb-1">🤖 本地 / 雲端 AI Agent 連線狀態</div>
+                <div className="text-xs text-purple-300 font-bold mb-1">🤖 AI 宣傳小幫手狀態</div>
                 <div className="text-lg font-black text-white flex items-center gap-2 mt-1">
                   <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping inline-block" />
                   {advertiser.remaining_days && advertiser.remaining_days > 0 && advertiser.status === 'ACTIVE'
-                    ? '全網協播運行中'
+                    ? '24H 自動幫您曝光中'
                     : '已到期或已暫停'}
                 </div>
                 <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                  同步節點：<code className="text-[11px] text-pink-300">1.5208.uk/ads/active_ads_pool.json</code>
+                  🤝 斗內一下、回您一把！感謝贊助 AI-SKILLS 開發
                 </p>
               </div>
             </div>
@@ -576,21 +576,21 @@ export default function AdStudioPage() {
                   </div>
                 </div>
 
-                {/* 廣告橫幅圖片上傳 (Cloudflare R2) */}
+                {/* 廣告橫幅圖片上傳 */}
                 <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
                   <label className="block text-xs font-bold text-gray-300 mb-1.5">
-                    7. 廣告橫幅圖片網址（選填，可直接貼上圖片網址或上傳至專用 R2）
+                    7. 廣告宣傳圖片（選填，可直接從手機/電腦上傳圖片，或貼上圖片網址）
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2.5">
                     <input
                       type="text"
                       value={bannerImageUrl}
                       onChange={e => setBannerImageUrl(e.target.value)}
-                      placeholder="https://1.5208.uk/ads/banners/..."
+                      placeholder="請點擊右側按鈕上傳圖片，或貼上圖片網址..."
                       className="flex-1 px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-xs text-gray-200 font-mono"
                     />
                     <label className="px-4 py-2 rounded-xl bg-indigo-600/40 hover:bg-indigo-600/60 border border-indigo-400/50 text-indigo-200 text-xs font-bold cursor-pointer text-center shrink-0">
-                      {uploadingBanner ? '☁️ 上傳 R2 中...' : '📤 上傳圖片至 R2'}
+                      {uploadingBanner ? '⏳ 正在上傳圖片...' : '📤 點此上傳宣傳圖片'}
                       <input
                         type="file"
                         accept="image/*"
@@ -670,16 +670,16 @@ export default function AdStudioPage() {
                     disabled={saving}
                     className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-[0_0_25px_rgba(16,185,129,0.4)] cursor-pointer disabled:opacity-50"
                   >
-                    {saving ? '☁️ 正在審核並同步 Cloudflare R2...' : '🚀 儲存並發佈至全網 100 站協播池'}
+                    {saving ? '⏳ 正在儲存並派發給 AI 小幫手...' : '🚀 儲存並立即讓 AI 幫我全網打廣告'}
                   </button>
                 </div>
               </form>
 
-              {/* 右側 5 欄：全網 WordPress 文章內嵌廣告卡即時預覽 */}
+              {/* 右側 5 欄：全網文章內嵌廣告卡即時預覽 */}
               <div className="lg:col-span-5 space-y-6">
                 <div className="bg-slate-900/90 border border-cyan-500/30 rounded-3xl p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-black text-cyan-400">👁️ LIVE AD CARD PREVIEW</span>
+                    <span className="text-xs font-black text-cyan-400">👁️ 您的廣告招牌即時預覽</span>
                     <div className="flex gap-1 bg-black/50 p-1 rounded-xl border border-white/10 text-[11px] font-bold">
                       {(['ZH', 'CN', 'EN', 'JA'] as const).map(l => (
                         <button
@@ -697,7 +697,7 @@ export default function AdStudioPage() {
                   </div>
 
                   <p className="text-xs text-gray-400 mb-4">
-                    以下為您的廣告在微享全球 WordPress 矩陣站群（現有 12 站 ➔ 邁向 100 站）與 AI Agent 每日發文內展示的真實視覺效果：
+                    以下就是您的廣告招牌在我們全球多語系主題網站群（邁向 100 站）與每日新文章裡讓讀者看到的真實模樣：
                   </p>
 
                   {/* 模擬廣告卡片 */}
@@ -736,15 +736,15 @@ export default function AdStudioPage() {
 
                 {/* 系統說明與免責條款提醒卡 */}
                 <div className="bg-slate-900/70 border border-white/10 rounded-3xl p-6 text-xs text-gray-300 space-y-2.5 leading-relaxed">
-                  <div className="font-black text-amber-300 text-sm">📌 萬商廣告協播運作機制與規範說明</div>
+                  <div className="font-black text-amber-300 text-sm">🤝 斗內一下、回您一把 · 貼心小叮嚀</div>
                   <p>
-                    1. <strong>雙軌全自動協播</strong>：當您點擊「儲存並發佈」後，系統會同時更新 Cloudflare R2 邊緣廣告池（供全網 WordPress 站群文章頁即時動態輪播），並供微享「本地端與雲端 AI Agent」每日自動發文時抓取嵌入文末。
+                    1. <strong>1 秒即時生效、隨時都能改</strong>：當您按下「儲存」後，我們的 AI 宣傳小幫手就會在每天發表全球多國語言新文章時，自動幫您掛上這張漂亮的名片招牌！想換活動或改台詞隨時都能上來改。
                   </p>
                   <p>
-                    2. <strong>曝光時間依天數精準計算</strong>：斗內 $15 享 30 天（1個月）、斗內 $120（買 8 個月送 4 個月）享 365 天 + VIP 3 倍輪播權重。到期後系統將自動停止輪播，隨時再次斗內即可無縫累加天數。
+                    2. <strong>曝光天數清清楚楚</strong>：斗內 $15 享 30 天（1個月）、斗內 $120（買 8 個月送 4 個月）享整整 365 天＋VIP 3 倍優先曝光。到期後自動停止，隨時再次斗內就能直接把天數往上加！
                   </p>
                   <p>
-                    3. <strong>合規與免責聲明</strong>：本服務為斗內贊助之回饋贈禮，<strong>不保證具體點擊數或實際成交業績額</strong>。嚴禁投放色情、賭博、詐騙、非法吸金或誇大醫療偏方，違規將強制下架封號且不退費。
+                    3. <strong>安心合規與免責約定</strong>：這套 AI 宣傳技能是感謝您贊助我們 AI-SKILLS 開發的回禮，<strong>保證在天數內幫您全網輪播曝光，但不保證具體點擊數或實際成交業績額喔</strong>。嚴禁放色情、賭博、詐騙或誇大醫療偏方（違規將下架且不退費）。
                   </p>
                 </div>
               </div>

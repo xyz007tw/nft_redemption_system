@@ -288,7 +288,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           success: true,
-          message: '✅ 廣告文案與導流連結已儲存，並同步發佈至 Cloudflare R2 全網 100 站協播池與 AI Agent 產線！',
+          message: '✅ 您的廣告介紹與連結已儲存！AI 宣傳小幫手已立即幫您同步至全球百大網站與每日新文章中曝光！',
           advertiser: {
             ...updated,
             remaining_days: getRemainingDays(updated.expires_at)
