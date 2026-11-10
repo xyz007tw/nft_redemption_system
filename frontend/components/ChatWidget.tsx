@@ -49,6 +49,8 @@ function renderMessageContent(content: string) {
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
+  const desktopMenuRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<{role: 'user'|'ai', content: string}[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -84,14 +86,24 @@ export default function ChatWidget() {
     };
     window.addEventListener('open-ai-chat', handleOpenChat);
     window.addEventListener('wx-open-ai-chat', handleOpenChat);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (desktopMenuRef.current && !desktopMenuRef.current.contains(event.target as Node)) {
+        setDesktopMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       window.removeEventListener('open-ai-chat', handleOpenChat);
       window.removeEventListener('wx-open-ai-chat', handleOpenChat);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [messages, welcomeMessage]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+    setDesktopMenuOpen(false);
     if (!isOpen && messages.length === 0) {
       setMessages([{ role: 'ai', content: welcomeMessage }]);
     }
@@ -102,6 +114,7 @@ export default function ChatWidget() {
     sectionId: string,
     serviceTab?: 'architecture' | 'shoppable' | 'livegood' | 'free365' | 'beauty'
   ) => {
+    setDesktopMenuOpen(false);
     setMobileMenuOpen(false);
     setIsOpen(false);
     if (typeof window === 'undefined') return;
@@ -151,11 +164,24 @@ export default function ChatWidget() {
     <>
       {/* 1. 電腦版 (md 以上) 維持右下角懸浮按鈕堆疊 (AI客製服務 + AI頂配教材 + AI客服) */}
       <div className="hidden md:flex fixed bottom-6 right-6 z-50 flex-col items-end gap-2.5">
-        {/* AI 客製服務 Floating Pill + 懸浮子選單 (位於 AI 頂配教材正上方) */}
+        {/* AI 客製服務 Floating Pill + 點擊展開子選單 (位於 AI 頂配教材正上方) */}
         {!isOpen && (
-          <div className="relative group flex flex-col items-end">
-            {/* 懸浮展開之服務快速跳轉氣泡 */}
-            <div className="mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col items-end gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+          <div ref={desktopMenuRef} className="relative flex flex-col items-end">
+            {/* 點擊「AI客製服務」才展開之服務快速跳轉氣泡，未點擊前不佔用任何空間，絕不誤遮擋右側卡片 */}
+            {desktopMenuOpen && (
+              <div className="mb-2 p-2.5 rounded-2xl bg-slate-950/95 border border-sky-400/60 shadow-[0_0_30px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col items-end gap-1.5 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                <div className="w-full flex items-center justify-between pb-1 border-b border-white/10 px-1 gap-2">
+                  <span className="text-[11px] font-black text-sky-300">
+                    {lang.includes('zh') ? '🛠️ 點擊直達方案：' : '🛠️ Select Solution:'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setDesktopMenuOpen(false)}
+                    className="text-xs text-slate-400 hover:text-white font-black px-1 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
               {/* 🏪 旗艦項目：知識自動販賣機 AI-ATM */}
               <a
                 href="/#author-coop"
@@ -263,12 +289,13 @@ export default function ChatWidget() {
                  lang === 'id-ID' ? '📝 Blog Praktis Kreator (SEO)' :
                  '📝 Creator SEO Blog (Daily)'}
               </a>
-            </div>
+              </div>
+            )}
 
-            <a
-              href="/#video-shoppable-service"
-              onClick={(e) => handleJumpToSection(e, 'video-shoppable-service')}
-              className="flex items-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap"
+            <button
+              type="button"
+              onClick={() => setDesktopMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-black px-4 py-2.5 rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] border border-white/40 hover:scale-105 transition-all duration-300 text-sm whitespace-nowrap cursor-pointer"
             >
               <span className="text-base">🛠️</span>
               <span>
@@ -280,7 +307,10 @@ export default function ChatWidget() {
                  lang === 'id-ID' ? 'Layanan Kustom AI' :
                  'AI Custom Services'}
               </span>
-            </a>
+              <span className="text-xs text-sky-200 font-bold">
+                {desktopMenuOpen ? '✕' : '▲'}
+              </span>
+            </button>
           </div>
         )}
 
