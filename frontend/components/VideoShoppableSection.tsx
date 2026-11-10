@@ -201,12 +201,14 @@ export default function VideoShoppableSection() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
               {/* Tab 0: 👑 20年首席架構師 · AI-ATM 自動商業變現系統客製接案 */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectTab('architecture')}
-                className={`text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelectTab('architecture')}
+                className={`w-full text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden whitespace-normal ${
                   activeServiceTab === 'architecture'
                     ? 'bg-gradient-to-br from-sky-950 via-indigo-950 to-purple-950 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.45)]'
                     : 'bg-slate-800/70 border-slate-700 hover:border-sky-400/50'
@@ -223,7 +225,7 @@ export default function VideoShoppableSection() {
                       {isZh ? 'AI-ATM 變現接案' : 'AI-ATM Bespoke'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm leading-snug break-words">
+                  <div className="font-black text-white text-sm leading-snug break-words whitespace-normal">
                     {lang === 'zh-TW' ? 'AI-ATM 自動商業變現系統客製接案' :
                      lang === 'zh-CN' ? 'AI-ATM 自动商业变现系统客制接案' :
                      lang === 'ja-JP' ? 'AI-ATM 自動収益化システム構築・受託開発' :
@@ -240,13 +242,15 @@ export default function VideoShoppableSection() {
                     {activeServiceTab === 'architecture' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Tab 1: AI 影片導購系統 */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectTab('shoppable')}
-                className={`text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelectTab('shoppable')}
+                className={`w-full text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden whitespace-normal ${
                   activeServiceTab === 'shoppable'
                     ? 'bg-gradient-to-br from-sky-900/90 to-blue-900/90 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.35)]'
                     : 'bg-slate-800/70 border-slate-700 hover:border-sky-500/50'
@@ -263,7 +267,7 @@ export default function VideoShoppableSection() {
                       {isZh ? 'YT 影分身導購' : 'Shadow Shoppable'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm leading-snug break-words">
+                  <div className="font-black text-white text-sm leading-snug break-words whitespace-normal">
                     {lang === 'zh-TW' ? '新開發 AI「影片導購系統」客製化建置' :
                      lang === 'zh-CN' ? '新开发 AI「影片导购系统」客制化建置' :
                      lang === 'ja-JP' ? '新開発 AI「動画コマース導線システム」カスタム構築' :
@@ -280,13 +284,15 @@ export default function VideoShoppableSection() {
                     {activeServiceTab === 'shoppable' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Tab 2: LiveGood 會員訂閱與 AI 自動化協播 */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectTab('livegood')}
-                className={`text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelectTab('livegood')}
+                className={`w-full text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden whitespace-normal ${
                   activeServiceTab === 'livegood'
                     ? 'bg-gradient-to-br from-purple-900/90 to-indigo-900/90 border-amber-400 shadow-[0_0_25px_rgba(168,85,247,0.4)]'
                     : 'bg-slate-800/70 border-slate-700 hover:border-purple-400/50'
@@ -303,7 +309,7 @@ export default function VideoShoppableSection() {
                       {isZh ? '自辦 / 專人協辦' : 'Self / Concierge'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm leading-snug break-words">
+                  <div className="font-black text-white text-sm leading-snug break-words whitespace-normal">
                     {lang === 'zh-TW' ? 'AI 點子變現商隊｜LiveGood 訂閱與 AI 自動協播' :
                      lang === 'zh-CN' ? 'AI 点子变现商队｜LiveGood 订阅与 AI 自动协播' :
                      lang === 'ja-JP' ? 'AI アイデア収益化｜LiveGood 購読＆AI 自動協播' :
@@ -320,13 +326,15 @@ export default function VideoShoppableSection() {
                     {activeServiceTab === 'livegood' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Tab 3: AI尋客365天攏免錢 ($660 全包辦) */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectTab('free365')}
-                className={`text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelectTab('free365')}
+                className={`w-full text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden whitespace-normal ${
                   activeServiceTab === 'free365'
                     ? 'bg-gradient-to-br from-emerald-900/95 to-teal-900/95 border-emerald-400 shadow-[0_0_25px_rgba(20,184,166,0.45)]'
                     : 'bg-slate-800/70 border-slate-700 hover:border-emerald-400/50'
@@ -343,7 +351,7 @@ export default function VideoShoppableSection() {
                       {isZh ? '送$198教材+25%分潤' : 'Incl. $198 Course'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm leading-snug break-words">
+                  <div className="font-black text-white text-sm leading-snug break-words whitespace-normal">
                     {lang === 'zh-TW' ? 'AI尋客365天攏免錢｜全球網購連鎖店計劃' :
                      lang === 'zh-CN' ? 'AI寻客365天拢免钱｜全球网购连锁店计划' :
                      lang === 'ja-JP' ? 'AI集客365日完全無料｜グローバル連鎖店計画' :
@@ -360,13 +368,15 @@ export default function VideoShoppableSection() {
                     {activeServiceTab === 'free365' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Tab 4: 💄 萬商客集 · AI 全球美業 (花緹生技 × 60天AI純服務陪跑) */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectTab('beauty')}
-                className={`text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelectTab('beauty')}
+                className={`w-full text-left cursor-pointer rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden whitespace-normal ${
                   activeServiceTab === 'beauty'
                     ? 'bg-gradient-to-br from-pink-900/95 via-fuchsia-900/95 to-rose-900/95 border-pink-400 shadow-[0_0_25px_rgba(236,72,153,0.45)]'
                     : 'bg-slate-800/70 border-slate-700 hover:border-pink-400/50'
@@ -383,7 +393,7 @@ export default function VideoShoppableSection() {
                       {isZh ? '60天AI純服務+$15協播' : '60-Day AI + $15 Ad'}
                     </span>
                   </div>
-                  <div className="font-black text-white text-sm leading-snug break-words">
+                  <div className="font-black text-white text-sm leading-snug break-words whitespace-normal">
                     {lang === 'zh-TW' ? '萬商客集・AI全球美業｜美麗又有全球副業收入' :
                      lang === 'zh-CN' ? '万商客集・AI全球美业｜美丽又有全球副业收入' :
                      lang === 'ja-JP' ? '万商客集・AIグローバル美容｜美しさと世界副業収入' :
@@ -400,7 +410,7 @@ export default function VideoShoppableSection() {
                     {activeServiceTab === 'beauty' ? (isZh ? '👁️ 當前顯示' : '👁️ Viewing') : (isZh ? '點擊切換 →' : 'View →')}
                   </div>
                 </div>
-              </button>
+              </div>
             </div>
           </div>
         </div>
