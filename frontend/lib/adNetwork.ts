@@ -619,6 +619,7 @@ export async function activateOrExtendSponsorAdAccount(params: {
   activated: boolean;
   daysAdded: number;
   alreadyRedeemed?: boolean;
+  emailSent?: boolean;
   advertiser?: SponsorAdvertiser;
   magicLoginUrl?: string;
 }> {
@@ -658,15 +659,71 @@ export async function activateOrExtendSponsorAdAccount(params: {
   const existing = store.advertisers[cleanEmail] ? enrichAdvertiserTierFields(store.advertisers[cleanEmail]) : undefined;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
 
-  // 🔒 防重複刷天數安全鎖 (Idempotency Check)：若同一筆 NFT 領取/訂單已入帳過，直接回傳既有帳號與魔術連結，不重複加天數
+  // 🔒 防重複刷天數安全鎖 (Idempotency Check)：若同一筆 NFT 領取/訂單已入帳過，不重複加天數，
+  // 但仍可為客戶「補寄一次包含登入帳密與一鍵免密連結的備案電郵」，防止客戶不小心滑掉畫面找不到密碼！
   if (params.idempotencyKey && existing && Array.isArray(existing.redeemed_nft_keys)) {
     if (existing.redeemed_nft_keys.includes(params.idempotencyKey)) {
       const magicToken = createAdMagicToken(cleanEmail);
       const magicLoginUrl = `${siteUrl}/ad-studio?ad_token=${encodeURIComponent(magicToken)}`;
+      let emailSent = false;
+      if (params.sendWelcomeEmail !== false && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        try {
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS
+            }
+          });
+          const spec = getAdTierSpecByTier(existing.plan_tier, existing.weight);
+          const remainingTotalDays = getRemainingDays(existing.expires_at);
+          await transporter.sendMail({
+            from: `"WeiXiang 萬商廣告中心" <${process.env.EMAIL_USER}>`,
+            to: cleanEmail,
+            cc: 'qqww0614@gmail.com',
+            subject: `📢 【WeiXiang 萬商廣告通行證備份】您的「${spec.name_zh}」登入帳密與一鍵免密連結（有效剩餘：${remainingTotalDays} 天）`,
+            html: `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 640px; margin: 0 auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 18px; background: #ffffff; color: #0f172a;">
+                <div style="display: inline-block; background: #fef3c7; color: #b45309; font-weight: 800; font-size: 12px; padding: 5px 12px; border-radius: 999px; margin-bottom: 12px;">
+                  📢 萬商自助廣告協播系統・專屬通行證電郵備份
+                </div>
+                <h2 style="margin: 0 0 12px; color: #0f172a; font-size: 22px;">🔑 您的「${spec.name_zh}」萬商廣告通行證（隨時可登入）</h2>
+                <p style="font-size: 14.5px; line-height: 1.7; color: #334155;">
+                  親愛的夥伴您好，為避免您在網頁核銷時不小心滑掉畫面，系統特別將您的<strong>「萬商自助廣告協播系統」專屬通行證資料</strong>同步寄送至您的信箱保存！
+                </p>
+
+                <div style="background: linear-gradient(135deg, #064e3b, #0f172a, #1e1b4b); color: #ffffff; padding: 22px; border-radius: 16px; margin: 20px 0; border: 2px solid #fbbf24;">
+                  <div style="font-size: 13px; font-weight: 800; color: #fcd34d; margin-bottom: 10px;">
+                    📢 萬商自助廣告協播系統・專屬通行證已生效
+                  </div>
+                  <p style="margin: 6px 0; font-size: 14px;">• <strong>登入帳號 (Email)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${cleanEmail}</code></p>
+                  <p style="margin: 6px 0; font-size: 14px;">• <strong>專屬通行密碼 (Password)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${existing.password_code}</code></p>
+                  <p style="margin: 6px 0; font-size: 14px;">• <strong>開通等級與件數</strong>：<strong style="color: #6ee7b7;">${spec.name_zh} ｜ ${existing.weight}x 優先輪播 ｜ 可上架 ${existing.max_ad_slots} 件廣告</strong></p>
+                  <p style="margin: 6px 0; font-size: 14px;">• <strong>有效期限至</strong>：<strong style="color: #67e8f9;">${existing.expires_at.slice(0, 10)}（剩餘 ${remainingTotalDays} 天）</strong></p>
+                  <p style="margin: 6px 0; font-size: 14px;">• <strong>廣告後台網址</strong>：<a href="${siteUrl}/ad-studio" style="color: #93c5fd; font-weight: bold;">${siteUrl}/ad-studio</a></p>
+                  <div style="margin-top: 18px;">
+                    <a href="${magicLoginUrl}" style="display: inline-block; background: linear-gradient(135deg, #fbbf24, #f97316); color: #0f172a; text-decoration: none; font-weight: 900; font-size: 14px; padding: 12px 24px; border-radius: 10px;">
+                      🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
+                    </a>
+                  </div>
+                </div>
+
+                <p style="font-size: 12px; color: #64748b; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                  📌 請妥善保留此信件，您隨時可點擊上方按鈕或憑 Email + 密碼登入 <a href="${siteUrl}/ad-studio">${siteUrl}/ad-studio</a> 修改或更換廣告內容！
+                </p>
+              </div>
+            `
+          });
+          emailSent = true;
+        } catch (reMailErr) {
+          console.error('[AdNetwork] Re-send welcome email error:', reMailErr);
+        }
+      }
       return {
         activated: true,
         daysAdded: 0,
         alreadyRedeemed: true,
+        emailSent,
         advertiser: existing,
         magicLoginUrl
       };
@@ -752,6 +809,7 @@ export async function activateOrExtendSponsorAdAccount(params: {
   const magicToken = createAdMagicToken(cleanEmail);
   const magicLoginUrl = `${siteUrl}/ad-studio?ad_token=${encodeURIComponent(magicToken)}`;
 
+  let emailSent = false;
   if (params.sendWelcomeEmail !== false && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     try {
       const transporter = nodemailer.createTransport({
@@ -775,8 +833,24 @@ export async function activateOrExtendSponsorAdAccount(params: {
             </div>
             <h2 style="margin: 0 0 12px; color: #0f172a; font-size: 22px;">🎉 感謝您的支持！您的「${finalSpec.name_zh}」已正式開通！</h2>
             <p style="font-size: 14.5px; line-height: 1.7; color: #334155;">
-              親愛的夥伴您好，系統已為您的信箱增加 <strong>+${daysToAdd} 天</strong> 萬商全網廣告協播權限（目前累計有效剩餘：<strong>${remainingTotalDays} 天</strong>，到期日：<strong>${updatedAdv.expires_at.slice(0, 10)}</strong>）。
+              親愛的夥伴您好，系統已為您的信箱增加 <strong>+${daysToAdd} 天</strong> 萬商全網廣告協播權限（目前累計有效剩餘：<strong>${remainingTotalDays} 天</strong>，到期日：<strong>${updatedAdv.expires_at.slice(0, 10)}</strong>）。為防止您在網頁核銷時不小心滑掉畫面，以下為您的<strong>專屬通行證電郵備份</strong>：
             </p>
+
+            <div style="background: linear-gradient(135deg, #064e3b, #0f172a, #1e1b4b); color: #ffffff; padding: 22px; border-radius: 16px; margin: 20px 0; border: 2px solid #fbbf24;">
+              <div style="font-size: 13px; font-weight: 800; color: #fcd34d; margin-bottom: 10px;">
+                📢 萬商自助廣告協播系統・專屬通行證已生效（與網頁畫面同步備份）
+              </div>
+              <p style="margin: 6px 0; font-size: 14px;">• <strong>登入帳號 (Email)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${cleanEmail}</code></p>
+              <p style="margin: 6px 0; font-size: 14px;">• <strong>專屬通行密碼 (Password)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${updatedAdv.password_code}</code></p>
+              <p style="margin: 6px 0; font-size: 14px;">• <strong>開通等級與件數</strong>：<strong style="color: #6ee7b7;">${finalSpec.name_zh} ｜ ${finalSpec.weight}x 優先輪播 ｜ 可上架 ${finalSpec.max_ad_slots} 件廣告</strong></p>
+              <p style="margin: 6px 0; font-size: 14px;">• <strong>有效期限至</strong>：<strong style="color: #67e8f9;">${updatedAdv.expires_at.slice(0, 10)}（剩餘 ${remainingTotalDays} 天）</strong></p>
+              <p style="margin: 6px 0; font-size: 14px;">• <strong>自助廣告後台網址</strong>：<a href="${siteUrl}/ad-studio" style="color: #93c5fd; font-weight: bold;">${siteUrl}/ad-studio</a></p>
+              <div style="margin-top: 18px;">
+                <a href="${magicLoginUrl}" style="display: inline-block; background: linear-gradient(135deg, #fbbf24, #f97316); color: #0f172a; text-decoration: none; font-weight: 900; font-size: 14px; padding: 12px 24px; border-radius: 10px;">
+                  🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
+                </a>
+              </div>
+            </div>
 
             <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 14px 18px; border-radius: 12px; margin: 16px 0; font-size: 13.5px; color: #166534;">
               <strong>🌟 您的專屬廣告方案等級權益：</strong><br/>
@@ -785,24 +859,13 @@ export async function activateOrExtendSponsorAdAccount(params: {
               • 可同時上架廣告件數：<strong>最多 ${finalSpec.max_ad_slots} 件不同廣告卡片輪番放送</strong>
             </div>
 
-            <div style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #ffffff; padding: 22px; border-radius: 14px; margin: 20px 0;">
-              <h3 style="margin: 0 0 12px; color: #38bdf8; font-size: 16px;">🔑 您的「萬商廣告小幫手」專屬登入憑證：</h3>
-              <p style="margin: 6px 0; font-size: 14px;">• <strong>自助廣告後台網址</strong>：<a href="${siteUrl}/ad-studio" style="color: #6ee7b7; font-weight: bold;">${siteUrl}/ad-studio</a></p>
-              <p style="margin: 6px 0; font-size: 14px;">• <strong>登入帳號 (Email)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047;">${cleanEmail}</code></p>
-              <p style="margin: 6px 0; font-size: 14px;">• <strong>專屬密碼 (Password)</strong>：<code style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; color: #fde047; font-weight: bold;">${updatedAdv.password_code}</code></p>
-              <div style="margin-top: 18px;">
-                <a href="${magicLoginUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 10px;">
-                  🚀 點此免輸入密碼「一鍵進入我的廣告小幫手」設定廣告 ➔
-                </a>
-              </div>
-            </div>
-
             <p style="font-size: 12px; color: #64748b; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-              📌 備註：您的斗內贊助金額已 100% 併入您個人的「級差分潤升等累積業績」。當可用天數到期後，各站將自動停止輪播；您隨時可至會員後台 (/dashboard) 或斗內專區 (/sponsor) 續加天數（純贊助回饋，不保證具體業績額）。
+              📌 備註：您的金額已 100% 併入您個人的「級差分潤升等累積業績」。當可用天數到期後，各站將自動停止輪播；您隨時可至會員後台 (/dashboard) 或斗內專區 (/sponsor) 續加天數（純曝光工具，不保證具體業績額）。
             </p>
           </div>
         `
       });
+      emailSent = true;
     } catch (mailErr) {
       console.error('[AdNetwork] Welcome email error:', mailErr);
     }
@@ -811,6 +874,7 @@ export async function activateOrExtendSponsorAdAccount(params: {
   return {
     activated: true,
     daysAdded: daysToAdd,
+    emailSent,
     advertiser: updatedAdv,
     magicLoginUrl
   };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useReadContract, useSignMessage } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { WEIXIANG_NFT_ADDRESS, WEIXIANG_NFT_ABI } from '@/lib/contractAbi';
@@ -17,6 +17,7 @@ export default function RedeemPage() {
   const [adAccountResult, setAdAccountResult] = useState<{
     daysAdded: number;
     alreadyRedeemed?: boolean;
+    emailSent?: boolean;
     planTier?: string;
     maxAdSlots?: number;
     weight?: number;
@@ -25,6 +26,8 @@ export default function RedeemPage() {
     magicLoginUrl?: string;
     email?: string;
   } | null>(null);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [resendEmailMsg, setResendEmailMsg] = useState<string | null>(null);
   
   // 信用卡/Email 用戶核銷狀態
   const [fiatEmail, setFiatEmail] = useState('');
@@ -44,6 +47,51 @@ export default function RedeemPage() {
 
   // 檢查用戶是否有 NFT
   const hasNFT = balance && (balance as bigint) > BigInt(0);
+  const isValidWeb3Email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isValidFiatEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fiatEmail.trim());
+
+  // 自動帶入先前儲存的 Email，避免客戶漏填
+  useEffect(() => {
+    const saved = localStorage.getItem('weixiang_user_email');
+    if (saved && saved.includes('@')) {
+      setEmail((prev) => prev || saved);
+      setFiatEmail((prev) => prev || saved);
+    }
+  }, []);
+
+  // 補寄備案電郵（若客戶擔心沒收到或想再次寄送備份）
+  const handleResendBackupEmail = async (targetEmail: string) => {
+    if (!targetEmail || !targetEmail.includes('@')) return;
+    setIsResendingEmail(true);
+    setResendEmailMsg(null);
+    try {
+      const authRes = await fetch('/api/auth/email-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: targetEmail.trim().toLowerCase() })
+      });
+      const authData = await authRes.json();
+      const targetWallet = address || authData?.userAddress;
+      const response = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: targetWallet,
+          signature: 'FIAT_VERIFIED_SIGNATURE',
+          message: `Resend backup credentials to ${targetEmail}`,
+          email: targetEmail.trim().toLowerCase(),
+          nftBalance: balance ? Number(balance) : 1
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || '補寄失敗');
+      setResendEmailMsg(`✅ 已再次將「萬商廣告通行證（含登入帳密與一鍵免密連結）」寄送至 ${targetEmail}！`);
+    } catch (e: any) {
+      setResendEmailMsg(`⚠️ 補寄提醒：${e.message || '請稍後再試'}`);
+    } finally {
+      setIsResendingEmail(false);
+    }
+  };
 
   // 1. Web3 錢包持有者核銷流程
   const handleRedeem = async () => {
@@ -214,6 +262,9 @@ export default function RedeemPage() {
               <div className="text-xs font-black text-amber-300 mb-1">
                 📢 萬商自助廣告協播系統・專屬通行證已生效
               </div>
+              <div className="mb-3 p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-400/40 text-xs text-emerald-200 font-bold leading-relaxed">
+                📩 <strong>防滑掉雙重備案</strong>：我們已同步將以下相同的「登入帳密與一鍵免密連結」寄送至您的信箱 <code className="text-amber-300">{adAccountResult.email}</code> 保存！萬一不小心滑掉或關閉畫面，請隨時到信箱收信（或至會員中心）即可進入！
+              </div>
               <div className="text-sm text-white space-y-1 mb-4">
                 <p>• 登入帳號：<code className="text-amber-300 font-bold">{adAccountResult.email}</code></p>
                 {adAccountResult.passwordCode && (
@@ -231,6 +282,14 @@ export default function RedeemPage() {
                 >
                   🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
                 </a>
+                <button
+                  type="button"
+                  disabled={isResendingEmail}
+                  onClick={() => handleResendBackupEmail(adAccountResult.email || '')}
+                  className="py-3 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 font-bold text-xs sm:text-sm text-center transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isResendingEmail ? '寄送中...' : '📩 再寄一次備份信'}
+                </button>
                 <Link
                   href="/dashboard"
                   className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm text-center transition-all"
@@ -238,6 +297,9 @@ export default function RedeemPage() {
                   📊 前往會員中心
                 </Link>
               </div>
+              {resendEmailMsg && (
+                <div className="mt-2.5 text-xs font-bold text-amber-300">{resendEmailMsg}</div>
+              )}
             </div>
           )}
 
@@ -278,10 +340,14 @@ export default function RedeemPage() {
             />
             <button
               type="submit"
-              disabled={isFiatVerifying}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 rounded-xl text-base font-bold transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
+              disabled={isFiatVerifying || !isValidFiatEmail}
+              className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 rounded-xl text-base font-bold transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isFiatVerifying ? "驗證開通中..." : "以 Email 驗證並開通 180 天 AI 服務 🚀"}
+              {isFiatVerifying
+                ? "驗證開通並寄送備份電郵中..."
+                : !isValidFiatEmail
+                ? "⚠️ 請先於上方輸入有效的購買 Email"
+                : "以 Email 驗證・開通萬商廣告並寄送電郵備份 🚀"}
             </button>
           </form>
         </div>
@@ -329,6 +395,9 @@ export default function RedeemPage() {
             <div className="text-xs font-black text-amber-300 mb-1">
               📢 萬商自助廣告協播系統・專屬通行證已生效
             </div>
+            <div className="mb-3 p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-400/40 text-xs text-emerald-200 font-bold leading-relaxed">
+              📩 <strong>防滑掉雙重備案</strong>：我們已同步將以下相同的「登入帳密與一鍵免密連結」寄送至您的信箱 <code className="text-amber-300">{adAccountResult.email}</code> 保存！萬一不小心滑掉或關閉畫面，請隨時到信箱收信（或至會員中心）即可進入！
+            </div>
             <div className="text-sm text-white space-y-1 mb-4">
               <p>• 登入帳號：<code className="text-amber-300 font-bold">{adAccountResult.email}</code></p>
               {adAccountResult.passwordCode && (
@@ -346,6 +415,14 @@ export default function RedeemPage() {
               >
                 🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
               </a>
+              <button
+                type="button"
+                disabled={isResendingEmail}
+                onClick={() => handleResendBackupEmail(adAccountResult.email || '')}
+                className="py-3 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 font-bold text-xs sm:text-sm text-center transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isResendingEmail ? '寄送中...' : '📩 再寄一次備份信'}
+              </button>
               <Link
                 href="/dashboard"
                 className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm text-center transition-all"
@@ -353,6 +430,9 @@ export default function RedeemPage() {
                 📊 前往會員中心
               </Link>
             </div>
+            {resendEmailMsg && (
+              <div className="mt-2.5 text-xs font-bold text-amber-300">{resendEmailMsg}</div>
+            )}
           </div>
         )}
 
@@ -368,25 +448,38 @@ export default function RedeemPage() {
               </p>
             </div>
 
-            <div className="text-left bg-gray-800/60 p-6 rounded-2xl border border-gray-700/60">
-              <label className="block text-sm font-medium text-gray-300 mb-2">請輸入您的業務聯絡信箱 (必填，作為萬商廣告系統登入帳號)</label>
+            <div className="text-left bg-gray-800/80 p-6 rounded-2xl border-2 border-amber-500/60 shadow-lg">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <label className="block text-sm font-bold text-amber-300">
+                  STEP 1｜請先填寫您的接收電郵 (必填・同步寄送通行證防滑掉備份)
+                </label>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-black border border-amber-400/40 shrink-0">
+                  必填備案
+                </span>
+              </div>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="example@gmail.com"
-                className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-green-500 focus:outline-none"
+                placeholder="請輸入您常用的 Email (例: example@gmail.com)"
+                className="w-full bg-black border-2 border-gray-600 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:outline-none"
                 required
               />
-              <p className="text-xs text-gray-400 mt-2">領取成功後，系統將 0 秒開通您的「萬商自助廣告系統 (/ad-studio)」並寄發專屬帳密與一鍵免密登入連結至此信箱。</p>
+              <p className="text-xs text-emerald-300 mt-2.5 leading-relaxed font-semibold">
+                📩 為什麼一定要先填電郵？核銷成功瞬間除了網頁彈出金色通行證外，系統會<strong>「同步寄送一份完全相同的登入帳密 (WX...) 與一鍵免密連結」</strong>到您的信箱，就算不小心把網頁畫面滑掉也隨時能在信箱找回！
+              </p>
             </div>
 
             <button 
               onClick={handleRedeem}
-              disabled={isVerifying}
-              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer"
+              disabled={isVerifying || !isValidWeb3Email}
+              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer"
             >
-              {isVerifying ? "開通中，請在錢包簽名確認..." : `簽名確認・立即啟動 ${Number(balance || 1) * 180} 天萬商廣告系統 🚀`}
+              {isVerifying
+                ? "開通並寄送備份電郵中，請在錢包簽名確認..."
+                : !isValidWeb3Email
+                ? "⚠️ 請先於上方填寫 Email 以解鎖領取按鈕"
+                : `STEP 2｜簽名確認・立即啟動 ${Number(balance || 1) * 180} 天萬商廣告並寄送電郵備份 🚀`}
             </button>
           </div>
         ) : (

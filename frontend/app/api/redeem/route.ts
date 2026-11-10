@@ -22,6 +22,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
     }
 
+    // 🛡️ 強制電郵必填校驗：防止客戶核銷後滑掉畫面找不到萬商廣告通行證，所有核銷必須提供有效 Email 以同步寄送備份信！
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return NextResponse.json(
+        { error: '請務必填寫有效的電子信箱 (Email)，系統將同步寄送您的「萬商廣告通行證 (登入帳密與一鍵免密連結)」備份至您的信箱，防止畫面滑掉遺失！' },
+        { status: 400 }
+      );
+    }
+
     // 嘗試從資料庫尋找使用者最後購買的商品（同時支援錢包地址與 Email 雙軌查詢，保障法幣與加密貨幣學員順暢核銷）
     let { data: userData } = await supabase
       .from('users')
@@ -127,13 +136,14 @@ export async function POST(req: Request) {
     // 📢 【核心升級】當客戶於 /redeem 領取 NFT 眾籌憑證時，0 秒自動啟動「萬商自助廣告系統」：
     // - 每 1 顆 NFT 延長 180 天使用時間 (days = pkgAmount * 180)
     // - 眾籌金額滿 $888 / $2700 / $6000 自動開通對應高階權限 (GOLD_888 / ROYAL_2700 / SUPREME_6000)
+    // - 同步寄發電郵備份（含登入信箱、WX 通行密碼、開通等級與件數、到期日及一鍵免密連結）
     let nftAdActivationResult: any = null;
-    if (email && email.includes('@') && (!productType || productType === 'NFT_REDEEM')) {
+    if (cleanEmail && (!productType || productType === 'NFT_REDEEM')) {
       try {
         const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
         const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${userData?.last_purchased_package || 1}_CNT${pkgAmount}`;
         nftAdActivationResult = await activateOrExtendNftCrowdfundAdAccount({
-          email,
+          email: cleanEmail,
           walletAddress,
           nftCount: pkgAmount,
           paidAmountUsdt: pkgPrice,
@@ -146,10 +156,20 @@ export async function POST(req: Request) {
       }
     }
 
+    // 同步將客戶填寫的 Email 綁定寫回 users 資料表，確保日後可用 Email 登入 /dashboard 查核
+    try {
+      await supabase
+        .from('users')
+        .update({ email: cleanEmail })
+        .ilike('wallet_address', walletAddress);
+    } catch (syncEmailErr) {
+      console.warn('[Redeem] Non-fatal user email sync warning:', syncEmailErr);
+    }
+
     // ==========================================
     // Send Notification Emails (Nodemailer)
     // ==========================================
-    if (email && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (cleanEmail && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -175,7 +195,7 @@ export async function POST(req: Request) {
           <p>WeiXiang AI 總指揮中心 敬上</p>
       `;
 
-      let clientEmailHandled = Boolean(nftAdActivationResult?.activated && !nftAdActivationResult?.alreadyRedeemed);
+      let clientEmailHandled = Boolean(nftAdActivationResult?.activated);
       if (productType === 'DIRECT_COURSE') {
         try {
           const web3TxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
@@ -308,6 +328,7 @@ export async function POST(req: Request) {
             activated: nftAdActivationResult.activated,
             daysAdded: nftAdActivationResult.daysAdded,
             alreadyRedeemed: nftAdActivationResult.alreadyRedeemed,
+            emailSent: Boolean(nftAdActivationResult.emailSent),
             planTier: nftAdActivationResult.advertiser?.plan_tier,
             maxAdSlots: nftAdActivationResult.advertiser?.max_ad_slots,
             weight: nftAdActivationResult.advertiser?.weight,
