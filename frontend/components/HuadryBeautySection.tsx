@@ -5,10 +5,9 @@ import { useLanguage } from '@/lib/LanguageContext';
 
 export default function HuadryBeautySection() {
   const { lang } = useLanguage();
-  const [innerLang, setInnerLang] = useState<'zh' | 'en'>(lang === 'en-US' ? 'en' : 'zh');
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
 
-  const isZh = innerLang === 'zh';
+  const isZh = lang.includes('zh');
 
   const handleCopyUrl = (url: string, label: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
@@ -42,26 +41,6 @@ export default function HuadryBeautySection() {
             </div>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <div className="inline-flex rounded-full bg-black/30 p-1 border border-white/20">
-              <button
-                type="button"
-                onClick={() => setInnerLang('zh')}
-                className={`px-3 py-1 rounded-full text-xs font-black transition-all cursor-pointer ${
-                  isZh ? 'bg-[#ffd700] text-[#831843]' : 'text-white hover:text-[#ffd700]'
-                }`}
-              >
-                繁中
-              </button>
-              <button
-                type="button"
-                onClick={() => setInnerLang('en')}
-                className={`px-3 py-1 rounded-full text-xs font-black transition-all cursor-pointer ${
-                  !isZh ? 'bg-[#ffd700] text-[#831843]' : 'text-white hover:text-[#ffd700]'
-                }`}
-              >
-                EN
-              </button>
-            </div>
             <button
               type="button"
               onClick={() =>
@@ -160,10 +139,40 @@ export default function HuadryBeautySection() {
               </span>
             </a>
           </div>
-          <p className="text-xs text-pink-100 mt-3 opacity-90">
+
+          {/* 💡 官網免費註冊 / 加盟 SOP 引導卡片 */}
+          <div className="mt-4 p-3.5 sm:p-4 bg-black/35 rounded-2xl border border-[#ffd700]/50 text-left max-w-2xl mx-auto backdrop-blur-sm shadow-md">
+            <div className="text-xs sm:text-sm font-black text-[#ffd700] flex items-center gap-1.5 mb-1.5">
+              <span>📌</span>
+              <span>
+                {isZh
+                  ? '【加盟／入會操作指南】進入花緹官網後如何免費註冊？'
+                  : '[How to Join / Franchise] Step-by-Step Registration Guide:'}
+              </span>
+            </div>
+            <p className="text-xs text-pink-100 leading-relaxed font-medium">
+              {isZh ? (
+                <>
+                  ① 點擊上方專屬按鈕進入花緹官網（<strong>https://aitutor.vip/f0</strong>）<br />
+                  ② 點選網頁上方的 <strong className="text-[#ffd700] underline">「會員專區」</strong><br />
+                  ③ 點擊 <strong className="text-[#ffd700] underline">「註冊」</strong> 填寫免費入會資料（推薦人已自動代入）<br />
+                  ④ 完成送出即享 <strong>$0 免費入會</strong>！立即可選購產品體驗或試臉，每一筆訂單自動累積 PV 積分升等拿更優批發價！
+                </>
+              ) : (
+                <>
+                  ① Click the button above to enter Huadry Biotech (<strong>https://aitutor.vip/f0</strong>)<br />
+                  ② Click <strong className="text-[#ffd700]">"Member Area (會員專區)"</strong> at the top navbar<br />
+                  ③ Click <strong className="text-[#ffd700]">"Register (註冊)"</strong> to fill in your free account details ($0 fee)<br />
+                  ④ Login to start shopping Honey Belle skincare and accumulate PV points!
+                </>
+              )}
+            </p>
+          </div>
+
+          <p className="text-xs text-pink-100 mt-2.5 opacity-90">
             {isZh
-              ? '🔗 官方專屬免費註冊連結：https://aitutor.vip/f0 （點擊後立即可選購花緹醫美級保養品自用體驗、預約試臉及深化美容技術）'
-              : '🔗 Official Free Signup Link: https://aitutor.vip/f0 (Instantly shop Honey Belle skincare & start your beauty training)'}
+              ? '🔗 官方專屬免費註冊連結：https://aitutor.vip/f0 （點擊後至「會員專區」➔「註冊」，立即可選購花緹保養品自用、試臉與深化美容技術）'
+              : '🔗 Official Free Signup Link: https://aitutor.vip/f0 (Click Member Area ➔ Register to begin)'}
           </p>
         </div>
       </div>
@@ -256,11 +265,37 @@ export default function HuadryBeautySection() {
                 <h3 className="text-base sm:text-lg font-black text-[#831843] mb-2">
                   {isZh ? '免費註冊花緹官網會員' : 'Free Huadry Member Signup'}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3">
                   {isZh
-                    ? '點擊專屬推薦通道（https://aitutor.vip/f0）免費加入花緹生技官方會員！零入會費，立即解鎖官網商城選購權限與專屬美容學習資源。'
-                    : 'Click our official link (https://aitutor.vip/f0) to register as a Huadry member for FREE! Zero joining fee.'}
+                    ? '零入會費！若需加盟或選購體驗，請依以下操作步驟完成免費入會：'
+                    : 'Zero fee! Follow these simple steps to complete your free registration:'}
                 </p>
+                <div className="p-2.5 bg-pink-50/90 rounded-xl border border-pink-200 text-xs text-slate-700 space-y-1">
+                  <div className="flex items-start gap-1">
+                    <span className="text-[#c239b3] font-black">①</span>
+                    <span>{isZh ? '點擊下方按鈕前往花緹官網' : 'Open Huadry site via link below'}</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <span className="text-[#c239b3] font-black">②</span>
+                    <span>
+                      {isZh
+                        ? <>點選頁面上方 <strong className="text-[#831843]">「會員專區」</strong></>
+                        : <>Click <strong className="text-[#831843]">&quot;Member Area&quot;</strong> on top</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <span className="text-[#c239b3] font-black">③</span>
+                    <span>
+                      {isZh
+                        ? <>點擊 <strong className="text-[#831843]">「註冊」</strong> 填寫入會資料（$0 加入）</>
+                        : <>Click <strong className="text-[#831843]">&quot;Register&quot;</strong> &amp; submit free form</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <span className="text-[#c239b3] font-black">④</span>
+                    <span>{isZh ? '登入即解鎖商城優惠與培訓課程' : 'Login to shop &amp; access training!'}</span>
+                  </div>
+                </div>
               </div>
               <a
                 href="https://aitutor.vip/f0"
@@ -268,7 +303,7 @@ export default function HuadryBeautySection() {
                 rel="noopener noreferrer"
                 className="mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b9d] to-[#c239b3] text-white text-xs font-black text-center shadow hover:opacity-95 transition-all block"
               >
-                {isZh ? '👉 點此免費註冊花緹會員' : '👉 Free Signup (aitutor.vip/f0)'}
+                {isZh ? '👉 前往花緹・點「會員專區」➔「註冊」' : '👉 Huadry · Member Area ➔ Register'}
               </a>
             </div>
 
@@ -607,8 +642,8 @@ export default function HuadryBeautySection() {
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-2xl mx-auto">
                 {isZh
-                  ? '💡 什麼是 PV？PV = 批發積分點數 (Purchase Volume)。您自己購買體驗、進貨幫客戶試臉或推廣成交的訂單都會累積相應 PV，累計滿 28,000 PV 立即免費解鎖以下全套跨國 AI 美業武器：'
-                  : '💡 What is PV? PV = Purchase Volume points accumulated through your orders. Reach 28,000 PV to unlock all 5 privileges:'}
+                  ? '💡 若需加盟操作步驟：請先點擊推薦網址 (aitutor.vip/f0) 進入花緹官網 ➔ 點選「會員專區」➔ 點擊「註冊」填寫免費入會資料。PV = 批發積分點數，您自己購買體驗、進貨幫客戶試臉或推廣成交都會累積 PV，滿 28,000 PV 立即免費解鎖以下全套跨國 AI 美業武器：'
+                  : '💡 How to Join Franchise: Open Huadry (aitutor.vip/f0) ➔ Click "Member Area" ➔ "Register" for free. PV = Purchase Volume points accumulated through orders. Reach 28,000 PV to unlock all 5 privileges:'}
               </p>
             </div>
 
@@ -722,8 +757,8 @@ export default function HuadryBeautySection() {
             </h3>
             <p className="text-xs sm:text-sm text-pink-100 leading-relaxed mb-5">
               {isZh
-                ? '現在就透過下方第 1 步「免費註冊花緹官網會員」，接著可任選一瓶保養品自用/試臉累積積分，並搭配「斗內 $15 萬商全球協播 30 天」與「60天 AI Agent 純服務輔導」，讓全球客源主動找上門！'
-                : 'Step 1: Register your FREE Huadry account below. Step 2: Experience products & accumulate PV. Step 3: Sponsor $15 for 30-day global ad co-broadcasting + 60-day AI Agent coaching!'}
+                ? '現在就透過下方第 1 步進入花緹官網，點選頁面上方的「會員專區」➔「註冊」填寫免費入會資料；接著可任選保養品自用/試臉累積積分，並搭配「斗內 $15 萬商全球協播 30 天」與「60天 AI Agent 純服務輔導」，讓全球客源主動找上門！'
+                : 'Step 1: Open Huadry via link below, click "Member Area" ➔ "Register" for FREE signup. Step 2: Experience products & accumulate PV. Step 3: Sponsor $15 for 30-day global ad co-broadcasting + 60-day AI Agent coaching!'}
             </p>
 
             <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
@@ -733,7 +768,7 @@ export default function HuadryBeautySection() {
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#ffd700] hover:bg-[#ffed4e] text-[#831843] font-black text-sm md:text-base shadow-xl hover:scale-105 transition-all"
               >
-                {isZh ? '🌸 STEP 1：免費加入花緹會員 (aitutor.vip/f0)' : '🌸 STEP 1: Free Huadry Signup (aitutor.vip/f0)'}
+                {isZh ? '🌸 STEP 1：前往花緹點「會員專區」➔「註冊」入會' : '🌸 STEP 1: Join Huadry (Member Area ➔ Register)'}
               </a>
               <a
                 href="/sponsor"
