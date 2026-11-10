@@ -14,6 +14,17 @@ export default function RedeemPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [email, setEmail] = useState('');
   const [statusBanner, setStatusBanner] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [adAccountResult, setAdAccountResult] = useState<{
+    daysAdded: number;
+    alreadyRedeemed?: boolean;
+    planTier?: string;
+    maxAdSlots?: number;
+    weight?: number;
+    expiresAt?: string;
+    passwordCode?: string;
+    magicLoginUrl?: string;
+    email?: string;
+  } | null>(null);
   
   // 信用卡/Email 用戶核銷狀態
   const [fiatEmail, setFiatEmail] = useState('');
@@ -53,10 +64,18 @@ export default function RedeemPage() {
       const signature = await signMessageAsync({ message });
 
       const refCode = localStorage.getItem('weixiang_referrer');
+      const nftBalanceNum = balance ? Number(balance) : 1;
       const response = await fetch('/api/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: address, signature, message, email, refCode })
+        body: JSON.stringify({
+          walletAddress: address,
+          signature,
+          message,
+          email: email.trim().toLowerCase(),
+          refCode,
+          nftBalance: nftBalanceNum
+        })
       });
 
       const data = await response.json();
@@ -64,8 +83,22 @@ export default function RedeemPage() {
         throw new Error(data.error || 'API 請求失敗');
       }
 
-      setStatusBanner({ type: 'success', text: '🎉 開通成功！我們已發送一封「系統設定指南」到您的信箱，即將導向會員中心...' });
-      setTimeout(() => router.push('/dashboard'), 1200);
+      localStorage.setItem('weixiang_user_email', email.trim().toLowerCase());
+      if (data.adNetwork?.activated) {
+        setAdAccountResult({
+          ...data.adNetwork,
+          email: email.trim().toLowerCase()
+        });
+        setStatusBanner({
+          type: 'success',
+          text: data.adNetwork.alreadyRedeemed
+            ? `🎉 驗證成功！您的「萬商自助廣告系統」帳號已開通，可直接點擊下方按鈕進入設定廣告！`
+            : `🎉 領取成功！已依您的 NFT 憑證為您自動延長 +${data.adNetwork.daysAdded} 天「萬商自助廣告系統」使用權限（可上架 ${data.adNetwork.maxAdSlots || 2} 件廣告）！`
+        });
+      } else {
+        setStatusBanner({ type: 'success', text: '🎉 開通成功！我們已發送專屬開通信至您的信箱，即將導向會員中心...' });
+        setTimeout(() => router.push('/dashboard'), 1500);
+      }
       
     } catch (error: any) {
       console.error(error);
@@ -119,8 +152,21 @@ export default function RedeemPage() {
       localStorage.setItem('weixiang_user_email', cleanEmail);
       localStorage.setItem('weixiang_user_address', authData.userAddress);
 
-      setStatusBanner({ type: 'success', text: '🎉 兌換成功！已為您的帳號啟用 180 天 AI 自動來客產線，即將導向會員中心...' });
-      setTimeout(() => router.push('/dashboard'), 1200);
+      if (data.adNetwork?.activated) {
+        setAdAccountResult({
+          ...data.adNetwork,
+          email: cleanEmail
+        });
+        setStatusBanner({
+          type: 'success',
+          text: data.adNetwork.alreadyRedeemed
+            ? `🎉 驗證成功！您的「萬商自助廣告系統」帳號已開通，可直接點擊下方按鈕進入設定廣告！`
+            : `🎉 領取成功！已依您的 NFT 眾籌憑證自動延長 +${data.adNetwork.daysAdded} 天「萬商自助廣告系統」權限（可上架 ${data.adNetwork.maxAdSlots || 2} 件廣告）！`
+        });
+      } else {
+        setStatusBanner({ type: 'success', text: '🎉 兌換成功！已為您的帳號啟用 180 天 AI 自動來客產線，即將導向會員中心...' });
+        setTimeout(() => router.push('/dashboard'), 1500);
+      }
     } catch (err: any) {
       console.error(err);
       setStatusBanner({ type: 'error', text: '❌ 核銷失敗: ' + (err.message || '請確認您輸入的 Email 與付款時相同') });
@@ -148,9 +194,9 @@ export default function RedeemPage() {
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg shadow-purple-500/30">
             🎟️
           </div>
-          <h1 className="text-3xl font-black mb-3">VIP 權限兌換專區</h1>
-          <p className="text-sm text-gray-400 mb-6">
-            驗證您的微享憑證，正式啟動每枚 180 天的專屬 AI 影音與 SEO 來客產線
+          <h1 className="text-3xl font-black mb-3">VIP 權限領取 ＆ 萬商廣告開通專區</h1>
+          <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+            驗證您的微享 NFT 憑證，每 <strong className="text-amber-300">1 顆 NFT 立即延長 180 天</strong>「萬商自助廣告系統」全網百站協播權限（眾籌滿 <strong className="text-emerald-300">$888 / $2,700 / $6,000</strong> 自動解鎖高頻率與最多 5～30 件廣告槽位）！
           </p>
 
           {statusBanner && (
@@ -160,6 +206,38 @@ export default function RedeemPage() {
                 : 'bg-red-950/80 border-red-500/50 text-red-300'
             }`}>
               {statusBanner.text}
+            </div>
+          )}
+
+          {adAccountResult && (
+            <div className="mb-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-indigo-950 border-2 border-amber-400/80 text-left shadow-xl">
+              <div className="text-xs font-black text-amber-300 mb-1">
+                📢 萬商自助廣告協播系統・專屬通行證已生效
+              </div>
+              <div className="text-sm text-white space-y-1 mb-4">
+                <p>• 登入帳號：<code className="text-amber-300 font-bold">{adAccountResult.email}</code></p>
+                {adAccountResult.passwordCode && (
+                  <p>• 專屬密碼：<code className="text-amber-300 font-bold">{adAccountResult.passwordCode}</code></p>
+                )}
+                <p>• 方案權重與槽位：<strong className="text-emerald-300">{adAccountResult.weight || 3}x 優先輪播 ｜ 可上架 {adAccountResult.maxAdSlots || 2} 件廣告</strong></p>
+                {adAccountResult.expiresAt && (
+                  <p>• 有效期限至：<strong className="text-cyan-300">{adAccountResult.expiresAt.slice(0, 10)}</strong></p>
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <a
+                  href={adAccountResult.magicLoginUrl || '/ad-studio'}
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-xs sm:text-sm text-center shadow-lg hover:scale-[1.02] transition-all"
+                >
+                  🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
+                </a>
+                <Link
+                  href="/dashboard"
+                  className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm text-center transition-all"
+                >
+                  📊 前往會員中心
+                </Link>
+              </div>
             </div>
           )}
 
@@ -246,6 +324,38 @@ export default function RedeemPage() {
           </div>
         )}
 
+        {adAccountResult && (
+          <div className="mb-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-indigo-950 border-2 border-amber-400/80 text-left shadow-xl">
+            <div className="text-xs font-black text-amber-300 mb-1">
+              📢 萬商自助廣告協播系統・專屬通行證已生效
+            </div>
+            <div className="text-sm text-white space-y-1 mb-4">
+              <p>• 登入帳號：<code className="text-amber-300 font-bold">{adAccountResult.email}</code></p>
+              {adAccountResult.passwordCode && (
+                <p>• 專屬密碼：<code className="text-amber-300 font-bold">{adAccountResult.passwordCode}</code></p>
+              )}
+              <p>• 方案權重與槽位：<strong className="text-emerald-300">{adAccountResult.weight || 3}x 優先輪播 ｜ 可上架 {adAccountResult.maxAdSlots || 2} 件廣告</strong></p>
+              {adAccountResult.expiresAt && (
+                <p>• 有效期限至：<strong className="text-cyan-300">{adAccountResult.expiresAt.slice(0, 10)}</strong></p>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <a
+                href={adAccountResult.magicLoginUrl || '/ad-studio'}
+                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-xs sm:text-sm text-center shadow-lg hover:scale-[1.02] transition-all"
+              >
+                🚀 一鍵免密進入「萬商廣告後台」上架廣告 ➔
+              </a>
+              <Link
+                href="/dashboard"
+                className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm text-center transition-all"
+              >
+                📊 前往會員中心
+              </Link>
+            </div>
+          </div>
+        )}
+
         {isReadingBalance ? (
           <div className="text-xl text-yellow-400 animate-pulse py-8">正在掃描區塊鏈上的微享憑證...</div>
         ) : hasNFT ? (
@@ -254,12 +364,12 @@ export default function RedeemPage() {
               <span className="text-4xl block mb-2">✅</span>
               <h2 className="text-2xl font-bold text-green-400">驗證成功！</h2>
               <p className="text-green-200 mt-2">
-                您的錢包內持有 <strong>{balance?.toString()}</strong> 枚微享 NFT 憑證。
+                您的錢包內持有 <strong>{balance?.toString()}</strong> 枚微享 NFT 憑證（可領取延長 <strong>{Number(balance || 1) * 180} 天</strong> 萬商全網廣告協播權限）。
               </p>
             </div>
 
             <div className="text-left bg-gray-800/60 p-6 rounded-2xl border border-gray-700/60">
-              <label className="block text-sm font-medium text-gray-300 mb-2">請輸入您的業務聯絡信箱 (必填)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">請輸入您的業務聯絡信箱 (必填，作為萬商廣告系統登入帳號)</label>
               <input
                 type="email"
                 value={email}
@@ -268,7 +378,7 @@ export default function RedeemPage() {
                 className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-green-500 focus:outline-none"
                 required
               />
-              <p className="text-xs text-gray-500 mt-2">我們將自動發送「專屬 AI 自動來客矩陣需求表單」至此信箱。</p>
+              <p className="text-xs text-gray-400 mt-2">領取成功後，系統將 0 秒開通您的「萬商自助廣告系統 (/ad-studio)」並寄發專屬帳密與一鍵免密登入連結至此信箱。</p>
             </div>
 
             <button 
@@ -276,7 +386,7 @@ export default function RedeemPage() {
               disabled={isVerifying}
               className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 rounded-xl text-lg font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer"
             >
-              {isVerifying ? "開通中，請在錢包簽名確認..." : "簽名確認・立即啟用 180 天 AI 矩陣 🚀"}
+              {isVerifying ? "開通中，請在錢包簽名確認..." : `簽名確認・立即啟動 ${Number(balance || 1) * 180} 天萬商廣告系統 🚀`}
             </button>
           </div>
         ) : (

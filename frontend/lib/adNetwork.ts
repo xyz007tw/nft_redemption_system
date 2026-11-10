@@ -227,6 +227,7 @@ export interface SponsorAdvertiser {
   created_at: string;
   updated_at: string;
   expires_at: string; // ISO 時間戳，依天數精準計算，到期 0 秒自動斷電下架
+  redeemed_nft_keys?: string[]; // 已透過 NFT 領取/金流核銷入帳過之憑證識別碼，防止重複刷 180 天
   admin_notes?: string;
 }
 
@@ -611,11 +612,13 @@ export async function activateOrExtendSponsorAdAccount(params: {
   walletAddress?: string;
   explicitDaysToAdd?: number;
   explicitPlanTier?: AdPlanTier;
+  idempotencyKey?: string;
   adminNote?: string;
   sendWelcomeEmail?: boolean;
 }): Promise<{
   activated: boolean;
   daysAdded: number;
+  alreadyRedeemed?: boolean;
   advertiser?: SponsorAdvertiser;
   magicLoginUrl?: string;
 }> {
@@ -631,11 +634,11 @@ export async function activateOrExtendSponsorAdAccount(params: {
     daysToAdd = Math.round(params.explicitDaysToAdd);
     if (params.explicitPlanTier && AD_TIER_SPECS[params.explicitPlanTier]) {
       chosenSpec = AD_TIER_SPECS[params.explicitPlanTier];
-    } else if (Number(params.paidAmountUsdt || 0) >= 15) {
+    } else if (Number(params.paidAmountUsdt || 0) >= 888) {
       chosenSpec = resolveAdTierFromAmount(Number(params.paidAmountUsdt)).spec;
     } else if (daysToAdd >= 700) {
       chosenSpec = AD_TIER_SPECS.SUPREME_6000;
-    } else if (daysToAdd >= 240) {
+    } else if (daysToAdd >= 180) {
       chosenSpec = AD_TIER_SPECS.RESIDENT_120;
     } else {
       chosenSpec = AD_TIER_SPECS.SPARK_15;
@@ -653,12 +656,29 @@ export async function activateOrExtendSponsorAdAccount(params: {
 
   const store = await loadAdNetworkStore();
   const existing = store.advertisers[cleanEmail] ? enrichAdvertiserTierFields(store.advertisers[cleanEmail]) : undefined;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+
+  // 🔒 防重複刷天數安全鎖 (Idempotency Check)：若同一筆 NFT 領取/訂單已入帳過，直接回傳既有帳號與魔術連結，不重複加天數
+  if (params.idempotencyKey && existing && Array.isArray(existing.redeemed_nft_keys)) {
+    if (existing.redeemed_nft_keys.includes(params.idempotencyKey)) {
+      const magicToken = createAdMagicToken(cleanEmail);
+      const magicLoginUrl = `${siteUrl}/ad-studio?ad_token=${encodeURIComponent(magicToken)}`;
+      return {
+        activated: true,
+        daysAdded: 0,
+        alreadyRedeemed: true,
+        advertiser: existing,
+        magicLoginUrl
+      };
+    }
+  }
+
   const now = new Date();
   const currentExpMs = existing ? new Date(existing.expires_at).getTime() : 0;
   const baseMs = !isNaN(currentExpMs) && currentExpMs > now.getTime() ? currentExpMs : now.getTime();
   const newExpDate = new Date(baseMs + daysToAdd * 24 * 60 * 60 * 1000);
 
-  // 若累積斗內金額達到更高階門檻，自動晉升為對應高階方案 (例如累積滿 $888 / $2700 / $6000)
+  // 若累積斗內或眾籌金額達到更高階門檻，自動晉升為對應高階方案 (例如滿 $888 / $2700 / $6000)
   const newTotalSponsored = Number((existing?.total_sponsored_usdt || 0) + (params.paidAmountUsdt || 0));
   const cumulativeSpec = resolveAdTierFromAmount(newTotalSponsored).spec;
   const finalSpec =
@@ -669,7 +689,9 @@ export async function activateOrExtendSponsorAdAccount(params: {
       : getAdTierSpecByTier(existing?.plan_tier, existing?.weight);
 
   const passwordCode = existing?.password_code || generateAdPasswordCode(cleanEmail);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+  const nextRedeemedKeys = Array.from(
+    new Set([...(existing?.redeemed_nft_keys || []), ...(params.idempotencyKey ? [params.idempotencyKey] : [])])
+  );
 
   const updatedAdv: SponsorAdvertiser = existing
     ? enrichAdvertiserTierFields({
@@ -683,6 +705,7 @@ export async function activateOrExtendSponsorAdAccount(params: {
         total_sponsored_usdt: newTotalSponsored,
         updated_at: now.toISOString(),
         expires_at: newExpDate.toISOString(),
+        redeemed_nft_keys: nextRedeemedKeys,
         admin_notes: params.adminNote
           ? `${existing.admin_notes ? existing.admin_notes + ' | ' : ''}[${now.toISOString().slice(0, 10)}] ${params.adminNote} (${daysToAdd >= 0 ? '+' : ''}${daysToAdd}天, 等級:${finalSpec.tier})`
           : existing.admin_notes
@@ -719,6 +742,7 @@ export async function activateOrExtendSponsorAdAccount(params: {
         created_at: now.toISOString(),
         updated_at: now.toISOString(),
         expires_at: newExpDate.toISOString(),
+        redeemed_nft_keys: nextRedeemedKeys,
         admin_notes: params.adminNote || `首次開通 ${finalSpec.name_zh} (+${daysToAdd}天)`
       });
 
@@ -790,4 +814,48 @@ export async function activateOrExtendSponsorAdAccount(params: {
     advertiser: updatedAdv,
     magicLoginUrl
   };
+}
+
+/**
+ * 依據 NFT 眾籌憑證顆數與眾籌金額，0 秒開通或延長「萬商自助廣告系統」：
+ * - 每 1 顆 NFT 自動延長 180 天使用時間 (days = nftCount * 180)
+ * - 眾籌金額 >= $6,000 解鎖「👑 萬商至尊型 (SUPREME_6000: 50x 頻率、30 件廣告)」
+ * - 眾籌金額 >= $2,700 解鎖「💎 皇家霸屏型 (ROYAL_2700: 20x 頻率、12 件廣告)」
+ * - 眾籌金額 >= $888 解鎖「🥇 黃金聚客型 (GOLD_888: 8x 頻率、5 件廣告)」
+ * - 1~3 顆入門眾籌 ($99/$198) 解鎖「🔥 百站常駐型 (RESIDENT_120: 3x 頻率、2 件廣告)」
+ */
+export async function activateOrExtendNftCrowdfundAdAccount(params: {
+  email: string;
+  walletAddress?: string;
+  nftCount: number;
+  paidAmountUsdt: number;
+  idempotencyKey?: string;
+  adminNote?: string;
+  sendWelcomeEmail?: boolean;
+}) {
+  const safeCount = Math.max(1, Math.round(Number(params.nftCount) || 1));
+  const daysToAdd = safeCount * 180;
+  const amt = Number(params.paidAmountUsdt || safeCount * 99);
+
+  let tier: AdPlanTier = 'RESIDENT_120';
+  if (amt >= 6000) {
+    tier = 'SUPREME_6000';
+  } else if (amt >= 2700) {
+    tier = 'ROYAL_2700';
+  } else if (amt >= 888) {
+    tier = 'GOLD_888';
+  } else {
+    tier = 'RESIDENT_120';
+  }
+
+  return activateOrExtendSponsorAdAccount({
+    email: params.email,
+    paidAmountUsdt: amt,
+    walletAddress: params.walletAddress,
+    explicitDaysToAdd: daysToAdd,
+    explicitPlanTier: tier,
+    idempotencyKey: params.idempotencyKey,
+    adminNote: params.adminNote || `NFT 眾籌憑證領取 (${safeCount} 顆 × 180天 = +${daysToAdd}天, $${amt} USDT)`,
+    sendWelcomeEmail: params.sendWelcomeEmail
+  });
 }

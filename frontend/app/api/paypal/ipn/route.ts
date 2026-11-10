@@ -215,6 +215,34 @@ export async function POST(req: Request) {
           console.error('[PayPal IPN] AdNetwork activation error:', adErr);
         }
       }
+    } else if (productType === 'NFT_REDEEM' || [1, 2, 3, 4, 5].includes(Number(packageId))) {
+      if (email && email.includes('@')) {
+        try {
+          const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
+          const nftCnt =
+            priceUsdt >= 12000
+              ? 360
+              : priceUsdt >= 5400
+              ? 108
+              : priceUsdt >= 1788
+              ? 30
+              : priceUsdt >= 198
+              ? 3
+              : 1;
+          const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${packageId}_CNT${nftCnt}`;
+          await activateOrExtendNftCrowdfundAdAccount({
+            email,
+            walletAddress,
+            nftCount: nftCnt,
+            paidAmountUsdt: priceUsdt,
+            idempotencyKey: idemKey,
+            adminNote: `PayPal 眾籌憑證開通 (${nftCnt}顆 × 180天, $${priceUsdt} USD)`,
+            sendWelcomeEmail: true
+          });
+        } catch (nftAdErr) {
+          console.error('[PayPal IPN] NFT AdNetwork activation error:', nftAdErr);
+        }
+      }
     } else if (email && email.includes('@')) {
       try {
         console.log(`[PayPal IPN] Auto enrolling user ${email} into package ${pkgNumericId}...`);

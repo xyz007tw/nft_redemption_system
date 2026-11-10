@@ -240,6 +240,37 @@ export async function POST(req: Request) {
           <br/>
           <p>微享 AI 團隊 敬上</p>
         `;
+      } else {
+        // 🚀 NFT 眾籌憑證方案：付款成功即刻依「每 1 顆 NFT 延長 180 天」與「滿 $888 / $2700 / $6000」自動開通萬商廣告系統！
+        try {
+          const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
+          const nftCnt =
+            Number(pkgData?.amount) ||
+            (packagePriceUSDT >= 12000
+              ? 360
+              : packagePriceUSDT >= 5400
+              ? 108
+              : packagePriceUSDT >= 1788
+              ? 30
+              : packagePriceUSDT >= 198
+              ? 3
+              : 1);
+          const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${packageId}_CNT${nftCnt}`;
+          const nftAdRes = await activateOrExtendNftCrowdfundAdAccount({
+            email,
+            walletAddress,
+            nftCount: nftCnt,
+            paidAmountUsdt: packagePriceUSDT,
+            idempotencyKey: idemKey,
+            adminNote: `PayUni 眾籌憑證付款開通 (${pkgData?.name_zh || `Pkg#${packageId}`}, ${nftCnt}顆 × 180天)`,
+            sendWelcomeEmail: true
+          });
+          if (nftAdRes.activated) {
+            clientEmailHandled = true;
+          }
+        } catch (nftAdErr) {
+          console.error('[PayUni Callback] NFT AdNetwork activation error:', nftAdErr);
+        }
       }
 
       const orderCategoryLabel =

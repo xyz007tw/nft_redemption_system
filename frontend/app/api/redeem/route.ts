@@ -16,7 +16,7 @@ const NFT_PRICE = 99; // USDT
 
 export async function POST(req: Request) {
   try {
-    const { walletAddress, signature, message, email, refCode } = await req.json();
+    const { walletAddress, signature, message, email, refCode, nftBalance } = await req.json();
 
     if (!walletAddress) {
       return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
@@ -74,7 +74,8 @@ export async function POST(req: Request) {
     let courseLink = '';
     let pkgName = 'AI 生產力憑證 / 頂配教材';
     let pkgPrice = NFT_PRICE;
-    let purchasedPkgId = 101;
+    let pkgAmount = Math.max(1, Number(nftBalance) || 1);
+    let purchasedPkgId = 1;
 
     if (userData && userData.last_purchased_package) {
       purchasedPkgId = normalizeCoursePkgId(Number(userData.last_purchased_package));
@@ -91,7 +92,26 @@ export async function POST(req: Request) {
         courseLink = pkgData.course_link || '';
         pkgName = pkgData.name_zh || pkgName;
         pkgPrice = Number(pkgData.price) || NFT_PRICE;
+        const dbAmount = Number(pkgData.amount) || 0;
+        if (dbAmount > 0) {
+          pkgAmount = Math.max(pkgAmount, dbAmount);
+        } else if (pkgPrice >= 12000) {
+          pkgAmount = Math.max(pkgAmount, 360);
+        } else if (pkgPrice >= 5400) {
+          pkgAmount = Math.max(pkgAmount, 108);
+        } else if (pkgPrice >= 1788) {
+          pkgAmount = Math.max(pkgAmount, 30);
+        } else if (pkgPrice >= 198) {
+          pkgAmount = Math.max(pkgAmount, 3);
+        }
       }
+    } else if (pkgAmount > 1) {
+      // 若為純鏈上 Web3 持有者且帶有多枚 NFT，自動估算對應眾籌價值
+      if (pkgAmount >= 360) pkgPrice = 12000;
+      else if (pkgAmount >= 108) pkgPrice = 5400;
+      else if (pkgAmount >= 30) pkgPrice = 1788;
+      else if (pkgAmount >= 3) pkgPrice = 198;
+      else pkgPrice = pkgAmount * NFT_PRICE;
     }
 
     // 🔒 防重複入帳保護：若金流回呼 (PayUni) 或先前核銷已將 has_purchased 標記為 true，
@@ -102,6 +122,28 @@ export async function POST(req: Request) {
     } else {
       // 首次 Web3 核銷或尚未計算分潤者，執行一次性 25% 聯盟分潤
       referrerAddress = await processAffiliateCommissions(walletAddress, refCode, pkgPrice, productType);
+    }
+
+    // 📢 【核心升級】當客戶於 /redeem 領取 NFT 眾籌憑證時，0 秒自動啟動「萬商自助廣告系統」：
+    // - 每 1 顆 NFT 延長 180 天使用時間 (days = pkgAmount * 180)
+    // - 眾籌金額滿 $888 / $2700 / $6000 自動開通對應高階權限 (GOLD_888 / ROYAL_2700 / SUPREME_6000)
+    let nftAdActivationResult: any = null;
+    if (email && email.includes('@') && (!productType || productType === 'NFT_REDEEM')) {
+      try {
+        const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
+        const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${userData?.last_purchased_package || 1}_CNT${pkgAmount}`;
+        nftAdActivationResult = await activateOrExtendNftCrowdfundAdAccount({
+          email,
+          walletAddress,
+          nftCount: pkgAmount,
+          paidAmountUsdt: pkgPrice,
+          idempotencyKey: idemKey,
+          adminNote: `VIP 專區領取 NFT 憑證 (${pkgName}, ${pkgAmount} 顆 × 180天)`,
+          sendWelcomeEmail: true
+        });
+      } catch (nftAdErr) {
+        console.error('[Redeem] Error activating NFT Ad Network account:', nftAdErr);
+      }
     }
 
     // ==========================================
@@ -133,7 +175,7 @@ export async function POST(req: Request) {
           <p>WeiXiang AI 總指揮中心 敬上</p>
       `;
 
-      let clientEmailHandled = false;
+      let clientEmailHandled = Boolean(nftAdActivationResult?.activated && !nftAdActivationResult?.alreadyRedeemed);
       if (productType === 'DIRECT_COURSE') {
         try {
           const web3TxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
@@ -259,8 +301,21 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Redemption successful, commissions calculated, and emails sent (if configured).',
-      referrerFound: !!referrerAddress
+      message: 'Redemption successful, commissions calculated, and Ad Network activated.',
+      referrerFound: !!referrerAddress,
+      adNetwork: nftAdActivationResult
+        ? {
+            activated: nftAdActivationResult.activated,
+            daysAdded: nftAdActivationResult.daysAdded,
+            alreadyRedeemed: nftAdActivationResult.alreadyRedeemed,
+            planTier: nftAdActivationResult.advertiser?.plan_tier,
+            maxAdSlots: nftAdActivationResult.advertiser?.max_ad_slots,
+            weight: nftAdActivationResult.advertiser?.weight,
+            expiresAt: nftAdActivationResult.advertiser?.expires_at,
+            passwordCode: nftAdActivationResult.advertiser?.password_code,
+            magicLoginUrl: nftAdActivationResult.magicLoginUrl
+          }
+        : null
     });
 
   } catch (error: any) {
