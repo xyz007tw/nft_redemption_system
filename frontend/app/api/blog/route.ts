@@ -34,11 +34,33 @@ async function generateBlogWithModelPatrol(prompt: string) {
   throw lastErr;
 }
 
+async function notifyIndexNowForBlogSlug(slug: string) {
+  const key = '4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d';
+  const postUrl = `https://nft1314.party/blog/${slug}`;
+  try {
+    await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'nft1314.party',
+        key,
+        keyLocation: `https://nft1314.party/${key}.txt`,
+        urlList: [postUrl, 'https://nft1314.party/blog'],
+      }),
+      signal: AbortSignal.timeout(4000),
+    });
+  } catch {
+    // Non-blocking best-effort notification
+  }
+}
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
     const slug = searchParams.get('slug');
+    const summaryMode = searchParams.get('summary') === '1';
+    const limitParam = parseInt(searchParams.get('limit') || '0', 10);
 
     const allPosts = await loadAllBlogPosts();
 
@@ -55,11 +77,40 @@ export async function GET(req: Request) {
         ? allPosts.filter((p) => p.category_id === category)
         : allPosts;
 
+    const sliced = limitParam > 0 ? filtered.slice(0, limitParam) : filtered;
+
+    if (summaryMode) {
+      const compactPosts = sliced.map((p) => {
+        const titleMap: Record<string, string> = {};
+        if (p.translations) {
+          for (const [k, v] of Object.entries(p.translations)) {
+            if (v && typeof v === 'object' && 'title' in v && v.title) {
+              titleMap[k] = String(v.title);
+            }
+          }
+        }
+        return {
+          slug: p.slug,
+          category_id: p.category_id,
+          published_at: p.published_at,
+          title_zh: p.title_zh,
+          title_en: p.title_en,
+          target_section_href: p.target_section_href,
+          titles: titleMap,
+        };
+      });
+      return NextResponse.json({
+        success: true,
+        total: filtered.length,
+        posts: compactPosts,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       total: filtered.length,
       categories: BLOG_CATEGORIES,
-      posts: filtered,
+      posts: sliced,
     });
   } catch (err: any) {
     return NextResponse.json(
@@ -85,6 +136,7 @@ export async function POST(req: Request) {
       }
 
       const updatedPosts = await saveDailyBlogPost(post);
+      await notifyIndexNowForBlogSlug(post.slug);
       return NextResponse.json({
         success: true,
         message: `Published SEO blogger post: ${post.slug}`,
@@ -169,6 +221,7 @@ export async function POST(req: Request) {
       const { text, usedModel } = await generateBlogWithModelPatrol(prompt);
       const generatedPost: BlogPost = JSON.parse(text);
       const updatedPosts = await saveDailyBlogPost(generatedPost);
+      await notifyIndexNowForBlogSlug(generatedPost.slug);
 
       return NextResponse.json({
         success: true,
