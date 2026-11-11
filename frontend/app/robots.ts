@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: ['/', '/blog', '/blog/*', '/ebook-store', '/sponsor'],
+      allow: ['/', '/blog', '/blog/*', '/ebook-store', '/sponsor', '/studio', '/sitemap.xml'],
       disallow: ['/admin', '/api/admin'],
     },
     sitemap: 'https://nft1314.party/sitemap.xml',

@@ -15,7 +15,15 @@ export interface BlogCloudStore {
   updated_at: string;
 }
 
-export async function loadAllBlogPosts(): Promise<BlogPost[]> {
+const CACHE_TTL_MS = 120 * 1000;
+let cachedPosts: BlogPost[] | null = null;
+let cachedAt = 0;
+
+export async function loadAllBlogPosts(bypassCache = false): Promise<BlogPost[]> {
+  if (!bypassCache && cachedPosts && Date.now() - cachedAt < CACHE_TTL_MS) {
+    return cachedPosts;
+  }
+
   let customPosts: BlogPost[] = [];
   try {
     const { data, error } = await supabase
@@ -47,9 +55,12 @@ export async function loadAllBlogPosts(): Promise<BlogPost[]> {
     }
   }
 
-  return Array.from(map.values()).sort((a, b) =>
+  const sorted = Array.from(map.values()).sort((a, b) =>
     (b.published_at || '').localeCompare(a.published_at || '')
   );
+  cachedPosts = sorted;
+  cachedAt = Date.now();
+  return sorted;
 }
 
 export async function saveDailyBlogPost(newPost: BlogPost): Promise<BlogPost[]> {
@@ -98,5 +109,7 @@ export async function saveDailyBlogPost(newPost: BlogPost): Promise<BlogPost[]> 
     console.error('[BlogStore] Failed to save daily blog post to Supabase:', e);
   }
 
-  return loadAllBlogPosts();
+  cachedPosts = null;
+  cachedAt = 0;
+  return loadAllBlogPosts(true);
 }
