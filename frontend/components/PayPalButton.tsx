@@ -36,6 +36,10 @@ export default function PayPalButton({ packageId, priceInUSDT, productType, prod
 
     setIsProcessing(true);
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      try {
+        localStorage.setItem('weixiang_user_email', cleanEmail);
+      } catch {}
       const refCode = typeof window !== 'undefined' ? (localStorage.getItem('weixiang_referrer') || '') : '';
       const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://nft1314.party';
 
@@ -44,7 +48,7 @@ export default function PayPalButton({ packageId, priceInUSDT, productType, prod
         packageId,
         productType || 'DIRECT_COURSE',
         priceInUSDT,
-        email.trim().toLowerCase(),
+        cleanEmail,
         refCode,
         address || '',
         bookId || ''
@@ -69,7 +73,7 @@ export default function PayPalButton({ packageId, priceInUSDT, productType, prod
         no_note: '1',
         charset: 'utf-8',
         custom: customPayload,
-        return: `${siteUrl}/api/paypal/success?pkg=${packageId}&email=${encodeURIComponent(email.trim().toLowerCase())}`,
+        return: `${siteUrl}/api/paypal/success?pkg=${packageId}&email=${encodeURIComponent(cleanEmail)}${bookId ? `&book=${encodeURIComponent(bookId)}` : ''}`,
         cancel_return: `${siteUrl}/#tutor-courses`,
         notify_url: `${siteUrl}/api/paypal/ipn`
       };

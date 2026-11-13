@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import type { VipSignedDownloadLinks } from './vipLinks';
+export type { VipSignedDownloadLinks, VipDownloadLinkItem } from './vipLinks';
+export { toDownloadLinkItems } from './vipLinks';
 
 export const COURSE_NAMES: Record<number, string> = {
   100: '🏆 全套 10 門課 VIP 終身旗艦合輯（贈 2 枚微享 NFT 憑證）',
@@ -47,6 +50,7 @@ export interface EnrollResult {
   course_url: string;
   course_id: number;
   user_id?: number;
+  download_links?: VipSignedDownloadLinks;
 }
 
 function escapeHtml(str: string): string {
@@ -69,7 +73,17 @@ export async function autoEnrollVipStudent(email: string, pkgId: number, txnId: 
       txn_id: String(txnId)
     });
 
-    const vipSecret = process.env.VIP_API_SECRET || 'vip_sec_2026_xyz007';
+    const vipSecret = (process.env.VIP_API_SECRET || '').trim();
+    if (!vipSecret) {
+      console.error('[VIP Auto-Enroll] VIP_API_SECRET environment variable is missing.');
+      return {
+        success: false,
+        magic_login_url: 'https://vip.5208.uk/dashboard/',
+        course_url: 'https://vip.5208.uk',
+        course_id: 0
+      };
+    }
+
     const resp = await fetch('https://vip.5208.uk/wp-json/vip/v1/auto-enroll', {
       method: 'POST',
       headers: {
@@ -97,7 +111,8 @@ export async function autoEnrollVipStudent(email: string, pkgId: number, txnId: 
       magic_login_url: data.magic_login_url || 'https://vip.5208.uk/dashboard/',
       course_url: data.course_url || 'https://vip.5208.uk',
       course_id: data.course_id || 0,
-      user_id: data.user_id
+      user_id: data.user_id,
+      download_links: data.download_links
     };
   } catch (error) {
     console.error('[VIP Auto-Enroll] Network error calling VIP Academy API:', error);
@@ -118,6 +133,7 @@ export async function sendVipCourseWelcomeEmail(options: {
   pkgId: number;
   txnId: string;
   magicLoginUrl: string;
+  downloadLinks?: Partial<VipSignedDownloadLinks>;
   courseName?: string;
   priceUsdt?: number;
 }): Promise<boolean> {
@@ -134,13 +150,13 @@ export async function sendVipCourseWelcomeEmail(options: {
   const safeEmail = escapeHtml(email);
   const safeTxnId = escapeHtml(txnId);
 
-  const downloadLinks = {
-    zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_zh_tw.pdf`,
-    zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_zh_cn.pdf`,
-    en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_en.pdf`,
-    ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_ja.pdf`,
-    code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}_source_code.zip`,
-    interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${normalizedPkgId}/master_bilingual.html`
+  const downloadLinks: VipSignedDownloadLinks = {
+    zh_tw: options.downloadLinks?.zh_tw || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_zh_tw.pdf`,
+    zh_cn: options.downloadLinks?.zh_cn || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_zh_cn.pdf`,
+    en: options.downloadLinks?.en || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_en.pdf`,
+    ja: options.downloadLinks?.ja || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_ja.pdf`,
+    code_zip: options.downloadLinks?.code_zip || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_source_code.zip`,
+    interactive_html: options.downloadLinks?.interactive_html || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}/master_bilingual.html`
   };
 
   const transporter = nodemailer.createTransport({

@@ -509,9 +509,10 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
   // 取得當前書籍的在地化標題與副標題
   const currentLoc = getEBookLocalizedContent(currentBook, targetLangCode);
 
-  // 驗證讀者信箱解鎖閱讀與下載
-  const handleVerifyReader = () => {
-    if (!verifyEmail || !verifyEmail.includes('@')) {
+  // 驗證讀者信箱解鎖閱讀與下載 (連線後端真實查核購買紀錄)
+  const handleVerifyReader = async () => {
+    const cleanEmail = verifyEmail.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
       setVerifyResult({
         success: false,
         msg: lang === 'ja-JP'
@@ -523,19 +524,63 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
       return;
     }
 
-    const r2Url =
-      currentBook.r2_published_urls?.primary_url ||
-      `https://1.5208.uk/ebooks/${currentBook.id}/master_bilingual.html`;
+    try {
+      const res = await fetch(
+        `/api/ebook?readerEmail=${encodeURIComponent(cleanEmail)}&bookId=${encodeURIComponent(currentBook.id)}`
+      );
+      const data = await res.json();
+      const unlocked: string[] = Array.isArray(data?.unlockedBooks) ? data.unlockedBooks : [];
+      const sigs: Record<string, string> =
+        data?.readerSigs && typeof data.readerSigs === 'object' ? data.readerSigs : {};
+      const hasAccess = unlocked.includes('ALL_VIP') || unlocked.includes(currentBook.id);
+      const sig = sigs[currentBook.id] || sigs['ALL_VIP'] || '';
 
-    setVerifyResult({
-      success: true,
-      msg: lang === 'ja-JP'
-        ? `✅ 認証成功！《${currentLoc.title}》の専用セキュア閲覧権限が解除されました！`
-        : lang.includes('zh')
-        ? `✅ 驗證成功！已解鎖《${currentLoc.title}》專屬防盜版閱讀授權！`
-        : `✅ Verified! Access granted to "${currentLoc.title}".`,
-      r2Url
-    });
+      if (data?.success && hasAccess && sig) {
+        try {
+          localStorage.setItem('weixiang_user_email', cleanEmail);
+        } catch {}
+        const targetMode =
+          lang === 'zh-TW'
+            ? 'ZH_TW'
+            : lang === 'zh-CN'
+            ? 'ZH_CN'
+            : lang === 'ja-JP'
+            ? 'JA'
+            : lang === 'vi-VN'
+            ? 'VI'
+            : lang === 'id-ID'
+            ? 'ID'
+            : lang === 'en-US'
+            ? 'EN'
+            : 'BILINGUAL';
+        const secureReaderUrl = `/api/ebook/reader?book=${encodeURIComponent(currentBook.id)}&email=${encodeURIComponent(cleanEmail)}&sig=${encodeURIComponent(sig)}&mode=${targetMode}`;
+        setVerifyResult({
+          success: true,
+          msg: lang === 'ja-JP'
+            ? `✅ 認証成功！《${currentLoc.title}》の専用セキュア閲覧・ダウンロード権限が解除されました！`
+            : lang.includes('zh')
+            ? `✅ 驗證成功！已解鎖《${currentLoc.title}》專屬防盜版閱讀與浮水印 PDF 下載授權！`
+            : `✅ Verified! Access granted to "${currentLoc.title}".`,
+          r2Url: secureReaderUrl
+        });
+      } else {
+        setVerifyResult({
+          success: false,
+          msg: lang === 'ja-JP'
+            ? '❌ このメールアドレスでの購入記録が見つかりません。先にご購入手続きを完了してください。'
+            : lang.includes('zh')
+            ? '❌ 查無此信箱的購買紀錄，請先完成上方購書結帳或確認輸入正確結帳信箱！'
+            : '❌ No paid purchase found for this email. Please complete checkout above or verify your email.'
+        });
+      }
+    } catch {
+      setVerifyResult({
+        success: false,
+        msg: lang.includes('zh')
+          ? '⚠️ 驗證伺服器連線異常，請稍後再試。'
+          : '⚠️ Verification service unavailable. Please try again.'
+      });
+    }
   };
 
   // 模擬讀者下單結算（體驗 10% 倒抵與 25% 聯盟分潤）
@@ -928,9 +973,20 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                           className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-left"
                         >
                           <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span className="px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 text-[10px] font-black">
-                              CHAPTER 0{idx + 1}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 text-[10px] font-black">
+                                CHAPTER 0{idx + 1}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  idx === 0 || verifyResult?.success
+                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                }`}
+                              >
+                                {idx === 0 ? '📖 免費試閱' : verifyResult?.success ? '🔓 已解鎖' : '🔒 購書解鎖全文'}
+                              </span>
+                            </div>
                             {ch.image_caption && (
                               <span className="text-[10px] text-cyan-300 font-bold truncate max-w-[200px]">
                                 📷 {ch.image_caption}
@@ -968,16 +1024,9 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                     <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
                       <span>🔓</span> {t.unlockLabel}
                     </span>
-                    {currentBook.r2_published_urls?.primary_url && (
-                      <a
-                        href={currentBook.r2_published_urls.primary_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[11px] text-cyan-400 hover:underline font-bold"
-                      >
-                        {t.previewMasterLink}
-                      </a>
-                    )}
+                    <span className="text-[11px] text-amber-300/90 font-bold">
+                      🔒 {lang.includes('zh') ? '完整閱讀與浮水印 PDF 將於購書驗證後解鎖' : 'Full reader & watermarked PDF unlock after checkout verification'}
+                    </span>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -1009,8 +1058,16 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                           >
                             {t.openR2Reader}
                           </a>
+                          <a
+                            href={`${verifyResult.r2Url}${verifyResult.r2Url.includes('?') ? '&' : '?'}print=1`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-black text-xs hover:bg-cyan-400 transition-all"
+                          >
+                            🖨️ 匯出浮水印 PDF
+                          </a>
                           <Link
-                            href="/ebook-store"
+                            href={`/ebook-store?book=${encodeURIComponent(currentBook.id)}&email=${encodeURIComponent(verifyEmail.trim().toLowerCase())}${verifyResult.r2Url.includes('sig=') ? `&sig=${encodeURIComponent(new URLSearchParams(verifyResult.r2Url.split('?')[1] || '').get('sig') || '')}` : ''}`}
                             className="px-3 py-1.5 rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition-all"
                           >
                             {t.gotoBookshelf}

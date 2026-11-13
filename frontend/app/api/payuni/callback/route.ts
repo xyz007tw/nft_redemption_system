@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     const rawCustom3 = String(decryptedInfo.CustomField3 || '');
     const [parsedPkgId, parsedProductType, parsedPriceUsdt, parsedBookId] = rawCustom3.split('|');
     const packageId = parsedPkgId || rawCustom3;
-    const email = decryptedInfo.BuyerMail; // PayUni standard field
+    const email = (decryptedInfo.BuyerMail || decryptedInfo.UsrMail || '').trim();
 
     if (!walletAddress || !walletAddress.startsWith('0x')) {
       const crypto = await import('crypto');
@@ -78,10 +78,10 @@ export async function POST(req: Request) {
     const maxAllowedUsdt = Math.max(1, Math.ceil(actualPaidTwd / 28)); // 給予匯率寬容上限 (約 1 USDT = 28~33 TWD)
 
     const BUILTIN_PRICES: Record<number, number> = {
-      100: 198, 101: 99, 102: 79, 103: 59, 104: 59, 105: 79,
-      106: 79, 107: 29, 108: 39, 109: 29, 110: 59,
-      9: 99, 25: 79, 30: 59, 35: 59, 40: 79,
-      45: 79, 50: 29, 55: 39, 60: 29, 65: 59
+      100: 198, 101: 39, 102: 39, 103: 39, 104: 49, 105: 59,
+      106: 49, 107: 29, 108: 39, 109: 29, 110: 59,
+      9: 39, 25: 39, 30: 39, 35: 49, 40: 59,
+      45: 49, 50: 29, 55: 39, 60: 29, 65: 59
     };
 
     const numPkgId = Number(packageId);
@@ -145,7 +145,130 @@ export async function POST(req: Request) {
       email: email || null
     }).eq('wallet_address', walletAddress);
 
-    // 2. Send emails
+    // 2. Unconditionally fulfill paid order FIRST (never gate DB/VIP classroom/eBook unlock behind SMTP env availability)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+    let emailSubject = "🎉 【WeiXiang AI】信用卡付款成功！請查看系統開通與後台登入資訊";
+    let emailHtml = `
+        <h2>親愛的投資人/贊助者，恭喜您成功購買 AI 生產力憑證！</h2>
+        <p>您的款項已確認完畢。系統已為您開通專屬會員權限與 AI 服務配額。</p>
+        <br/>
+        <div style="background:#f4f4f5; padding: 16px; border-radius: 8px;">
+          <h3>📊 【如何進入會員數據後台？】</h3>
+          <p>請前往 <a href="${siteUrl}/dashboard" style="color:#2563eb; font-weight:bold;">會員中心 (Dashboard)</a>，輸入您的信箱 <strong>${email}</strong> 即可免密碼快速登入，領取專屬推廣碼並查看 25% 業務分潤！</p>
+          <br/>
+          <h3>🎟️ 【如何啟用 AI 來客矩陣？】</h3>
+          <p>請前往 <a href="${siteUrl}/redeem" style="color:#2563eb; font-weight:bold;">VIP 兌換專區 (Redeem)</a> 開通您的專屬 AI 影音與 SEO 文章產線（每枚享 180 天服務）。</p>
+        </div>
+        <br>
+        <p>感謝您的參與，讓我們一起掌握未來的定價權！</p>
+        <p>微享 AI 團隊 敬上</p>
+    `;
+
+    let clientEmailHandled = false;
+    let directEnrollResult: Awaited<ReturnType<typeof autoEnrollVipStudent>> | null = null;
+    const isEbookOrder = pkgData?.product_type === 'EBOOK_PURCHASE' || Number(packageId) === 991 || Number(packageId) === 992;
+
+    if (pkgData?.product_type === 'DIRECT_COURSE') {
+      if (email) {
+        try {
+          const normPkgId = normalizeCoursePkgId(Number(packageId));
+          directEnrollResult = await autoEnrollVipStudent(email, normPkgId, tradeKey);
+        } catch (enrollErr) {
+          console.error('[PayUni Callback] Error in VIP auto-enroll:', enrollErr);
+        }
+      }
+    } else if (isEbookOrder) {
+      try {
+        const { settleRealEBookPurchase } = await import('@/lib/ebookSettlement');
+        const ebookSettle = await settleRealEBookPurchase({
+          bookId: parsedBookId || 'ebook-demo-001',
+          amountUsdt: packagePriceUSDT,
+          readerEmail: email || undefined
+        });
+        const bookTitle = ebookSettle?.book?.title_zh || pkgData?.name_zh || '精裝雙語電子書';
+        const targetBookId = encodeURIComponent(parsedBookId || 'ebook-demo-001');
+        const readerUrl =
+          ebookSettle?.readerUrl ||
+          `${siteUrl}/ebook-store?book=${targetBookId}`;
+        const storeUrl =
+          ebookSettle?.storeUrl ||
+          `${siteUrl}/ebook-store?book=${targetBookId}`;
+        emailSubject = `📖 【WeiXiang AI】電子書購買成功！《${bookTitle}》專屬防盜版閱讀與下載通行證`;
+        emailHtml = `
+          <div style="font-family: sans-serif; max-width: 640px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
+            <h2 style="color: #0f172a; margin-top: 0;">🎉 恭喜您成功解鎖《${bookTitle}》！</h2>
+            <p>您的款項（$${packagePriceUSDT} USDT）已確認收訖，系統已完成加盟商 10% 抽佣抵用金倒抵與 25% 聯盟分潤結算，並為您的信箱 <strong>${email}</strong> 開通永久閱讀與下載授權：</p>
+            <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin: 18px 0; border: 1px solid #cbd5e1;">
+              <p style="margin: 0 0 12px; font-weight: bold; color: #1e293b;">📥 一鍵進入閱讀與下載精裝 PDF：</p>
+              <p style="margin: 8px 0;"><a href="${readerUrl}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬浮水印雙語互動閱讀器</a></p>
+              <p style="margin: 8px 0;"><a href="${storeUrl}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃一鍵驗證與下載 PDF</a></p>
+            </div>
+            <p style="font-size: 13px; color: #64748b;">微享 AI-ATM 全球知識自動販賣機 敬上</p>
+          </div>
+        `;
+      } catch (ebErr) {
+        console.error('[PayUni Callback] Error in EBook settlement:', ebErr);
+      }
+    } else if (pkgData?.product_type === 'SPONSOR') {
+      if (email) {
+        try {
+          const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');
+          const adRes = await activateOrExtendSponsorAdAccount({
+            email,
+            paidAmountUsdt: packagePriceUSDT,
+            walletAddress,
+            adminNote: `PayUni 斗內贊助 ($${packagePriceUSDT} USDT)`,
+            sendWelcomeEmail: Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS)
+          });
+          if (adRes.activated) {
+            clientEmailHandled = true;
+          }
+        } catch (adErr) {
+          console.error('[PayUni Callback] AdNetwork activation error:', adErr);
+        }
+      }
+      emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
+      emailHtml = `
+        <h2>親愛的贊助者，衷心感謝您對微享 AI 團隊的支持與贊助！</h2>
+        <p>您的贊助款項（${pkgData.name_zh || '斗內贊助方案'}）已確認收訖，並已 100% 計入您個人的級差升等累積業績。</p>
+        <p>因為有您的支持，我們將持續研發更強大的 AI 自動化工具回饋社群！</p>
+        <br/>
+        <p>微享 AI 團隊 敬上</p>
+      `;
+    } else if (email) {
+      // 🚀 NFT 眾籌憑證方案：付款成功即刻依「每 1 顆 NFT 延長 180 天」與「滿 $888 / $2700 / $6000」自動開通萬商廣告系統！
+      try {
+        const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
+        const nftCnt =
+          Number(pkgData?.amount) ||
+          (packagePriceUSDT >= 12000
+            ? 360
+            : packagePriceUSDT >= 5400
+            ? 108
+            : packagePriceUSDT >= 1788
+            ? 30
+            : packagePriceUSDT >= 198
+            ? 3
+            : 1);
+        const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${packageId}_CNT${nftCnt}`;
+        const nftAdRes = await activateOrExtendNftCrowdfundAdAccount({
+          email,
+          walletAddress,
+          nftCount: nftCnt,
+          paidAmountUsdt: packagePriceUSDT,
+          idempotencyKey: idemKey,
+          adminNote: `PayUni 眾籌憑證付款開通 (${pkgData?.name_zh || `Pkg#${packageId}`}, ${nftCnt}顆 × 180天)`,
+          sendWelcomeEmail: Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS)
+        });
+        if (nftAdRes.activated) {
+          clientEmailHandled = true;
+        }
+      } catch (nftAdErr) {
+        console.error('[PayUni Callback] NFT AdNetwork activation error:', nftAdErr);
+      }
+    }
+
+    // 3. Send welcome / admin notification emails when SMTP credentials exist
     if (email && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -155,127 +278,29 @@ export async function POST(req: Request) {
         },
       });
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
-      let emailSubject = "🎉 【WeiXiang AI】信用卡付款成功！請查看系統開通與後台登入資訊";
-      let emailHtml = `
-          <h2>親愛的投資人/贊助者，恭喜您成功購買 AI 生產力憑證！</h2>
-          <p>您的款項已確認完畢。系統已為您開通專屬會員權限與 AI 服務配額。</p>
-          <br/>
-          <div style="background:#f4f4f5; padding: 16px; border-radius: 8px;">
-            <h3>📊 【如何進入會員數據後台？】</h3>
-            <p>請前往 <a href="${siteUrl}/dashboard" style="color:#2563eb; font-weight:bold;">會員中心 (Dashboard)</a>，輸入您的信箱 <strong>${email}</strong> 即可免密碼快速登入，領取專屬推廣碼並查看 25% 業務分潤！</p>
-            <br/>
-            <h3>🎟️ 【如何啟用 AI 來客矩陣？】</h3>
-            <p>請前往 <a href="${siteUrl}/redeem" style="color:#2563eb; font-weight:bold;">VIP 兌換專區 (Redeem)</a> 開通您的專屬 AI 影音與 SEO 文章產線（每枚享 180 天服務）。</p>
-          </div>
-          <br>
-          <p>感謝您的參與，讓我們一起掌握未來的定價權！</p>
-          <p>微享 AI 團隊 敬上</p>
-      `;
-
-      let clientEmailHandled = false;
-      if (pkgData?.product_type === 'DIRECT_COURSE') {
+      if (pkgData?.product_type === 'DIRECT_COURSE' && directEnrollResult) {
         try {
           const normPkgId = normalizeCoursePkgId(Number(packageId));
-          const enrollResult = await autoEnrollVipStudent(email, normPkgId, tradeKey);
           await sendVipCourseWelcomeEmail({
             email,
             pkgId: normPkgId,
             txnId: tradeKey,
-            magicLoginUrl: enrollResult.magic_login_url,
+            magicLoginUrl: directEnrollResult.magic_login_url,
+            downloadLinks: directEnrollResult.download_links,
             courseName: pkgData.name_zh,
             priceUsdt: packagePriceUSDT
           });
           clientEmailHandled = true;
-        } catch (enrollErr) {
-          console.error('[PayUni Callback] Error in VIP auto-enroll:', enrollErr);
-        }
-      } else if (pkgData?.product_type === 'EBOOK_PURCHASE' || Number(packageId) === 991 || Number(packageId) === 992) {
-        try {
-          const { settleRealEBookPurchase } = await import('@/lib/ebookSettlement');
-          const ebookSettle = await settleRealEBookPurchase({
-            bookId: parsedBookId || 'ebook-demo-001',
-            amountUsdt: packagePriceUSDT,
-            readerEmail: email
-          });
-          const bookTitle = ebookSettle?.book?.title_zh || pkgData?.name_zh || '精裝雙語電子書';
-          const r2Url = ebookSettle?.r2Url || 'https://1.5208.uk/ebooks/ebook-demo-001/master_bilingual.html';
-          emailSubject = `📖 【WeiXiang AI】電子書購買成功！《${bookTitle}》專屬防盜版閱讀與下載通行證`;
-          emailHtml = `
-            <div style="font-family: sans-serif; max-width: 640px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
-              <h2 style="color: #0f172a; margin-top: 0;">🎉 恭喜您成功解鎖《${bookTitle}》！</h2>
-              <p>您的款項（$${packagePriceUSDT} USDT）已確認收訖，系統已完成加盟商 10% 抽佣抵用金倒抵與 25% 聯盟分潤結算，並為您的信箱 <strong>${email}</strong> 開通永久閱讀與下載授權：</p>
-              <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin: 18px 0; border: 1px solid #cbd5e1;">
-                <p style="margin: 0 0 12px; font-weight: bold; color: #1e293b;">📥 一鍵進入閱讀與下載精裝 PDF：</p>
-                <p style="margin: 8px 0;"><a href="${r2Url}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬 R2 防盜版雙語閱讀器</a></p>
-                <p style="margin: 8px 0;"><a href="${siteUrl}/ebook-store?book=${encodeURIComponent(parsedBookId || 'ebook-demo-001')}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃下載浮水印 PDF</a></p>
-              </div>
-              <p style="font-size: 13px; color: #64748b;">微享 AI-ATM 全球知識自動販賣機 敬上</p>
-            </div>
-          `;
-        } catch (ebErr) {
-          console.error('[PayUni Callback] Error in EBook settlement:', ebErr);
-        }
-      } else if (pkgData?.product_type === 'SPONSOR') {
-        try {
-          const { activateOrExtendSponsorAdAccount } = await import('@/lib/adNetwork');
-          const adRes = await activateOrExtendSponsorAdAccount({
-            email,
-            paidAmountUsdt: packagePriceUSDT,
-            walletAddress,
-            adminNote: `PayUni 斗內贊助 ($${packagePriceUSDT} USDT)`,
-            sendWelcomeEmail: true
-          });
-          if (adRes.activated) {
-            clientEmailHandled = true;
-          }
-        } catch (adErr) {
-          console.error('[PayUni Callback] AdNetwork activation error:', adErr);
-        }
-        emailSubject = "💖 【WeiXiang AI】感謝您的溫暖斗內贊助！";
-        emailHtml = `
-          <h2>親愛的贊助者，衷心感謝您對微享 AI 團隊的支持與贊助！</h2>
-          <p>您的贊助款項（${pkgData.name_zh || '斗內贊助方案'}）已確認收訖，並已 100% 計入您個人的級差升等累積業績。</p>
-          <p>因為有您的支持，我們將持續研發更強大的 AI 自動化工具回饋社群！</p>
-          <br/>
-          <p>微享 AI 團隊 敬上</p>
-        `;
-      } else {
-        // 🚀 NFT 眾籌憑證方案：付款成功即刻依「每 1 顆 NFT 延長 180 天」與「滿 $888 / $2700 / $6000」自動開通萬商廣告系統！
-        try {
-          const { activateOrExtendNftCrowdfundAdAccount } = await import('@/lib/adNetwork');
-          const nftCnt =
-            Number(pkgData?.amount) ||
-            (packagePriceUSDT >= 12000
-              ? 360
-              : packagePriceUSDT >= 5400
-              ? 108
-              : packagePriceUSDT >= 1788
-              ? 30
-              : packagePriceUSDT >= 198
-              ? 3
-              : 1);
-          const idemKey = `NFT_REDEEM_${walletAddress.toLowerCase()}_PKG${packageId}_CNT${nftCnt}`;
-          const nftAdRes = await activateOrExtendNftCrowdfundAdAccount({
-            email,
-            walletAddress,
-            nftCount: nftCnt,
-            paidAmountUsdt: packagePriceUSDT,
-            idempotencyKey: idemKey,
-            adminNote: `PayUni 眾籌憑證付款開通 (${pkgData?.name_zh || `Pkg#${packageId}`}, ${nftCnt}顆 × 180天)`,
-            sendWelcomeEmail: true
-          });
-          if (nftAdRes.activated) {
-            clientEmailHandled = true;
-          }
-        } catch (nftAdErr) {
-          console.error('[PayUni Callback] NFT AdNetwork activation error:', nftAdErr);
+        } catch (emailErr) {
+          console.error('[PayUni Callback] Error sending VIP course welcome email:', emailErr);
         }
       }
 
       const orderCategoryLabel =
         pkgData?.product_type === 'DIRECT_COURSE'
           ? '🎓 AI頂配教材 (納入 25% 推廣分潤)'
+          : isEbookOrder
+          ? '📖 VIP 雙語電子書 (納入 25% 推廣分潤)'
           : pkgData?.product_type === 'SPONSOR'
           ? '💖 斗內贊助 (純贊助・不計入分潤)'
           : '🚀 眾籌憑證方案 (納入 25% 推廣分潤)';
@@ -283,6 +308,8 @@ export async function POST(req: Request) {
       const orderSubjectPrefix =
         pkgData?.product_type === 'DIRECT_COURSE'
           ? '🎓 【新訂單・AI頂配教材】'
+          : isEbookOrder
+          ? '📖 【新訂單・電子書】'
           : pkgData?.product_type === 'SPONSOR'
           ? '💖 【新訂單・斗內贊助】'
           : '🚀 【新訂單・眾籌憑證】';

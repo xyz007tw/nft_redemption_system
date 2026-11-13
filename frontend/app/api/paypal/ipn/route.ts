@@ -62,28 +62,39 @@ export async function POST(req: Request) {
       return new Response('Missing txn_id', { status: 400 });
     }
 
-    // 3. 🛡️ Official PayPal IPN Postback Verification (cmd=_notify-validate with network timeout graceful fallback)
+    // 3. 🛡️ Official PayPal IPN Postback Verification (cmd=_notify-validate, fail-closed on unverified/error so PayPal retries)
     const verifyUrl = process.env.PAYPAL_SANDBOX === 'true'
       ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
       : 'https://ipnpb.paypal.com/cgi-bin/webscr';
 
-    try {
-      const verifyResp = await fetch(verifyUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'WeiXiang-IPN-Security-Verifier/1.0'
-        },
-        body: `cmd=_notify-validate&${rawBody}`,
-        signal: AbortSignal.timeout(12000)
-      });
-      const verifyText = (await verifyResp.text()).trim();
-      if (verifyText === 'INVALID') {
-        console.error(`[PayPal IPN Security] Forged IPN explicitly rejected by PayPal! Response: ${verifyText}`);
-        return new Response('Invalid IPN', { status: 400 });
+    let verifiedStatus = '';
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const verifyResp = await fetch(verifyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'WeiXiang-IPN-Security-Verifier/1.0'
+          },
+          body: `cmd=_notify-validate&${rawBody}`,
+          signal: AbortSignal.timeout(12000)
+        });
+        verifiedStatus = (await verifyResp.text()).trim();
+        if (verifiedStatus === 'VERIFIED' || verifiedStatus === 'INVALID') {
+          break;
+        }
+      } catch (verifyNetErr) {
+        console.warn(`[PayPal IPN] Postback attempt ${attempt} network error:`, verifyNetErr);
       }
-    } catch (verifyNetErr) {
-      console.warn('[PayPal IPN] Postback network timeout/error, proceeding with receiver & amount checks to protect buyer delivery:', verifyNetErr);
+    }
+
+    if (verifiedStatus === 'INVALID') {
+      console.error(`[PayPal IPN Security] Forged IPN explicitly rejected by PayPal! Response: ${verifiedStatus}`);
+      return new Response('Invalid IPN', { status: 400 });
+    }
+    if (verifiedStatus !== 'VERIFIED') {
+      console.error(`[PayPal IPN Security] Postback verification did not return VERIFIED (got "${verifiedStatus}"). Returning 500 for PayPal retry.`);
+      return new Response('IPN Verification Retry', { status: 500 });
     }
 
     // 4. 🔒 Idempotency & Concurrency Lock
@@ -180,7 +191,9 @@ export async function POST(req: Request) {
           });
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
           const bookTitle = ebookSettle?.book?.title_zh || '精裝雙語電子書';
-          const r2Url = ebookSettle?.r2Url || 'https://1.5208.uk/ebooks/ebook-demo-001/master_bilingual.html';
+          const targetBookId = encodeURIComponent(bookId || 'ebook-demo-001');
+          const readerUrl = ebookSettle?.readerUrl || `${siteUrl}/ebook-store?book=${targetBookId}`;
+          const storeUrl = ebookSettle?.storeUrl || `${siteUrl}/ebook-store?book=${targetBookId}`;
           await transporter.sendMail({
             from: `"WeiXiang AI" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -190,8 +203,8 @@ export async function POST(req: Request) {
                 <h2 style="color: #0f172a; margin-top: 0;">🎉 恭喜您成功解鎖《${bookTitle}》！</h2>
                 <p>您的 PayPal 款項（$${priceUsdt} USD）已確認收訖，系統已為您的信箱 <strong>${email}</strong> 開通永久閱讀與下載授權：</p>
                 <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin: 18px 0; border: 1px solid #cbd5e1;">
-                  <p style="margin: 8px 0;"><a href="${r2Url}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬 R2 防盜版雙語閱讀器</a></p>
-                  <p style="margin: 8px 0;"><a href="${siteUrl}/ebook-store?book=${encodeURIComponent(bookId || 'ebook-demo-001')}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃下載浮水印 PDF</a></p>
+                  <p style="margin: 8px 0;"><a href="${readerUrl}" style="display:inline-block; background:#10b981; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📖 開啟專屬浮水印雙語互動閱讀器</a></p>
+                  <p style="margin: 8px 0;"><a href="${storeUrl}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px;">📚 前往 VIP 讀者書櫃下載浮水印 PDF</a></p>
                 </div>
               </div>
             `
@@ -254,6 +267,7 @@ export async function POST(req: Request) {
           pkgId: pkgNumericId,
           txnId,
           magicLoginUrl: enrollResult.magic_login_url,
+          downloadLinks: enrollResult.download_links,
           priceUsdt
         });
       } catch (enrollErr) {

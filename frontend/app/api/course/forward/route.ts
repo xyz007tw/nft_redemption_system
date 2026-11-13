@@ -57,10 +57,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Determine target package ID to unlock/forward (Preserve full convenience for verified buyers across single or multiple purchases)
-    const normalizedPurchasedId = purchasedPackageId ? normalizeCoursePkgId(purchasedPackageId) : 101;
+    // 2. Enforce strict per-package entitlement (100 = All 10 Flagship Bundle; otherwise must match purchasedPackageId)
+    if (!purchasedPackageId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: '查無此帳號的已購課方案編號，無法自動配發下載權限。(Missing purchased package record.)'
+        },
+        { status: 403 }
+      );
+    }
+
+    const normalizedPurchasedId = normalizeCoursePkgId(purchasedPackageId);
     const requestedPkgId = packageId ? normalizeCoursePkgId(Number(packageId)) : normalizedPurchasedId;
-    const effectiveId = requestedPkgId || normalizedPurchasedId;
+    if (normalizedPurchasedId !== 100 && requestedPkgId !== normalizedPurchasedId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `您購買的課程方案為 #${normalizedPurchasedId}，無權跨區下載或轉發課程 #${requestedPkgId}。(Package entitlement mismatch.)`
+        },
+        { status: 403 }
+      );
+    }
+    const effectiveId = requestedPkgId;
 
     // 2. Fetch course info from packages table
     const { unpackPackageRow } = await import('@/lib/packageMeta');
@@ -133,28 +152,31 @@ export async function POST(req: Request) {
 
     let magicLoginUrl = 'https://vip.5208.uk/dashboard/';
     let publicClassroomUrl = 'https://vip.5208.uk/dashboard/';
-    try {
-      const enrollRes = await autoEnrollVipStudent(
-        (buyerEmail && buyerEmail.includes('@')) ? buyerEmail.trim() : targetEmail.trim(),
-        effectiveId,
-        `FORWARD_${Date.now()}`
+    const enrollRes = await autoEnrollVipStudent(
+      (buyerEmail && buyerEmail.includes('@')) ? buyerEmail.trim() : targetEmail.trim(),
+      effectiveId,
+      `FORWARD_${Date.now()}`
+    );
+    if (!enrollRes.success || !enrollRes.download_links) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'VIP 雲教室授權簽章服務暫時無法連線，請稍後再試或直接前往 https://vip.5208.uk/dashboard/ 登入下載。'
+        },
+        { status: 503 }
       );
-      if (enrollRes.success) {
-        if (enrollRes.magic_login_url) magicLoginUrl = enrollRes.magic_login_url;
-        if (enrollRes.course_url) publicClassroomUrl = enrollRes.course_url;
-      }
-    } catch (e) {
-      console.warn('[Course Forward] Magic link generation fallback:', e);
     }
+    magicLoginUrl = enrollRes.magic_login_url || magicLoginUrl;
+    publicClassroomUrl = enrollRes.course_url || publicClassroomUrl;
 
     const downloadLinks = {
       primary: magicLoginUrl,
-      zh_tw: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_tw.pdf`,
-      zh_cn: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_zh_cn.pdf`,
-      en: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_en.pdf`,
-      ja: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_ja.pdf`,
-      code_zip: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}_source_code.zip`,
-      interactive_html: `https://vip.5208.uk/wp-content/uploads/ebooks/material_${effectiveId}/master_bilingual.html`,
+      zh_tw: enrollRes.download_links.zh_tw,
+      zh_cn: enrollRes.download_links.zh_cn,
+      en: enrollRes.download_links.en,
+      ja: enrollRes.download_links.ja,
+      code_zip: enrollRes.download_links.code_zip,
+      interactive_html: enrollRes.download_links.interactive_html,
       magic_classroom: magicLoginUrl
     };
 

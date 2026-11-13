@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { useLanguage, Lang } from '@/lib/LanguageContext';
-import BuyNFTButton from './BuyNFTButton';
 import PayUniButton from './PayUniButton';
 import PayPalButton from './PayPalButton';
 import { BIGMONEY_PROMO_HTML_ZH, BIGMONEY_PROMO_HTML_EN } from '@/lib/bigmoneyPromoHtml';
@@ -619,10 +618,18 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
                 <span className="flex-shrink-0 mx-4 text-gray-500 text-xs font-medium">OR WEB3 USDT</span>
                 <div className="flex-grow border-t border-gray-800"></div>
               </div>
-              <BuyNFTButton
-                packageId={selectedCourse.id === 101 ? 2 : selectedCourse.id === 102 ? 1 : selectedCourse.id}
-                priceInUSDT={selectedCourse.price}
-              />
+              <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 leading-relaxed">
+                <p className="font-bold text-amber-300 mb-1">
+                  {isChinese
+                    ? '⛓️ Web3 Polygon 智能合約自動發貨升級說明'
+                    : '⛓️ Web3 Polygon Smart-Contract Fulfillment Notice'}
+                </p>
+                <p className="text-gray-300">
+                  {isChinese
+                    ? `AI 頂配教材 SKU #${selectedCourse.id} 正待 Polygon 鏈上批次啟動；如需立即自動開通與接收 4 語系下載包，請直接使用上方「PayUni 刷卡」或「PayPal」秒級結帳。若需以 USDT 轉帳購買，請聯繫總工程師 CTO SEN（LINE / 微信：xyz007tw）人工即時開通。`
+                    : `AI Master Material SKU #${selectedCourse.id} is pending on-chain Polygon batch activation. Use PayUni or PayPal above for instant auto-unlock & download links, or contact CTO SEN (LINE/WeChat: xyz007tw) for direct USDT fulfillment.`}
+                </p>
+              </div>
             </div>
           </div>
 

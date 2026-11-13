@@ -12,8 +12,11 @@ export default function ReaderEBookStorePage() {
   const { lang } = useLanguage();
   const [books, setBooks] = useState<EBookProject[]>([]);
   const [selectedBook, setSelectedBook] = useState<EBookProject | null>(null);
-  const [readerEmail, setReaderEmail] = useState('vip_reader@aitutor.vip');
-  const [unlockedBookIds, setUnlockedBookIds] = useState<string[]>(['ebook-demo-001']);
+  const [readerEmail, setReaderEmail] = useState('');
+  const [unlockedBookIds, setUnlockedBookIds] = useState<string[]>([]);
+  const [readerSigs, setReaderSigs] = useState<Record<string, string>>({});
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [verifyMsg, setVerifyMsg] = useState<string | null>(null);
   const [readingModeLang, setReadingModeLang] = useState<'AUTO' | 'BILINGUAL' | 'ZH_TW' | 'ZH_CN' | 'EN' | 'JA' | 'VI' | 'ID'>('AUTO');
   const [settlementNotice, setSettlementNotice] = useState<string | null>(null);
   const [storePlanMode, setStorePlanMode] = useState<'SINGLE' | 'MONTHLY'>('SINGLE');
@@ -192,8 +195,112 @@ export default function ReaderEBookStorePage() {
     }[lang] || '🚩 Report Book Violation'
   };
 
+  const loadStoreWithAccess = async (
+    emailToCheck: string,
+    sigToCheck?: string | null,
+    targetBookId?: string | null,
+    explicitVerify = false
+  ) => {
+    const cleanEmail = emailToCheck.trim().toLowerCase();
+    if (explicitVerify) {
+      setVerifyingEmail(true);
+      setVerifyMsg(null);
+    }
+    try {
+      const qs = new URLSearchParams();
+      if (cleanEmail) qs.set('readerEmail', cleanEmail);
+      if (sigToCheck) qs.set('sig', sigToCheck);
+      if (targetBookId) qs.set('bookId', targetBookId);
+
+      const url = `/api/ebook${qs.toString() ? `?${qs.toString()}` : ''}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success && data.store?.books) {
+        const published = data.store.books.filter(
+          (b: EBookProject) => b.status === 'APPROVED_PUBLISHED'
+        );
+        setBooks(published);
+        const unlocked: string[] = Array.isArray(data.unlockedBooks) ? data.unlockedBooks : [];
+        const sigs: Record<string, string> =
+          data.readerSigs && typeof data.readerSigs === 'object' ? data.readerSigs : {};
+        setUnlockedBookIds(unlocked);
+        setReaderSigs(sigs);
+
+        if (published.length > 0) {
+          setSelectedBook(prev => {
+            if (targetBookId) {
+              const matched = published.find((b: EBookProject) => b.id === targetBookId);
+              if (matched) return matched;
+            }
+            if (prev) {
+              const refreshedPrev = published.find((b: EBookProject) => b.id === prev.id);
+              if (refreshedPrev) return refreshedPrev;
+            }
+            return published[0];
+          });
+        }
+
+        if (explicitVerify) {
+          if (cleanEmail) {
+            try {
+              localStorage.setItem('weixiang_user_email', cleanEmail);
+            } catch {}
+          }
+          const isMatchedUnlocked =
+            unlocked.includes('ALL_VIP') ||
+            (targetBookId ? unlocked.includes(targetBookId) : unlocked.length > 0);
+          if (isMatchedUnlocked) {
+            setVerifyMsg('✅ 購買資格驗證成功！已為您解鎖完整章節與授權浮水印閱讀/下載權限。');
+          } else {
+            setVerifyMsg(
+              '⚠️ 查無此信箱的已付款購買紀錄，請確認輸入與結帳時相同的 Email，或於上方完成付款立即自動開通。'
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      if (explicitVerify) {
+        setVerifyMsg('❌ 驗證連線異常，請稍後再試。');
+      }
+    } finally {
+      if (explicitVerify) setVerifyingEmail(false);
+    }
+  };
+
+  const isBookUnlocked = (bookId?: string | null) => {
+    if (!bookId) return false;
+    return unlockedBookIds.includes('ALL_VIP') || unlockedBookIds.includes(bookId);
+  };
+
+  const resolveReaderMode = () => {
+    if (readingModeLang !== 'AUTO') return readingModeLang;
+    if (lang === 'zh-TW') return 'ZH_TW';
+    if (lang === 'zh-CN') return 'ZH_CN';
+    if (lang === 'ja-JP') return 'JA';
+    if (lang === 'vi-VN') return 'VI';
+    if (lang === 'id-ID') return 'ID';
+    if (lang === 'en-US') return 'EN';
+    return 'BILINGUAL';
+  };
+
+  const buildReaderUrl = (bookId: string, printMode = false) => {
+    const cleanEmail = readerEmail.trim().toLowerCase();
+    const sig = readerSigs[bookId] || readerSigs['ALL_VIP'] || '';
+    const qs = new URLSearchParams({
+      book: bookId,
+      mode: resolveReaderMode()
+    });
+    if (cleanEmail) qs.set('email', cleanEmail);
+    if (sig) qs.set('sig', sig);
+    if (printMode) qs.set('print', '1');
+    return `/api/ebook/reader?${qs.toString()}`;
+  };
+
   useEffect(() => {
     let targetBookParam: string | null = null;
+    let initialEmail = '';
+    let initialSig: string | null = null;
     if (typeof window !== 'undefined') {
       const sp = new URLSearchParams(window.location.search);
       targetBookParam = sp.get('book');
@@ -201,23 +308,17 @@ export default function ReaderEBookStorePage() {
       if (refParam && refParam.trim()) {
         localStorage.setItem('weixiang_referrer', refParam.trim());
       }
+      const emailParam = sp.get('email');
+      initialSig = sp.get('sig');
+      initialEmail = (emailParam || localStorage.getItem('weixiang_user_email') || '').trim();
+      if (initialEmail) {
+        setReaderEmail(initialEmail);
+      }
     }
-    fetch('/api/ebook')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success && data.store?.books) {
-          const published = data.store.books.filter((b: EBookProject) => b.status === 'APPROVED_PUBLISHED');
-          setBooks(published);
-          if (published.length > 0) {
-            const matched = targetBookParam ? published.find((b: EBookProject) => b.id === targetBookParam) : null;
-            setSelectedBook(matched || published[0]);
-          }
-        }
-      })
-      .catch(console.error);
+    loadStoreWithAccess(initialEmail, initialSig, targetBookParam, false);
   }, []);
 
-  // 模擬讀者購買或訂閱解鎖
+  // 分潤與 100% 倒抵試算預覽（不跳過付費牆解鎖）
   const handleSimulateUnlock = async (book: EBookProject, isMonthlySub: boolean) => {
     const price = isMonthlySub ? book.price_monthly_sub_usdt : book.price_single_usdt;
     const savedRef = typeof window !== 'undefined' ? localStorage.getItem('weixiang_referrer') : null;
@@ -234,9 +335,9 @@ export default function ReaderEBookStorePage() {
     });
     const data = await res.json();
     if (data.success && data.settlement) {
-      if (!unlockedBookIds.includes(book.id)) {
-        setUnlockedBookIds([...unlockedBookIds, book.id]);
-      }
+      setVerifyMsg(
+        '📊 【100% 抵扣與 25% 聯盟分潤公式試算完成】（僅供試算預覽，欲解鎖閱讀與下載請完成上方 PayUni / PayPal 真實付款）'
+      );
       const s = data.settlement;
       const bd = s.affiliateBreakdown;
       setSettlementNotice(
@@ -306,7 +407,7 @@ export default function ReaderEBookStorePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {books.map(book => {
-              const isUnlocked = unlockedBookIds.includes(book.id);
+              const isUnlocked = isBookUnlocked(book.id);
               const loc = getEBookLocalizedContent(book, effectiveLang);
 
               return (
@@ -374,12 +475,34 @@ export default function ReaderEBookStorePage() {
                   <label className="block text-xs text-gray-400 mb-1">
                     {t.readerAuthEmail}
                   </label>
-                  <input
-                    type="email"
-                    value={readerEmail}
-                    onChange={e => setReaderEmail(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white"
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="email"
+                      value={readerEmail}
+                      onChange={e => setReaderEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white"
+                    />
+                    <button
+                      type="button"
+                      disabled={verifyingEmail}
+                      onClick={() => {
+                        if (!readerEmail.trim() || !readerEmail.includes('@')) {
+                          setVerifyMsg('⚠️ 請先輸入有效的購買 Email 信箱');
+                          return;
+                        }
+                        loadStoreWithAccess(readerEmail, null, selectedBook?.id || null, true);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs whitespace-nowrap cursor-pointer transition-colors"
+                    >
+                      {verifyingEmail ? '驗證中...' : '🔍 驗證購買資格解鎖'}
+                    </button>
+                  </div>
+                  {verifyMsg && (
+                    <p className="mt-2 text-[11px] leading-relaxed text-amber-300 bg-amber-950/40 border border-amber-500/30 rounded-lg px-2.5 py-1.5">
+                      {verifyMsg}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3">
@@ -451,14 +574,33 @@ export default function ReaderEBookStorePage() {
                   </button>
                 </div>
 
-                {unlockedBookIds.includes(selectedBook.id) && (
-                  <div className="mt-6 pt-5 border-t border-white/10 space-y-3">
-                    <div className="text-xs font-bold text-cyan-300">📥 VIP 讀者專屬下載</div>
-                    <button
-                      onClick={() => handleReaderDownloadPDF(selectedBook)}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs shadow-lg cursor-pointer"
+                {isBookUnlocked(selectedBook.id) && (
+                  <div className="mt-6 pt-5 border-t border-white/10 space-y-2.5">
+                    <div className="text-xs font-bold text-cyan-300">
+                      📥 VIP 讀者專屬閱讀與浮水印下載（已授權：{readerEmail || 'VIP 會員'}）
+                    </div>
+                    <a
+                      href={buildReaderUrl(selectedBook.id, false)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs shadow-lg transition-all"
                     >
-                      {t.downloadPdf(readerEmail)}
+                      🌐 開啟防盜版獨立閱讀器（全文解鎖）
+                    </a>
+                    <a
+                      href={buildReaderUrl(selectedBook.id, true)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs shadow-lg transition-all"
+                    >
+                      🖨️ {t.downloadPdf(readerEmail || 'VIP')}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleReaderDownloadPDF(selectedBook)}
+                      className="w-full py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-bold text-[11px] cursor-pointer transition-colors"
+                    >
+                      ⚡ 瀏覽器快速預覽列印本頁
                     </button>
                   </div>
                 )}
@@ -566,6 +708,42 @@ export default function ReaderEBookStorePage() {
                     </button>
                   </div>
                 </div>
+
+                {isBookUnlocked(selectedBook.id) ? (
+                  <div className="mb-6 p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="text-xs text-emerald-200 leading-relaxed">
+                      <span className="font-black text-emerald-300 block">
+                        🔓 VIP 權限已解鎖（授權讀者：{readerEmail || 'VIP'}）
+                      </span>
+                      您可於下方完整閱讀全部章節，或點擊右側開啟防盜版獨立閱讀器與匯出專屬浮水印精裝 PDF。
+                    </div>
+                    <div className="flex flex-wrap gap-2 shrink-0">
+                      <a
+                        href={buildReaderUrl(selectedBook.id, false)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs"
+                      >
+                        🌐 獨立閱讀器
+                      </a>
+                      <a
+                        href={buildReaderUrl(selectedBook.id, true)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs"
+                      >
+                        🖨️ 匯出浮水印 PDF
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-6 p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 leading-relaxed">
+                    <span className="font-black text-amber-300 block mb-1">
+                      🔒 免費試閱模式（僅開放第 1 章完整試閱，第 2～{selectedBook.chapters.length} 章受付費防盜版保護）
+                    </span>
+                    完成左側「PayUni 刷卡」或「PayPal」結帳後系統將自動寄發永久免密解鎖信；若您已付款，請於左側輸入結帳 Email 並點擊「🔍 驗證購買資格解鎖」。
+                  </div>
+                )}
 
                 {/* 章節內容渲染 (支援繁中/簡中/英文/日文/越南文/印尼文) */}
                 <div className="space-y-10">

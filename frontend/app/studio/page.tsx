@@ -86,7 +86,8 @@ export default function FranchiseStudioPage() {
 
   const fetchStoreData = async () => {
     try {
-      const res = await fetch('/api/ebook');
+      const authorParam = address ? `?authorKey=${encodeURIComponent(address.toLowerCase())}` : '';
+      const res = await fetch(`/api/ebook${authorParam}`);
       const data = await res.json();
       if (data.success && data.store) {
         setBooks(data.store.books || []);

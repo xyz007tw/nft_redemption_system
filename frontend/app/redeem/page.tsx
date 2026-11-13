@@ -28,6 +28,12 @@ export default function RedeemPage() {
   } | null>(null);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [resendEmailMsg, setResendEmailMsg] = useState<string | null>(null);
+  const [courseAccessResult, setCourseAccessResult] = useState<{
+    courseName: string;
+    packageId: number;
+    magicLoginUrl?: string;
+    downloadLinks?: { label: string; url: string }[];
+  } | null>(null);
   
   // 信用卡/Email 用戶核銷狀態
   const [fiatEmail, setFiatEmail] = useState('');
@@ -93,6 +99,82 @@ export default function RedeemPage() {
     }
   };
 
+  // 共用：處理核銷成功後之萬商廣告帳號與 AI 頂配教材簽章連結顯示
+  const applyRedeemSuccessResult = (data: any, normalizedEmail: string) => {
+    if (data.courseAccess) {
+      setCourseAccessResult(data.courseAccess);
+      setStatusBanner({
+        type: 'success',
+        text: `🎓 《${data.courseAccess.courseName}》開通成功！您可直接點擊下方免密雲教室入口與 4 語系專屬簽章下載連結！`
+      });
+      return;
+    }
+    if (data.adNetwork?.activated) {
+      setAdAccountResult({
+        ...data.adNetwork,
+        email: normalizedEmail
+      });
+      setStatusBanner({
+        type: 'success',
+        text: data.adNetwork.alreadyRedeemed
+          ? `🎉 驗證成功！您的「萬商自助廣告系統」帳號已開通，可直接點擊下方按鈕進入設定廣告！`
+          : `🎉 領取成功！已依您的 NFT 憑證為您自動延長 +${data.adNetwork.daysAdded} 天「萬商自助廣告系統」使用權限（可上架 ${data.adNetwork.maxAdSlots || 2} 件廣告）！`
+      });
+      return;
+    }
+    setStatusBanner({ type: 'success', text: '🎉 開通成功！我們已發送專屬開通信至您的信箱，即將導向會員中心...' });
+    setTimeout(() => router.push('/dashboard'), 1500);
+  };
+
+  const renderCourseAccessCard = () => {
+    if (!courseAccessResult) return null;
+    return (
+      <div className="mb-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-cyan-950 border-2 border-emerald-400/70 text-left shadow-xl space-y-3">
+        <div className="text-xs font-black text-emerald-300">
+          🎓 AI 頂配教材・雲教室免密登入與簽章下載權限已生效
+        </div>
+        <div className="text-base font-black text-white">
+          {courseAccessResult.courseName} (方案 #{courseAccessResult.packageId})
+        </div>
+        {courseAccessResult.magicLoginUrl && (
+          <a
+            href={courseAccessResult.magicLoginUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black text-xs sm:text-sm text-center shadow-lg"
+          >
+            🏛️ 一鍵免密進入 AI 雲教室 (vip.5208.uk) ➔
+          </a>
+        )}
+        {courseAccessResult.downloadLinks && courseAccessResult.downloadLinks.length > 0 && (
+          <div className="space-y-2 pt-1">
+            <div className="text-xs font-bold text-cyan-300">📥 專屬簽章 PDF / 雙語指南即時下載：</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {courseAccessResult.downloadLinks.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 rounded-lg bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-400/40 text-cyan-200 font-bold text-xs flex items-center justify-between gap-2"
+                >
+                  <span className="truncate">📄 {item.label}</span>
+                  <span>↗</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        <Link
+          href="/dashboard"
+          className="inline-block py-2 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs"
+        >
+          📊 前往會員中心查看全部下載
+        </Link>
+      </div>
+    );
+  };
+
   // 1. Web3 錢包持有者核銷流程
   const handleRedeem = async () => {
     setStatusBanner(null);
@@ -131,22 +213,9 @@ export default function RedeemPage() {
         throw new Error(data.error || 'API 請求失敗');
       }
 
-      localStorage.setItem('weixiang_user_email', email.trim().toLowerCase());
-      if (data.adNetwork?.activated) {
-        setAdAccountResult({
-          ...data.adNetwork,
-          email: email.trim().toLowerCase()
-        });
-        setStatusBanner({
-          type: 'success',
-          text: data.adNetwork.alreadyRedeemed
-            ? `🎉 驗證成功！您的「萬商自助廣告系統」帳號已開通，可直接點擊下方按鈕進入設定廣告！`
-            : `🎉 領取成功！已依您的 NFT 憑證為您自動延長 +${data.adNetwork.daysAdded} 天「萬商自助廣告系統」使用權限（可上架 ${data.adNetwork.maxAdSlots || 2} 件廣告）！`
-        });
-      } else {
-        setStatusBanner({ type: 'success', text: '🎉 開通成功！我們已發送專屬開通信至您的信箱，即將導向會員中心...' });
-        setTimeout(() => router.push('/dashboard'), 1500);
-      }
+      const cleanWeb3Email = email.trim().toLowerCase();
+      localStorage.setItem('weixiang_user_email', cleanWeb3Email);
+      applyRedeemSuccessResult(data, cleanWeb3Email);
       
     } catch (error: any) {
       console.error(error);
@@ -199,22 +268,7 @@ export default function RedeemPage() {
       // 儲存 Email 登入狀態
       localStorage.setItem('weixiang_user_email', cleanEmail);
       localStorage.setItem('weixiang_user_address', authData.userAddress);
-
-      if (data.adNetwork?.activated) {
-        setAdAccountResult({
-          ...data.adNetwork,
-          email: cleanEmail
-        });
-        setStatusBanner({
-          type: 'success',
-          text: data.adNetwork.alreadyRedeemed
-            ? `🎉 驗證成功！您的「萬商自助廣告系統」帳號已開通，可直接點擊下方按鈕進入設定廣告！`
-            : `🎉 領取成功！已依您的 NFT 眾籌憑證自動延長 +${data.adNetwork.daysAdded} 天「萬商自助廣告系統」權限（可上架 ${data.adNetwork.maxAdSlots || 2} 件廣告）！`
-        });
-      } else {
-        setStatusBanner({ type: 'success', text: '🎉 兌換成功！已為您的帳號啟用 180 天 AI 自動來客產線，即將導向會員中心...' });
-        setTimeout(() => router.push('/dashboard'), 1500);
-      }
+      applyRedeemSuccessResult(data, cleanEmail);
     } catch (err: any) {
       console.error(err);
       setStatusBanner({ type: 'error', text: '❌ 核銷失敗: ' + (err.message || '請確認您輸入的 Email 與付款時相同') });
@@ -256,6 +310,8 @@ export default function RedeemPage() {
               {statusBanner.text}
             </div>
           )}
+
+          {renderCourseAccessCard()}
 
           {adAccountResult && (
             <div className="mb-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-indigo-950 border-2 border-amber-400/80 text-left shadow-xl">
@@ -389,6 +445,8 @@ export default function RedeemPage() {
             {statusBanner.text}
           </div>
         )}
+
+        {renderCourseAccessCard()}
 
         {adAccountResult && (
           <div className="mb-6 p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-indigo-950 border-2 border-amber-400/80 text-left shadow-xl">

@@ -4,7 +4,7 @@ import crypto from 'crypto';
 export const R2_PRIMARY_PUBLIC_DOMAIN = 'https://1.5208.uk';
 export const R2_DEV_PUBLIC_DOMAIN = 'https://pub-2006e181b8544782b8d026affdaa34ab.r2.dev';
 
-export const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '2ecef792d2c54e7d88cfd1f5184c117b';
+export const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '6d8c3d64df48655650ce2ea0761d0550';
 export const CF_R2_BUCKET = process.env.CF_R2_BUCKET_NAME || 'aivideo';
 
 /**

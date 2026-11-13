@@ -7,6 +7,7 @@ import {
   GLOBAL_BANNED_BOOK_CATEGORIES,
   generateStandaloneEBookHTML
 } from '@/lib/ebookEngine';
+import { getAdminHeaders } from '@/lib/adminClient';
 
 export default function AdminFranchiseReviewPage() {
   const [books, setBooks] = useState<EBookProject[]>([]);
@@ -17,7 +18,9 @@ export default function AdminFranchiseReviewPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/ebook');
+      const res = await fetch('/api/ebook', {
+        headers: { ...getAdminHeaders() }
+      });
       const data = await res.json();
       if (data.success && data.store) {
         setBooks(data.store.books || []);
@@ -47,7 +50,7 @@ export default function AdminFranchiseReviewPage() {
 
     const res = await fetch('/api/ebook', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify({
         action: 'admin_review_book',
         bookId,
@@ -95,7 +98,7 @@ export default function AdminFranchiseReviewPage() {
 
     const res = await fetch('/api/ebook', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify({
         action: 'admin_delete_or_expire',
         targetType,

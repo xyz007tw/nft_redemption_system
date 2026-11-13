@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { createClient } from '@supabase/supabase-js';
 import { useLanguage } from '@/lib/LanguageContext';
+import { toDownloadLinkItems } from '@/lib/vipLinks';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 
@@ -38,43 +39,96 @@ export default function Dashboard() {
   // 萬商自助廣告協播會員狀態
   const [adMemberInfo, setAdMemberInfo] = useState<any | null>(null);
 
-  // 監聽 Web3 錢包連線狀態，或讀取本地 Email 登入紀錄
+  // 已購 AI 頂配教材與 VIP 電子書解鎖狀態
+  const [purchasedPackageId, setPurchasedPackageId] = useState<number | null>(null);
+  const [courseDownloadLinks, setCourseDownloadLinks] = useState<{ label: string; url: string }[]>([]);
+  const [forwardingCourse, setForwardingCourse] = useState(false);
+  const [courseForwardMsg, setCourseForwardMsg] = useState<string | null>(null);
+  const [unlockedEBooks, setUnlockedEBooks] = useState<any[]>([]);
+  const [ebookSigs, setEbookSigs] = useState<Record<string, string>>({});
+  const [effectiveUserEmail, setEffectiveUserEmail] = useState('');
+
+  // 監聽 Web3 錢包連線狀態，或讀取本地 Email 登入紀錄 / 結帳跳轉參數 (?email=)
   useEffect(() => {
     if (isConnected && address) {
       setActiveAddress(address);
       setActiveEmail(null);
-    } else {
-      const savedEmail = localStorage.getItem('weixiang_user_email');
-      const savedAddress = localStorage.getItem('weixiang_user_address');
-      if (savedEmail && savedAddress) {
-        setActiveEmail(savedEmail);
-        setActiveAddress(savedAddress);
-      } else {
-        setActiveAddress(null);
-        setActiveEmail(null);
+      return;
+    }
+
+    const sp = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const queryEmail = sp?.get('email')?.trim().toLowerCase() || '';
+    const pkgParam = sp?.get('pkg')?.trim() || '';
+    const savedEmail = localStorage.getItem('weixiang_user_email')?.trim().toLowerCase() || '';
+    const savedAddress = localStorage.getItem('weixiang_user_address') || '';
+
+    if (queryEmail) {
+      setInputEmail(queryEmail);
+      if (pkgParam && /^\d+$/.test(pkgParam)) {
+        setCourseForwardMsg(`🎉 已偵測到教材方案 #${pkgParam} 結帳完成，正在載入您的專屬課程與下載中心...`);
       }
+      if (savedEmail === queryEmail && savedAddress) {
+        setActiveEmail(queryEmail);
+        setActiveAddress(savedAddress);
+        return;
+      }
+      (async () => {
+        try {
+          const { data: matchedUser } = await supabase
+            .from('users')
+            .select('wallet_address, email')
+            .ilike('email', queryEmail)
+            .maybeSingle();
+          if (matchedUser?.wallet_address) {
+            const resolved = (matchedUser.email || queryEmail).toLowerCase();
+            localStorage.setItem('weixiang_user_email', resolved);
+            localStorage.setItem('weixiang_user_address', matchedUser.wallet_address);
+            setActiveEmail(resolved);
+            setActiveAddress(matchedUser.wallet_address);
+          } else {
+            setActiveAddress(null);
+            setActiveEmail(null);
+          }
+        } catch {
+          setActiveAddress(null);
+          setActiveEmail(null);
+        }
+      })();
+      return;
+    }
+
+    if (savedEmail && savedAddress) {
+      setActiveEmail(savedEmail);
+      setActiveAddress(savedAddress);
+    } else {
+      setActiveAddress(null);
+      setActiveEmail(null);
     }
   }, [isConnected, address]);
 
-  // 載入會員數據 + 萬商廣告剩餘天數與方案狀態
+  // 載入會員數據 + 萬商廣告剩餘天數 + 已購教材/電子書權限
   useEffect(() => {
     if (activeAddress) {
       // 1. 產生該用戶專屬推廣連結 (取錢包前綴作 6 碼推廣碼)
       const code = activeAddress.substring(2, 8).toUpperCase();
       setTimeout(() => setReferralLink(`${window.location.origin}/?ref=${code}`), 0);
 
-      // 2. 即時連線至 Supabase 撈取業績與獎金資料
+      // 2. 即時連線至 Supabase 撈取業績、獎金與教材開通資料
       const fetchStats = async () => {
         try {
           const { data: user } = await supabase
             .from('users')
-            .select('total_sales, payout_wallet, email')
+            .select('total_sales, payout_wallet, email, has_purchased, last_purchased_package')
             .eq('wallet_address', activeAddress)
             .maybeSingle();
           
           if (user?.payout_wallet) {
             setPayoutWallet(user.payout_wallet);
           }
+
+          setPurchasedPackageId(
+            user?.has_purchased ? Number(user?.last_purchased_package || 100) : null
+          );
 
           const { data: commissions } = await supabase
             .from('commissions')
@@ -90,7 +144,9 @@ export default function Dashboard() {
           });
 
           // 3. 查詢萬商自助廣告協播帳號與剩餘使用時間
-          const queryEmail = activeEmail || user?.email || '';
+          const queryEmail = (activeEmail || user?.email || '').trim().toLowerCase();
+          setEffectiveUserEmail(queryEmail);
+
           const adRes = await fetch(
             `/api/ads?mode=member_status&email=${encodeURIComponent(queryEmail)}&wallet=${encodeURIComponent(activeAddress)}`
           );
@@ -100,6 +156,29 @@ export default function Dashboard() {
           } else {
             setAdMemberInfo(null);
           }
+
+          // 4. 查詢該信箱已購買解鎖的 VIP 電子書清單與 HMAC 簽章
+          if (queryEmail) {
+            const ebRes = await fetch(`/api/ebook?readerEmail=${encodeURIComponent(queryEmail)}`);
+            const ebData = await ebRes.json();
+            if (ebData?.success) {
+              const unlockedIds: string[] = Array.isArray(ebData.unlockedBooks) ? ebData.unlockedBooks : [];
+              const sigs: Record<string, string> =
+                ebData.readerSigs && typeof ebData.readerSigs === 'object' ? ebData.readerSigs : {};
+              const allBooks: any[] = Array.isArray(ebData.store?.books) ? ebData.store.books : [];
+              setUnlockedEBooks(
+                allBooks.filter(
+                  b =>
+                    b.status === 'APPROVED_PUBLISHED' &&
+                    (unlockedIds.includes('ALL_VIP') || unlockedIds.includes(b.id))
+                )
+              );
+              setEbookSigs(sigs);
+            }
+          } else {
+            setUnlockedEBooks([]);
+            setEbookSigs({});
+          }
         } catch (err) {
           console.error('Fetch stats error:', err);
         }
@@ -107,6 +186,45 @@ export default function Dashboard() {
       fetchStats();
     }
   }, [activeAddress, activeEmail]);
+
+  // 一鍵領取 4 語系已購教材簽章下載包並重發免密登入教學信
+  const handleClaimCourseMaterials = async () => {
+    const targetEmail = (effectiveUserEmail || inputEmail || '').trim().toLowerCase();
+    if (!targetEmail || !targetEmail.includes('@')) {
+      setCourseForwardMsg('⚠️ 請先輸入有效的接收信箱 Email。');
+      return;
+    }
+    setForwardingCourse(true);
+    setCourseForwardMsg(null);
+    try {
+      const res = await fetch('/api/course/forward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyerEmail: effectiveUserEmail || undefined,
+          walletAddress: activeAddress || undefined,
+          targetEmail,
+          packageId: purchasedPackageId || 100
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data?.success) {
+        const normalizedLinks = Array.isArray(data.downloadLinks)
+          ? data.downloadLinks
+          : toDownloadLinkItems(data.downloadLinks);
+        setCourseDownloadLinks(normalizedLinks);
+        setCourseForwardMsg(
+          `✅ 已寄出教學開通通知至 ${targetEmail}，下方已為您產生簽章專屬教材下載連結！`
+        );
+      } else {
+        setCourseForwardMsg(`⚠️ ${data?.error || '領取教材失敗，請確認購買紀錄或聯繫 CTO SEN (xyz007tw)'}`);
+      }
+    } catch {
+      setCourseForwardMsg('❌ 領取連線異常，請稍後再試。');
+    } finally {
+      setForwardingCourse(false);
+    }
+  };
 
   // 處理 Email 免密碼快速登入
   const handleEmailLogin = async (e: React.FormEvent) => {
@@ -324,6 +442,186 @@ export default function Dashboard() {
               {stats.totalSales > 15000 ? '10%' : stats.totalSales > 6000 ? '6%' : stats.totalSales >= 600 ? '3%' : '0%'}
             </p>
             <p className="text-sm text-gray-500 mt-2">{t.dashNextLevel}</p>
+          </div>
+        </div>
+
+        {/* 🎓 我的已購 AI頂配教材 & VIP 電子書下載中心 */}
+        <div className="bg-gradient-to-br from-emerald-950/40 via-gray-800 to-gray-900 p-6 md:p-8 rounded-2xl border-2 border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.12)] mb-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black mb-2 border border-emerald-400/40">
+                ⚡ 付費即下載 · 雙重授權學習中心
+              </div>
+              <h2 className="text-xl md:text-2xl font-black text-white">
+                🎓 我的已購 AI 頂配教材 ＆ VIP 電子書下載中心
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-300 mt-1">
+                結帳成功後，您可在此直接領取 4 語系 AI 教材簽章下載連結、登入 AI 雲教室，或開啟已購 VIP 電子書防盜版閱讀與 PDF 匯出。
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <a
+                href="https://vip.5208.uk/dashboard/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold text-xs shadow-lg transition-all"
+              >
+                🏛️ 前往 AI 雲教室 (vip.5208.uk)
+              </a>
+              <Link
+                href="/ebook-store"
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs transition-all"
+              >
+                📚 前往 VIP 書櫃
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 左欄：AI 頂配實戰教材 (100~110) */}
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-emerald-300">📘 AI 頂配實戰教材權益</h3>
+                {purchasedPackageId !== null ? (
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black border border-emerald-500/40">
+                    {purchasedPackageId === 100
+                      ? '👑 #100 全套 10 冊旗艦權限'
+                      : `✅ 已開通方案 #${purchasedPackageId}`}
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 rounded-full bg-gray-700/60 text-gray-300 text-xs font-bold">
+                    尚未開通教材
+                  </span>
+                )}
+              </div>
+
+              {purchasedPackageId !== null ? (
+                <>
+                  {!effectiveUserEmail && (
+                    <input
+                      type="email"
+                      value={inputEmail}
+                      onChange={e => setInputEmail(e.target.value)}
+                      placeholder="輸入接收教材下載包的 Email (name@example.com)"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleClaimCourseMaterials}
+                    disabled={forwardingCourse}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 text-white font-black text-xs shadow-lg cursor-pointer transition-all"
+                  >
+                    {forwardingCourse
+                      ? '⏳ 正在產生簽章下載連結並寄信...'
+                      : '📥 領取 4 語系電子書下載包 & 免密登入信'}
+                  </button>
+
+                  {courseForwardMsg && (
+                    <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-xs text-emerald-200 leading-relaxed">
+                      {courseForwardMsg}
+                    </div>
+                  )}
+
+                  {courseDownloadLinks.length > 0 && (
+                    <div className="space-y-2 pt-2 border-t border-white/10">
+                      <div className="text-xs font-bold text-cyan-300">
+                        ⬇️ 已授權專用即時下載連結（含簽章保護）：
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {courseDownloadLinks.map((item, idx) => (
+                          <a
+                            key={idx}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-2 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-200 font-bold text-xs flex items-center justify-between gap-2 transition-colors"
+                          >
+                            <span className="truncate">📄 {item.label}</span>
+                            <span className="shrink-0">↗</span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-xs text-gray-400 space-y-3">
+                  <p>您目前帳號尚未查得 AI 頂配教材 (#100～#110) 購買紀錄；結帳完成後將自動在此顯示一鍵下載區。</p>
+                  <Link
+                    href="/#tutor-courses"
+                    className="inline-block px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors"
+                  >
+                    前往選購 AI 頂配教材 →
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* 右欄：已解鎖 VIP 電子書 (E-Book SaaS) */}
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-cyan-300">📖 已解鎖 VIP 電子書專櫃</h3>
+                <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-black border border-cyan-500/40">
+                  {unlockedEBooks.length} 本可讀
+                </span>
+              </div>
+
+              {unlockedEBooks.length > 0 ? (
+                <div className="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                  {unlockedEBooks.map((book: any) => {
+                    const sig = ebookSigs[book.id] || ebookSigs['ALL_VIP'] || '';
+                    const emailQS = effectiveUserEmail ? `&email=${encodeURIComponent(effectiveUserEmail)}` : '';
+                    const sigQS = sig ? `&sig=${encodeURIComponent(sig)}` : '';
+                    const readerUrl = `/api/ebook/reader?book=${encodeURIComponent(book.id)}${emailQS}${sigQS}`;
+                    return (
+                      <div
+                        key={book.id}
+                        className="p-3.5 rounded-xl bg-gray-900/80 border border-cyan-500/30 space-y-2.5"
+                      >
+                        <div className="font-bold text-sm text-white">
+                          {book.title_zh || book.title_en || book.id}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <a
+                            href={readerUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition-colors"
+                          >
+                            📖 開啟閱讀器
+                          </a>
+                          <a
+                            href={`${readerUrl}&print=1`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs transition-colors"
+                          >
+                            🖨️ 匯出浮水印 PDF
+                          </a>
+                          <Link
+                            href={`/ebook-store?book=${encodeURIComponent(book.id)}${emailQS}${sigQS}`}
+                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-colors"
+                          >
+                            📚 書櫃閱讀
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-xs text-gray-400 space-y-3">
+                  <p>目前尚未查得此信箱 ({effectiveUserEmail || '未綁定 Email'}) 的 VIP 電子書購買紀錄。</p>
+                  <Link
+                    href="/ebook-store"
+                    className="inline-block px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition-colors"
+                  >
+                    前往微享全球 VIP 電子書櫃 →
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

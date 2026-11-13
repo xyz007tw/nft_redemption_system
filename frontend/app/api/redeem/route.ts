@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
 import nodemailer from 'nodemailer';
 import { processAffiliateCommissions } from '@/lib/affiliate';
-import { autoEnrollVipStudent, sendVipCourseWelcomeEmail, normalizeCoursePkgId } from '@/lib/vipEnroll';
+import { autoEnrollVipStudent, sendVipCourseWelcomeEmail, normalizeCoursePkgId, toDownloadLinkItems } from '@/lib/vipEnroll';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -166,6 +166,17 @@ export async function POST(req: Request) {
       console.warn('[Redeem] Non-fatal user email sync warning:', syncEmailErr);
     }
 
+    // 🎓 若為 AI 頂配教材 (DIRECT_COURSE)，無條件先完成 VIP 雲教室開通與簽章下載連結生成
+    let directCourseEnroll: Awaited<ReturnType<typeof autoEnrollVipStudent>> | null = null;
+    const redeemCourseTxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
+    if (productType === 'DIRECT_COURSE' && cleanEmail) {
+      try {
+        directCourseEnroll = await autoEnrollVipStudent(cleanEmail, purchasedPkgId, redeemCourseTxnId);
+      } catch (enrollErr) {
+        console.error('[Redeem] Error in VIP auto-enroll:', enrollErr);
+      }
+    }
+
     // ==========================================
     // Send Notification Emails (Nodemailer)
     // ==========================================
@@ -197,29 +208,30 @@ export async function POST(req: Request) {
 
       let clientEmailHandled = Boolean(nftAdActivationResult?.activated);
       if (productType === 'DIRECT_COURSE') {
-        try {
-          const web3TxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
-          const enrollResult = await autoEnrollVipStudent(email, purchasedPkgId, web3TxnId);
-          await sendVipCourseWelcomeEmail({
-            email,
-            pkgId: purchasedPkgId,
-            txnId: web3TxnId,
-            magicLoginUrl: enrollResult.magic_login_url,
-            courseName: pkgName,
-            priceUsdt: pkgPrice
-          });
-          clientEmailHandled = true;
-        } catch (enrollErr) {
-          console.error('[Redeem] Error in VIP auto-enroll:', enrollErr);
+        if (directCourseEnroll) {
+          try {
+            await sendVipCourseWelcomeEmail({
+              email: cleanEmail,
+              pkgId: purchasedPkgId,
+              txnId: redeemCourseTxnId,
+              magicLoginUrl: directCourseEnroll.magic_login_url,
+              downloadLinks: directCourseEnroll.download_links,
+              courseName: pkgName,
+              priceUsdt: pkgPrice
+            });
+            clientEmailHandled = true;
+          } catch (emailErr) {
+            console.error('[Redeem] Error sending VIP course welcome email:', emailErr);
+          }
         }
         emailSubject = "🎓 【WeiXiang AI】您的 AI頂配教材 已兌換開通！";
         emailHtml = `
           <h2>親愛的學員，恭喜您成功兌換「${pkgName}」！</h2>
-          <p>您的 Web3 錢包簽署已確認完畢。請點擊下方連結下載/觀看您的專屬 AI頂配教材：</p>
+          <p>您的權限已確認開通。請點擊下方連結進入雲教室或會員中心下載專屬 AI 頂配教材：</p>
           <br/>
-          <a href="${courseLink || 'https://vip.5208.uk/dashboard/'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即下載 / 觀看 AI頂配教材</a>
+          <a href="${directCourseEnroll?.magic_login_url || courseLink || 'https://vip.5208.uk/dashboard/'}" style="display:inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">📥 立即登入雲教室 / 下載 AI頂配教材</a>
           <br/><br/>
-          <p>（此連結為您的專屬教材，請妥善保存。）</p>
+          <p>（若未立即看到下載連結，亦可前往 https://nft1314.party/dashboard 領取 4 語系下載包。）</p>
           <p>微享 AI 團隊 敬上</p>
         `;
       } else if (productType === 'SPONSOR') {
@@ -321,8 +333,17 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Redemption successful, commissions calculated, and Ad Network activated.',
+      message: 'Redemption successful, commissions calculated, and fulfillment activated.',
       referrerFound: !!referrerAddress,
+      courseAccess:
+        productType === 'DIRECT_COURSE' && directCourseEnroll?.success
+          ? {
+              courseName: pkgName,
+              packageId: purchasedPkgId,
+              magicLoginUrl: directCourseEnroll.magic_login_url,
+              downloadLinks: toDownloadLinkItems(directCourseEnroll.download_links)
+            }
+          : null,
       adNetwork: nftAdActivationResult
         ? {
             activated: nftAdActivationResult.activated,

@@ -17,6 +17,15 @@ export async function POST(req: Request) {
       ? `${packageId}|${productType}|${Number(priceInUSDT)}${bookId ? `|${bookId}` : ''}`
       : packageId.toString();
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const returnParams = new URLSearchParams({
+      pkg: String(packageId),
+      type: String(productType || ''),
+      email: cleanEmail
+    });
+    if (bookId) returnParams.set('book', String(bookId));
+
     // Payload for PayUni
     const tradeData = {
       MerID: PAYUNI_MERCHANT_ID,
@@ -24,9 +33,9 @@ export async function POST(req: Request) {
       TradeAmt: amountTWD.toString(),
       ProdDesc: productName ? productName.slice(0, 45) : `WeiXiang AI Package ${packageId}`,
       TradeType: '1', // 1: 整合支付頁 (Credit Card / ATM / CVS)
-      ReturnURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party'}/dashboard`, 
-      NotifyURL: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party'}/api/payuni/callback`,
-      UsrMail: email,
+      ReturnURL: `${siteUrl}/api/payuni/return?${returnParams.toString()}`,
+      NotifyURL: `${siteUrl}/api/payuni/callback`,
+      UsrMail: cleanEmail,
       // Pass our custom Web3 data in a custom field so we can process it in the callback
       CustomField1: finalWallet,
       CustomField2: refCode || '',

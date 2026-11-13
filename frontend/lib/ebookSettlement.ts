@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { EBookProject, FranchiseeProfile } from '@/lib/ebookEngine';
+import { signEBookAccess } from '@/lib/ebookAuth';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -94,14 +95,28 @@ export async function settleRealEBookPurchase(params: {
       { onConflict: 'id' }
     );
 
-    const r2Url =
-      book.r2_published_urls?.primary_url ||
-      `https://1.5208.uk/ebooks/${book.id}/master_bilingual.html`;
+    const cleanReader = (params.readerEmail || '').trim().toLowerCase();
+    const isMonthly = price <= (book.price_monthly_sub_usdt || 15) + 2;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+    const sigTarget = isMonthly ? 'ALL_VIP' : book.id;
+    const sig = cleanReader ? signEBookAccess(cleanReader, sigTarget) : '';
+    const bookSig = cleanReader ? signEBookAccess(cleanReader, book.id) : '';
+    const readerUrl = cleanReader
+      ? `${siteUrl}/api/ebook/reader?book=${encodeURIComponent(book.id)}&email=${encodeURIComponent(cleanReader)}&sig=${encodeURIComponent(bookSig || sig)}`
+      : `${siteUrl}/ebook-store?book=${encodeURIComponent(book.id)}`;
+    const storeUrl = cleanReader
+      ? `${siteUrl}/ebook-store?book=${encodeURIComponent(book.id)}&email=${encodeURIComponent(cleanReader)}&sig=${encodeURIComponent(sig || bookSig)}`
+      : `${siteUrl}/ebook-store?book=${encodeURIComponent(book.id)}`;
+
+    const r2Url = readerUrl;
 
     return {
       book,
       profile,
       r2Url,
+      readerUrl,
+      storeUrl,
+      sig: sig || bookSig,
       settlement: {
         orderAmount: price,
         originalFee10Pct: standardPlatformFee10Pct,

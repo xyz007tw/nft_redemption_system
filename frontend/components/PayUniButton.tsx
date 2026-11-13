@@ -30,6 +30,10 @@ export default function PayUniButton({ packageId, priceInUSDT, productType, prod
     
     setIsProcessing(true);
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      try {
+        localStorage.setItem('weixiang_user_email', cleanEmail);
+      } catch {}
       const refCode = localStorage.getItem('weixiang_referrer') || '';
       const response = await fetch('/api/payuni/checkout', {
         method: 'POST',
@@ -41,7 +45,7 @@ export default function PayUniButton({ packageId, priceInUSDT, productType, prod
           productName: productName || '',
           bookId: bookId || '',
           buyerAddress: address || '',
-          email: email.trim().toLowerCase(),
+          email: cleanEmail,
           refCode
         })
       });
