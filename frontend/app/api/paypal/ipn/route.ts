@@ -261,6 +261,12 @@ export async function POST(req: Request) {
         console.log(`[PayPal IPN] Auto enrolling user ${email} into package ${pkgNumericId}...`);
         const enrollResult = await autoEnrollVipStudent(email, pkgNumericId, txnId);
         console.log(`[PayPal IPN] Auto enroll result:`, enrollResult);
+        const { grantVipBundleEBookAccess } = await import('@/lib/ebookSettlement');
+        const bundledEbookResult = await grantVipBundleEBookAccess({
+          email,
+          pkgId: pkgNumericId,
+          priceUsdt
+        });
 
         await sendVipCourseWelcomeEmail({
           email,
@@ -268,7 +274,9 @@ export async function POST(req: Request) {
           txnId,
           magicLoginUrl: enrollResult.magic_login_url,
           downloadLinks: enrollResult.download_links,
-          priceUsdt
+          priceUsdt,
+          bundledEbookReaderUrl: bundledEbookResult?.readerUrl,
+          bundledEbookStoreUrl: bundledEbookResult?.storeUrl
         });
       } catch (enrollErr) {
         console.error('[PayPal IPN] Error in auto-enroll or welcome email:', enrollErr);

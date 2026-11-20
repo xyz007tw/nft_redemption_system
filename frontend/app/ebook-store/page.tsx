@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { EBookProject, generateStandaloneEBookHTML, getEBookLocalizedContent } from '@/lib/ebookEngine';
+import { EBookProject, generateStandaloneEBookHTML, getEBookLocalizedContent, getEffectiveBookPrice } from '@/lib/ebookEngine';
 import PayUniButton from '@/components/PayUniButton';
 import PayPalButton from '@/components/PayPalButton';
 
@@ -320,7 +320,8 @@ export default function ReaderEBookStorePage() {
 
   // 分潤與 100% 倒抵試算預覽（不跳過付費牆解鎖）
   const handleSimulateUnlock = async (book: EBookProject, isMonthlySub: boolean) => {
-    const price = isMonthlySub ? book.price_monthly_sub_usdt : book.price_single_usdt;
+    const pricing = getEffectiveBookPrice(book);
+    const price = isMonthlySub ? book.price_monthly_sub_usdt : pricing.currentPrice;
     const savedRef = typeof window !== 'undefined' ? localStorage.getItem('weixiang_referrer') : null;
     const res = await fetch('/api/ebook', {
       method: 'POST',
@@ -409,6 +410,7 @@ export default function ReaderEBookStorePage() {
             {books.map(book => {
               const isUnlocked = isBookUnlocked(book.id);
               const loc = getEBookLocalizedContent(book, effectiveLang);
+              const pricing = getEffectiveBookPrice(book);
 
               return (
                 <div
@@ -421,11 +423,18 @@ export default function ReaderEBookStorePage() {
                   }`}
                 >
                   <div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        {t.approvedBadge}
-                      </span>
-                      <span className="text-xs text-gray-400">{book.author_name}</span>
+                    <div className="flex justify-between items-center gap-2 mb-3">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {t.approvedBadge}
+                        </span>
+                        {pricing.isPromoActive && (
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-500/25 text-rose-200 border border-rose-400/50">
+                            {lang.includes('zh') ? (book.promo_label_zh || '2027前特惠') : (book.promo_label_en || 'Pre-2027 Promo')}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400 truncate max-w-[120px]">{book.author_name}</span>
                     </div>
                     <h3 className="text-base sm:text-lg font-black text-white mb-1 line-clamp-2">
                       {loc.title}
@@ -439,10 +448,13 @@ export default function ReaderEBookStorePage() {
                   </div>
 
                   <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
-                    <div>
+                    <div className="flex items-baseline flex-wrap gap-1">
                       <span className="text-xs text-gray-400">{t.buySingle} </span>
-                      <span className="text-lg font-black text-emerald-400">${book.price_single_usdt}</span>
-                      <span className="text-xs text-gray-400 ml-2">｜{t.subscribe} </span>
+                      {pricing.originalPrice && (
+                        <span className="text-xs line-through text-gray-500 font-bold">${pricing.originalPrice}</span>
+                      )}
+                      <span className="text-lg font-black text-emerald-400">${pricing.currentPrice}</span>
+                      <span className="text-xs text-gray-400 ml-1">｜{t.subscribe} </span>
                       <span className="text-sm font-bold text-pink-400">${book.price_monthly_sub_usdt}{t.month}</span>
                     </div>
                     <span className="text-xs font-bold text-cyan-300">
@@ -456,7 +468,10 @@ export default function ReaderEBookStorePage() {
         </div>
 
         {/* 選中書籍之「VIP 線上防盜版雙語/多語系閱讀器 ＋ 購買訂閱面板」 */}
-        {selectedBook && selectedLocalized && (
+        {selectedBook && selectedLocalized && (() => {
+          const selectedPricing = getEffectiveBookPrice(selectedBook);
+          const freeChapterCount = selectedBook.free_preview_chapters ?? 1;
+          return (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* 左側：購買/訂閱與浮水印下載控制列 (4 欄) */}
             <div className="lg:col-span-4 space-y-5">
@@ -505,6 +520,27 @@ export default function ReaderEBookStorePage() {
                   )}
                 </div>
 
+                {selectedPricing.isPromoActive && (
+                  <div className="mb-3 px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs font-black flex items-center justify-between">
+                    <span>{lang.includes('zh') ? (selectedBook.promo_label_zh || '🔥 2027年前優惠') : (selectedBook.promo_label_en || '🔥 Pre-2027 Promo')}</span>
+                    <span className="text-amber-300">
+                      <span className="line-through text-gray-400 mr-1">${selectedPricing.originalPrice}</span>
+                      ➔ ${selectedPricing.currentPrice} USDT
+                    </span>
+                  </div>
+                )}
+
+                {selectedBook.id === 'ebook-agy-buffer-001' && (
+                  <Link
+                    href="/#tutor-courses"
+                    className="block mb-3 px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 text-amber-200 text-[11px] font-bold transition-all"
+                  >
+                    {lang.includes('zh')
+                      ? '🎓 本書已合併收錄於【AI 頂配教材 $198 合輯】（購 $198 合輯可輸入信箱直接解鎖全書）➔'
+                      : '🎓 Also Included Free in 【AI Master Course $198 VIP Bundle】➔'}
+                  </Link>
+                )}
+
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   <button
                     type="button"
@@ -514,7 +550,12 @@ export default function ReaderEBookStorePage() {
                     }`}
                   >
                     <span className="text-[11px] text-emerald-300 font-bold block">單本永久買斷</span>
-                    <span className="text-lg font-black text-white">${selectedBook.price_single_usdt} USDT</span>
+                    <div className="flex items-baseline gap-1.5">
+                      {selectedPricing.originalPrice && (
+                        <span className="text-xs line-through text-gray-400 font-bold">${selectedPricing.originalPrice}</span>
+                      )}
+                      <span className="text-lg font-black text-white">${selectedPricing.currentPrice} USDT</span>
+                    </div>
                   </button>
                   <button
                     type="button"
@@ -531,14 +572,14 @@ export default function ReaderEBookStorePage() {
                 <div className="space-y-3">
                   <PayUniButton
                     packageId={storePlanMode === 'SINGLE' ? 991 : 992}
-                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedBook.price_single_usdt : selectedBook.price_monthly_sub_usdt}
+                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedPricing.currentPrice : selectedBook.price_monthly_sub_usdt}
                     productType="EBOOK_PURCHASE"
                     productName={`${storePlanMode === 'SINGLE' ? '電子書單本買斷' : 'VIP電子書專欄月閱'}：${selectedLocalized.title}`}
                     bookId={selectedBook.id}
                   />
                   <PayPalButton
                     packageId={storePlanMode === 'SINGLE' ? 991 : 992}
-                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedBook.price_single_usdt : selectedBook.price_monthly_sub_usdt}
+                    priceInUSDT={storePlanMode === 'SINGLE' ? selectedPricing.currentPrice : selectedBook.price_monthly_sub_usdt}
                     productType="EBOOK_PURCHASE"
                     productName={`${storePlanMode === 'SINGLE' ? 'EBook Buyout' : 'VIP EBook Monthly'}: ${selectedLocalized.title}`}
                     bookId={selectedBook.id}
@@ -563,7 +604,7 @@ export default function ReaderEBookStorePage() {
                     onClick={() => handleSimulateUnlock(selectedBook, false)}
                     className="w-full py-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400 text-emerald-200 font-bold text-xs cursor-pointer text-center"
                   >
-                    {t.testSingleBuy(selectedBook.price_single_usdt)}
+                    {t.testSingleBuy(selectedPricing.currentPrice)}
                   </button>
 
                   <button
@@ -739,22 +780,36 @@ export default function ReaderEBookStorePage() {
                 ) : (
                   <div className="mb-6 p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 leading-relaxed">
                     <span className="font-black text-amber-300 block mb-1">
-                      🔒 免費試閱模式（僅開放第 1 章完整試閱，第 2～{selectedBook.chapters.length} 章受付費防盜版保護）
+                      🔒 免費試閱模式（{freeChapterCount === 1 ? `僅開放第 1 章試閱，第 2～${selectedBook.chapters.length} 章` : `已開放第 1～${freeChapterCount} 章完整免費試閱，第 ${freeChapterCount + 1}～${selectedBook.chapters.length} 章`}受付費防盜版保護）
                     </span>
                     完成左側「PayUni 刷卡」或「PayPal」結帳後系統將自動寄發永久免密解鎖信；若您已付款，請於左側輸入結帳 Email 並點擊「🔍 驗證購買資格解鎖」。
                   </div>
                 )}
 
-                {/* 章節內容渲染 (支援繁中/簡中/英文/日文/越南文/印尼文) */}
+                {/* 章節內容渲染 (支援繁中/簡中/英文/日文/越南文/印尼文 ＋ AGY對話截圖與圖表解說) */}
                 <div className="space-y-10">
                   {selectedBook.chapters.map((ch, idx) => {
                     const chLoc = getEBookLocalizedContent(ch, effectiveLang);
+                    const isChapterUnlocked = isBookUnlocked(selectedBook.id) || idx < freeChapterCount;
 
                     return (
-                      <div key={ch.id || idx} className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs font-mono text-cyan-400 font-bold">
-                            CHAPTER 0{idx + 1}
+                      <div key={ch.id || idx} className="space-y-4 pb-8 border-b border-white/10 last:border-b-0">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-cyan-400 font-bold">
+                              CHAPTER 0{idx + 1}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                                idx < freeChapterCount
+                                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                  : isBookUnlocked(selectedBook.id)
+                                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                              }`}
+                            >
+                              {idx < freeChapterCount ? '📖 免費試閱 FREE' : isBookUnlocked(selectedBook.id) ? '🔓 已解鎖全文' : '🔒 付費解鎖全文'}
+                            </span>
                           </div>
                           {ch.image_caption && (
                             <span className="text-[11px] text-gray-400">
@@ -775,10 +830,26 @@ export default function ReaderEBookStorePage() {
                           </h4>
                         )}
 
+                        {/* 圖表解說與 AGY 對話截圖視覺卡片 (僅免費章節或已解鎖章節顯示) */}
+                        {isChapterUnlocked && ch.image_url && (
+                          <div className="my-4 rounded-2xl overflow-hidden border border-cyan-500/30 bg-[#090d18] shadow-xl">
+                            <img
+                              src={ch.image_url}
+                              alt={ch.image_caption || chLoc.title}
+                              className="w-full h-auto object-contain max-h-[540px] mx-auto"
+                            />
+                            {ch.image_caption && (
+                              <div className="px-4 py-2 bg-slate-900/90 border-t border-white/10 text-[11px] text-cyan-300 font-semibold text-center">
+                                📷 {ch.image_caption}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* 主語系內容 */}
-                        <div className="space-y-3 text-gray-200 leading-relaxed text-sm sm:text-base">
+                        <div className="space-y-3 text-gray-200 leading-relaxed text-sm sm:text-base whitespace-pre-line">
                           {chLoc.content
-                            .split('\n')
+                            .split('\n\n')
                             .filter(Boolean)
                             .map((p, i) => (
                               <p key={i}>{p}</p>
@@ -787,12 +858,12 @@ export default function ReaderEBookStorePage() {
 
                         {/* 雙語對照模式下的次語系內容 */}
                         {isBilingual && ch.content_en && (
-                          <div className="p-5 rounded-2xl bg-slate-900/90 border-l-4 border-cyan-400 space-y-3 text-gray-300 text-sm leading-relaxed">
+                          <div className="p-5 rounded-2xl bg-slate-900/90 border-l-4 border-cyan-400 space-y-3 text-gray-300 text-sm leading-relaxed whitespace-pre-line">
                             <div className="text-[10px] font-bold text-cyan-400 tracking-wider">
                               ENGLISH REFERENCE EDITION
                             </div>
                             {ch.content_en
-                              .split('\n')
+                              .split('\n\n')
                               .filter(Boolean)
                               .map((p, i) => (
                                 <p key={i}>{p}</p>
@@ -846,7 +917,8 @@ export default function ReaderEBookStorePage() {
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

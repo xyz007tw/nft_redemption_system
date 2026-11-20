@@ -149,11 +149,11 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
     },
     {
       id: 100,
-      name_zh: '🏆 全套 10 門課 VIP 終身旗艦合輯（贈 2 枚微享 NFT 憑證）',
-      name_en: 'VIP 100 | Complete 10-Course Master Bundle (Incl. 2 Weixiang NFTs)',
+      name_zh: '🏆 全套 10 門課 VIP 終身旗艦合輯（含新書《不寫一行程式！用對話打造 24H AI 自動來客流》＋贈 2 枚 NFT）',
+      name_en: 'VIP 100 | 10-Course Master Bundle + Zero-Code AI Traffic Engine E-Book + 2 NFTs',
       amount: 2,
       price: 198,
-      discount_text: isChinese ? '👑 現省$232・贈2枚NFT(360天權限)＋享25%分潤' : '👑 Save $232 · Incl. 2 NFTs · 25% Affiliate',
+      discount_text: isChinese ? '👑 現省$271・含新書全解鎖($39)＋贈2枚NFT＋享25%分潤' : '👑 Save $271 · Includes New E-Book ($39) + 2 NFTs · 25% Affiliate',
       product_type: 'DIRECT_COURSE',
       course_link: 'https://vip.5208.uk/dashboard/',
       promo_html_zh: BIGMONEY_PROMO_HTML_ZH,
@@ -597,6 +597,23 @@ export default function TutorCourseSection({ courses }: TutorCourseSectionProps)
                     {isChinese ? '✓ 計入 25% 推廣業績分潤' : '✓ 25% Affiliate Commission'}
                   </span>
                 </div>
+                {(selectedCourse.id === 100 || Number(selectedCourse.price) >= 198) && (
+                  <div className="mt-3 p-3 rounded-xl bg-amber-500/15 border border-amber-400/50 text-xs text-amber-200 leading-relaxed">
+                    <span className="font-black text-amber-300 block mb-0.5">
+                      {isChinese
+                        ? '🎁 $198 合輯已合併收錄最新暢銷書（免費全文解鎖）：'
+                        : '🎁 Included Free in $198 Master Bundle:'}
+                    </span>
+                    <a
+                      href="/ebook-store?book=ebook-agy-buffer-001"
+                      className="text-cyan-300 hover:text-cyan-200 underline font-bold"
+                    >
+                      {isChinese
+                        ? '📖 《不寫一行程式！用對話打造你的 24H AI 自動來客流》免費試閱 1~2 章 ➔'
+                        : '📖 Zero-Code AI Traffic Engine (Ch 1-2 Free Preview) ➔'}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 

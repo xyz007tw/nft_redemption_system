@@ -136,8 +136,10 @@ export async function sendVipCourseWelcomeEmail(options: {
   downloadLinks?: Partial<VipSignedDownloadLinks>;
   courseName?: string;
   priceUsdt?: number;
+  bundledEbookReaderUrl?: string;
+  bundledEbookStoreUrl?: string;
 }): Promise<boolean> {
-  const { email, pkgId, txnId, magicLoginUrl, priceUsdt = 39 } = options;
+  const { email, pkgId, txnId, magicLoginUrl, priceUsdt = 39, bundledEbookReaderUrl, bundledEbookStoreUrl } = options;
 
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !email || !email.includes('@')) {
     console.warn('[VIP Email] Missing email configuration or invalid recipient:', email);
@@ -149,6 +151,26 @@ export async function sendVipCourseWelcomeEmail(options: {
   const courseTitle = escapeHtml(rawTitle);
   const safeEmail = escapeHtml(email);
   const safeTxnId = escapeHtml(txnId);
+  const isVip198Bundle = normalizedPkgId === 100 || Number(priceUsdt) >= 198;
+  const fallbackStoreUrl = `https://nft1314.party/ebook-store?book=ebook-agy-buffer-001`;
+  const bonusBookUrl = bundledEbookReaderUrl || fallbackStoreUrl;
+  const bonusStoreUrl = bundledEbookStoreUrl || fallbackStoreUrl;
+  const bundledBookBannerHtml = isVip198Bundle
+    ? `
+      <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #f59e0b; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 900; color: #b45309; margin-bottom: 6px;">
+          🎁 $198 終身旗艦合輯專屬加碼合併權益
+        </div>
+        <h3 style="margin: 0 0 8px; font-size: 17px; font-weight: 900; color: #0f172a;">
+          📖 已同步免費為您解鎖新書《不寫一行程式！用對話打造你的 24H AI 自動來客流》（原價 $39 / 優惠 $27）
+        </h3>
+        <p style="margin: 0 0 14px; font-size: 13px; color: #475569; line-height: 1.6;">
+          含 6 大語系線上防盜版互動閱讀（第 1～8 章全解鎖）、AGY 真實對話截圖圖解及 SEO/GEO → Buffer 全自動提示詞庫：
+        </p>
+        <a href="${escapeHtml(bonusBookUrl)}" style="display:inline-block; background:#d97706; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px; margin-right:8px; font-size:13px;">📖 立即開啟防盜版新書閱讀與 PDF 下載 ➔</a>
+        <a href="${escapeHtml(bonusStoreUrl)}" style="display:inline-block; background:#0f172a; color:#ffffff; text-decoration:none; font-weight:bold; padding:10px 18px; border-radius:8px; font-size:13px;">📚 前往 VIP 讀者書櫃 ➔</a>
+      </div>`
+    : '';
 
   const downloadLinks: VipSignedDownloadLinks = {
     zh_tw: options.downloadLinks?.zh_tw || `https://vip.5208.uk/?vip_ebook_dl=material_${normalizedPkgId}_zh_tw.pdf`,
@@ -218,6 +240,8 @@ export async function sendVipCourseWelcomeEmail(options: {
           <li>🌐 <a href="${downloadLinks.interactive_html}" style="color: #059669; text-decoration: none; font-weight: 700;">在線雙語互動閱讀器 (R2 高速快取) ➔</a></li>
         </ul>
       </div>
+
+      ${bundledBookBannerHtml}
 
       <!-- Platform Info & Account Credentials -->
       <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin-bottom: 24px; font-size: 13px; color: #475569; line-height: 1.8;">

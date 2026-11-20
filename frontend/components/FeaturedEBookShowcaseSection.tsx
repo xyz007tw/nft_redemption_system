@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
-import { EBookProject, getEBookLocalizedContent } from '@/lib/ebookEngine';
+import { EBookProject, getEBookLocalizedContent, getEffectiveBookPrice } from '@/lib/ebookEngine';
+import { AGY_BUFFER_EBOOK } from '@/lib/ebookCatalog/agyBufferBook';
 import PayUniButton from '@/components/PayUniButton';
 import PayPalButton from '@/components/PayPalButton';
 
@@ -16,6 +17,7 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
 
   // 備援官方力作展示書目 (支援 繁中/簡中/英文/日文/越南文/印尼文 完整在地化)
   const fallbackBooks: EBookProject[] = [
+    AGY_BUFFER_EBOOK,
     {
       id: 'ebook-demo-001',
       author_wallet: '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc',
@@ -583,12 +585,14 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
     }
   };
 
+  const effectivePricing = getEffectiveBookPrice(currentBook);
+
   // 模擬讀者下單結算（體驗 10% 倒抵與 25% 聯盟分潤）
   const handleSimulatePurchase = async (type: 'SINGLE' | 'MONTHLY') => {
     setSimulatingBuy(true);
     setSimSettlement(null);
     try {
-      const price = type === 'SINGLE' ? currentBook.price_single_usdt : currentBook.price_monthly_sub_usdt;
+      const price = type === 'SINGLE' ? effectivePricing.currentPrice : currentBook.price_monthly_sub_usdt;
       const res = await fetch('/api/ebook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -734,10 +738,11 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${books.length >= 3 ? 'lg:grid-cols-3' : ''} gap-4`}>
             {books.map((b) => {
               const isSelected = b.id === currentBook.id;
               const bLoc = getEBookLocalizedContent(b, targetLangCode);
+              const bPricing = getEffectiveBookPrice(b);
               const langPairBadge =
                 b.lang_pair === 'JA_EN'
                   ? '🇯🇵/🇺🇸 JA·EN'
@@ -776,6 +781,11 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                         <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[10px] font-bold text-emerald-300">
                           {t.approvedTag}
                         </span>
+                        {bPricing.isPromoActive && (
+                          <span className="px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/60 text-[10px] font-black text-rose-200">
+                            {lang.includes('zh') ? (b.promo_label_zh || `2027前特惠 $${bPricing.currentPrice}`) : (b.promo_label_en || `Promo $${bPricing.currentPrice}`)}
+                          </span>
+                        )}
                       </div>
                       <h4 className="font-black text-white text-sm sm:text-base truncate leading-snug">
                         {bLoc.title}
@@ -783,8 +793,13 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                       <p className="text-xs text-gray-300 truncate mt-0.5">
                         {bLoc.subtitle}
                       </p>
-                      <div className="text-[11px] text-amber-300 mt-1 font-bold">
-                        ✍️ {b.author_name} ｜ ${b.price_single_usdt} USDT ｜ VIP ${b.price_monthly_sub_usdt}
+                      <div className="text-[11px] text-amber-300 mt-1 font-bold flex flex-wrap items-center gap-1">
+                        <span>✍️ {b.author_name} ｜</span>
+                        {bPricing.originalPrice && (
+                          <span className="line-through text-gray-400">${bPricing.originalPrice}</span>
+                        )}
+                        <span className="text-emerald-300 font-black">${bPricing.currentPrice} USDT</span>
+                        <span>｜ VIP ${b.price_monthly_sub_usdt}</span>
                       </div>
                     </div>
                   </div>
@@ -853,6 +868,27 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
 
               {/* 結帳定價與購買 CTA (真實 PayUni 信用卡 / PayPal 結帳 + 單書專屬推廣連結 + 100% 倒抵分潤預覽) */}
               <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/90 to-purple-950/90 border border-indigo-400/50 shadow-xl space-y-3">
+                {effectivePricing.isPromoActive && (
+                  <div className="px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs font-black flex items-center justify-between">
+                    <span>{lang.includes('zh') ? (currentBook.promo_label_zh || '🔥 2027年前限時優惠') : (currentBook.promo_label_en || '🔥 Pre-2027 Early Bird Offer')}</span>
+                    <span className="text-amber-300">
+                      <span className="line-through text-gray-400 mr-1.5">${effectivePricing.originalPrice}</span>
+                      ➔ ${effectivePricing.currentPrice} USDT
+                    </span>
+                  </div>
+                )}
+
+                {currentBook.id === 'ebook-agy-buffer-001' && (
+                  <a
+                    href="#tutor-courses"
+                    className="block px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 text-amber-200 text-[11px] font-bold transition-all"
+                  >
+                    {lang.includes('zh')
+                      ? '🎓 本書已合併收錄於【AI 頂配教材 $198 終身旗艦合輯】（購 $198 合輯免費解鎖全書）➔'
+                      : '🎓 Also Included Free in 【AI Master Course $198 VIP Bundle】➔'}
+                  </a>
+                )}
+
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -864,7 +900,12 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                     }`}
                   >
                     <span className="text-[11px] text-emerald-300 font-bold block">{t.lifetimeBuyout}</span>
-                    <span className="text-xl sm:text-2xl font-black text-white">${currentBook.price_single_usdt} <span className="text-[11px] font-normal text-gray-300">USDT</span></span>
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      {effectivePricing.originalPrice && (
+                        <span className="text-sm line-through text-gray-400 font-bold">${effectivePricing.originalPrice}</span>
+                      )}
+                      <span className="text-xl sm:text-2xl font-black text-white">${effectivePricing.currentPrice} <span className="text-[11px] font-normal text-gray-300">USDT</span></span>
+                    </div>
                   </button>
                   <button
                     type="button"
@@ -883,14 +924,14 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                 <div className="space-y-2 pt-1">
                   <PayUniButton
                     packageId={selectedPlanMode === 'SINGLE' ? 991 : 992}
-                    priceInUSDT={selectedPlanMode === 'SINGLE' ? currentBook.price_single_usdt : currentBook.price_monthly_sub_usdt}
+                    priceInUSDT={selectedPlanMode === 'SINGLE' ? effectivePricing.currentPrice : currentBook.price_monthly_sub_usdt}
                     productType="EBOOK_PURCHASE"
                     productName={`${selectedPlanMode === 'SINGLE' ? '電子書買斷' : 'VIP電子書月閱'}：${currentLoc.title}`}
                     bookId={currentBook.id}
                   />
                   <PayPalButton
                     packageId={selectedPlanMode === 'SINGLE' ? 991 : 992}
-                    priceInUSDT={selectedPlanMode === 'SINGLE' ? currentBook.price_single_usdt : currentBook.price_monthly_sub_usdt}
+                    priceInUSDT={selectedPlanMode === 'SINGLE' ? effectivePricing.currentPrice : currentBook.price_monthly_sub_usdt}
                     productType="EBOOK_PURCHASE"
                     productName={`${selectedPlanMode === 'SINGLE' ? 'EBook Buyout' : 'VIP EBook Sub'}: ${currentLoc.title}`}
                     bookId={currentBook.id}
@@ -916,7 +957,7 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                       disabled={simulatingBuy}
                       className="w-full py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-bold text-[11px] transition-all cursor-pointer text-center"
                     >
-                      ⚡ 試算買斷 (${currentBook.price_single_usdt}) 倒抵分潤
+                      ⚡ 試算買斷 (${effectivePricing.currentPrice}) 倒抵分潤
                     </button>
                     <button
                       type="button"
@@ -943,19 +984,35 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                     🏛️ Google 4 Authority Engine
                   </span>
                   <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-bold border border-pink-400/40">
-                    📄 8 Chapters · 25+ Pages
+                    📄 {currentBook.chapters.length} Chapters · 25+ Pages
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold border border-cyan-400/40">
-                    ☁️ Cloudflare R2
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/40">
+                    📖 {lang.includes('zh') ? `開放第 1~${currentBook.free_preview_chapters ?? 1} 章免費試閱` : `Free Ch. 1–${currentBook.free_preview_chapters ?? 1} Preview`}
                   </span>
                 </div>
 
                 <h3 className="text-xl sm:text-3xl font-black text-white leading-tight mb-2">
                   {currentLoc.title}
                 </h3>
-                <p className="text-sm sm:text-base text-indigo-200/90 leading-relaxed mb-6">
+                <p className="text-sm sm:text-base text-indigo-200/90 leading-relaxed mb-4">
                   {currentLoc.subtitle}
                 </p>
+
+                <div className="mb-5">
+                  <Link
+                    href={`/ebook-store?book=${encodeURIComponent(currentBook.id)}`}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition-all hover:scale-[1.02]"
+                  >
+                    <span>📖</span>
+                    <span>
+                      {lang === 'ja-JP'
+                        ? `第1〜${currentBook.free_preview_chapters ?? 1}章を無料試し読み（図解＆対話スクショ付き）→`
+                        : lang.includes('zh')
+                        ? `立即免費試閱第 1~${currentBook.free_preview_chapters ?? 1} 章（含真實對話截圖與架構圖解）→`
+                        : `Read Free Preview Chapters 1–${currentBook.free_preview_chapters ?? 1} (With Diagrams) →`}
+                    </span>
+                  </Link>
+                </div>
 
                 {/* 章節清單 (Chapter Breakdown) */}
                 <div className="space-y-3">
@@ -966,6 +1023,8 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                   <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
                     {currentBook.chapters.map((ch, idx) => {
                       const chLoc = getEBookLocalizedContent(ch, targetLangCode);
+                      const freeCount = currentBook.free_preview_chapters ?? 1;
+                      const isFreeChapter = idx < freeCount;
 
                       return (
                         <div
@@ -979,12 +1038,12 @@ export default function FeaturedEBookShowcaseSection({ initialBooks }: FeaturedE
                               </span>
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                  idx === 0 || verifyResult?.success
+                                  isFreeChapter || verifyResult?.success
                                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                     : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                 }`}
                               >
-                                {idx === 0 ? '📖 免費試閱' : verifyResult?.success ? '🔓 已解鎖' : '🔒 購書解鎖全文'}
+                                {isFreeChapter ? '📖 免費試閱' : verifyResult?.success ? '🔓 已解鎖' : '🔒 購書解鎖全文'}
                               </span>
                             </div>
                             {ch.image_caption && (

@@ -112,6 +112,33 @@ export function hasPurchasedEBookInStore(
 }
 
 /**
+ * 查驗指定 Email 是否曾購買 AI 頂配教材 $198 終身旗艦合輯 (Pkg 100)，若已購則自動賦予新書解鎖資格
+ */
+export async function hasVip198BundleEntitlement(readerEmail: string): Promise<boolean> {
+  const cleanEmail = (readerEmail || '').toLowerCase().trim();
+  if (!cleanEmail || !cleanEmail.includes('@')) return false;
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key'
+    );
+    const { data, error } = await supabase
+      .from('users')
+      .select('last_purchased_package, has_purchased')
+      .ilike('email', cleanEmail)
+      .limit(5);
+    if (error || !Array.isArray(data)) return false;
+    return data.some(
+      (row: any) =>
+        String(row?.last_purchased_package || '').trim() === '100' &&
+        row?.has_purchased !== false
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 依購買狀態或合法作者/管理員權限，安全裁切章節內容與敏感金流/PII 欄位
  */
 export function buildSanitizedEBookStoreResponse(
@@ -122,14 +149,18 @@ export function buildSanitizedEBookStoreResponse(
     readerEmail?: string;
     readerSig?: string;
     targetBookId?: string;
+    extraUnlockedBookIds?: string[];
   }
 ) {
   const cleanReader = (options.readerEmail || '').toLowerCase().trim();
   const cleanAuthor = (options.authorKey || '').toLowerCase().trim();
   const purchasedByReader = cleanReader ? store.reader_purchases?.[cleanReader] || [] : [];
 
-  // 若呼叫者帶入有效的全館或單書 HMAC 憑證，視同該書已驗證解鎖
-  const unlockedSet = new Set<string>(purchasedByReader);
+  // 若呼叫者帶入有效的全館、單書 HMAC 憑證或 $198 旗艦合輯合併資格，視同該書已驗證解鎖
+  const unlockedSet = new Set<string>([
+    ...purchasedByReader,
+    ...(options.extraUnlockedBookIds || [])
+  ]);
   if (cleanReader && options.readerSig) {
     if (verifyEBookAccess(cleanReader, 'ALL_VIP', options.readerSig)) {
       unlockedSet.add('ALL_VIP');
@@ -160,9 +191,14 @@ export function buildSanitizedEBookStoreResponse(
         return book;
       }
 
-      // 未購買訪客：僅保留第 1 章簡短試閱摘錄，隱藏第 2..N 章全文與私密 R2 連結
+      // 未購買訪客：依 free_preview_chapters 決定免費試閱章數（預設僅第 1 章簡短摘錄；若設定 >= 2 則完整開放該免費試閱章節含圖解），隱藏後續章節與私密 R2 連結
+      const freePreviewCount = Math.max(1, Number(book.free_preview_chapters || 1));
+      const fullFreeChapters = Boolean(book.free_preview_chapters && book.free_preview_chapters >= 2);
       const sanitizedChapters: EBookChapter[] = (book.chapters || []).map((ch, idx) => {
-        if (idx === 0) {
+        if (idx < freePreviewCount) {
+          if (fullFreeChapters) {
+            return ch;
+          }
           const truncate = (s?: string) => (s ? (s.length > 260 ? `${s.slice(0, 260)}...` : s) : s);
           return {
             ...ch,
@@ -176,12 +212,13 @@ export function buildSanitizedEBookStoreResponse(
         }
         return {
           ...ch,
-          content_zh: '🔒 付費解鎖後方可閱讀完整章節內容與雙語對照。',
-          content_en: '🔒 Purchase this E-Book to unlock full chapter content.',
-          content_ja: '🔒 ご購入後に本チャプターの全編をお読みいただけます。',
-          content_zh_cn: '🔒 付费解锁后方可阅读完整章节内容与双语对照。',
-          content_vi: '🔒 Mở khóa để đọc toàn bộ nội dung chương này.',
-          content_id: '🔒 Buka kunci untuk membaca konten bab ini.'
+          image_url: undefined,
+          content_zh: '🔒 付費解鎖後方可閱讀完整章節內容、AGY 實戰截圖圖解與小白萬用提示卡。',
+          content_en: '🔒 Purchase this E-Book to unlock full chapters, AGY dialog diagrams & copy-paste prompt cards.',
+          content_ja: '🔒 ご購入後に本チャプターの全編・AGY対話図解・コピペ用プロンプト集をお読みいただけます。',
+          content_zh_cn: '🔒 付费解锁后方可阅读完整章节内容、AGY 实战截图图解与小白万用提示卡。',
+          content_vi: '🔒 Mở khóa để đọc toàn bộ chương, sơ đồ hội thoại AGY & bộ câu lệnh mẫu.',
+          content_id: '🔒 Buka kunci untuk membaca bab lengkap, diagram dialog AGY & kartu prompt.'
         };
       });
 

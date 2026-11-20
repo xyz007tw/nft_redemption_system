@@ -53,7 +53,12 @@ export interface EBookProject {
   theme_id: 'tech_blue' | 'royal_gold' | 'minimal_white';
   bilingual_mode: boolean;
   price_single_usdt: number;
+  price_original_usdt?: number;  // 原價劃線價 (如 $39)
+  promo_until?: string;          // 優惠截止 ISO 時間 (如 '2027-01-01T00:00:00+08:00')
+  promo_label_zh?: string;       // 優惠標籤 (如 '2027前早鳥優惠')
+  promo_label_en?: string;       // Promo label (e.g., 'Pre-2027 Early Bird')
   price_monthly_sub_usdt: number;
+  free_preview_chapters?: number;// 免費試閱章節數 (預設 1，新書可設為 2)
   chapters: EBookChapter[];
   status: 'DRAFT' | 'PENDING_REVIEW' | 'APPROVED_PUBLISHED' | 'REJECTED_BANNED';
   edit_count?: number;           // 本書累計已修改次數 (含完稿後再修改)
@@ -317,6 +322,32 @@ export function getEBookLocalizedContent(
   return { title, content, subtitle };
 }
 
+/**
+ * 計算電子書當前有效售價（含 2027 年前等限時早鳥優惠自動切換邏輯）
+ */
+export function getEffectiveBookPrice(
+  book: Pick<EBookProject, 'price_single_usdt' | 'price_original_usdt' | 'promo_until'>
+): { currentPrice: number; originalPrice: number | null; isPromoActive: boolean } {
+  const basePrice = Number(book.price_single_usdt || 0);
+  const origPrice = Number(book.price_original_usdt || 0);
+  if (book.promo_until) {
+    const deadlineMs = Date.parse(book.promo_until);
+    if (Number.isFinite(deadlineMs)) {
+      if (Date.now() < deadlineMs && origPrice > basePrice) {
+        return { currentPrice: basePrice, originalPrice: origPrice, isPromoActive: true };
+      }
+      if (Date.now() >= deadlineMs && origPrice > basePrice) {
+        return { currentPrice: origPrice, originalPrice: null, isPromoActive: false };
+      }
+    }
+  }
+  return {
+    currentPrice: basePrice,
+    originalPrice: origPrice > basePrice ? origPrice : null,
+    isPromoActive: origPrice > basePrice,
+  };
+}
+
 export type EBookExportLangMode = 'BILINGUAL' | 'ZH_ONLY' | 'EN_ONLY' | 'JA_ONLY';
 
 // 生成可獨立下載與列印為精美 PDF 的完整獨立電子書 HTML (支援多種語系版面模式：BILINGUAL 雙語對照版 / ZH_ONLY 純繁中 / EN_ONLY 純英文 / JA_ONLY 純日文)
@@ -404,7 +435,7 @@ export function generateStandaloneEBookHTML(
           ${
             ch.image_url
               ? `<div style="margin: 18px 0 24px 0; text-align: center;">
-                   <img src="${ch.image_url}" alt="${pTitle}" style="max-width: 100%; max-height: 420px; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);" />
+                   <img src="${ch.image_url.startsWith('/') ? `https://nft1314.party${ch.image_url}` : ch.image_url}" alt="${pTitle}" style="max-width: 100%; max-height: 460px; border-radius: 12px; object-fit: contain; background: #090d18; box-shadow: 0 8px 24px rgba(0,0,0,0.18); border: 1px solid rgba(0,0,0,0.12);" />
                    ${ch.image_caption ? `<div style="font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic;">📷 ${ch.image_caption}</div>` : ''}
                  </div>`
               : ''

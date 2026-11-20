@@ -1,5 +1,6 @@
 import type { EBookProject } from '@/lib/ebookEngine';
 import type { EBookCloudStoreShape } from '@/lib/ebookAuth';
+import { AGY_BUFFER_EBOOK } from '@/lib/ebookCatalog/agyBufferBook';
 
 export const DEFAULT_EBOOK_STORE: EBookCloudStoreShape = {
   franchisees: {
@@ -20,6 +21,7 @@ export const DEFAULT_EBOOK_STORE: EBookCloudStoreShape = {
     }
   },
   books: [
+    AGY_BUFFER_EBOOK,
     {
       id: 'ebook-demo-001',
       author_wallet: '0xea693e358f1527f8aa6563c9f6ebd42e37ee14fc',
@@ -134,48 +136,67 @@ export const DEFAULT_EBOOK_STORE: EBookCloudStoreShape = {
   ]
 };
 
+function mergeBookDefaults(defBook: EBookProject, existing: EBookProject): EBookProject {
+  return {
+    ...defBook,
+    ...existing,
+    title_zh_cn: existing.title_zh_cn || defBook.title_zh_cn,
+    title_ja: existing.title_ja || defBook.title_ja,
+    title_vi: existing.title_vi || defBook.title_vi,
+    title_id: existing.title_id || defBook.title_id,
+    subtitle_zh_cn: existing.subtitle_zh_cn || defBook.subtitle_zh_cn,
+    subtitle_ja: existing.subtitle_ja || defBook.subtitle_ja,
+    subtitle_vi: existing.subtitle_vi || defBook.subtitle_vi,
+    subtitle_id: existing.subtitle_id || defBook.subtitle_id,
+    price_original_usdt: existing.price_original_usdt ?? defBook.price_original_usdt,
+    promo_until: existing.promo_until ?? defBook.promo_until,
+    promo_label_zh: existing.promo_label_zh ?? defBook.promo_label_zh,
+    promo_label_en: existing.promo_label_en ?? defBook.promo_label_en,
+    free_preview_chapters: existing.free_preview_chapters ?? defBook.free_preview_chapters,
+    chapters: defBook.chapters.map((defCh, idx) => {
+      const existingCh = existing.chapters?.[idx];
+      return existingCh
+        ? {
+            ...defCh,
+            ...existingCh,
+            title_zh_cn: existingCh.title_zh_cn || defCh.title_zh_cn,
+            title_ja: existingCh.title_ja || defCh.title_ja,
+            title_vi: existingCh.title_vi || defCh.title_vi,
+            title_id: existingCh.title_id || defCh.title_id,
+            content_zh_cn: existingCh.content_zh_cn || defCh.content_zh_cn,
+            content_ja: existingCh.content_ja || defCh.content_ja,
+            content_vi: existingCh.content_vi || defCh.content_vi,
+            content_id: existingCh.content_id || defCh.content_id,
+            image_url: existingCh.image_url || defCh.image_url,
+            image_caption: existingCh.image_caption || defCh.image_caption,
+            references: existingCh.references || defCh.references
+          }
+        : defCh;
+    })
+  };
+}
+
 /**
- * 補齊旗艦示範書籍的多語系與預設章節結構
+ * 補齊旗艦示範書籍與官方實戰新書之多語系與預設章節結構
  */
 export function hydrateEBookCloudStore(parsedStore: EBookCloudStoreShape): EBookCloudStoreShape {
   if (!parsedStore || !Array.isArray(parsedStore.books)) {
     return parsedStore;
   }
-  const defBook = DEFAULT_EBOOK_STORE.books[0];
-  parsedStore.books = parsedStore.books.map((b: EBookProject) => {
-    if (b.id !== 'ebook-demo-001') return b;
-    return {
-      ...defBook,
-      ...b,
-      title_zh_cn: b.title_zh_cn || defBook.title_zh_cn,
-      title_ja: b.title_ja || defBook.title_ja,
-      title_vi: b.title_vi || defBook.title_vi,
-      title_id: b.title_id || defBook.title_id,
-      subtitle_zh_cn: b.subtitle_zh_cn || defBook.subtitle_zh_cn,
-      subtitle_ja: b.subtitle_ja || defBook.subtitle_ja,
-      subtitle_vi: b.subtitle_vi || defBook.subtitle_vi,
-      subtitle_id: b.subtitle_id || defBook.subtitle_id,
-      chapters: defBook.chapters.map((defCh, idx) => {
-        const existingCh = b.chapters?.[idx];
-        return existingCh
-          ? {
-              ...defCh,
-              ...existingCh,
-              title_zh_cn: existingCh.title_zh_cn || defCh.title_zh_cn,
-              title_ja: existingCh.title_ja || defCh.title_ja,
-              title_vi: existingCh.title_vi || defCh.title_vi,
-              title_id: existingCh.title_id || defCh.title_id,
-              content_zh_cn: existingCh.content_zh_cn || defCh.content_zh_cn,
-              content_ja: existingCh.content_ja || defCh.content_ja,
-              content_vi: existingCh.content_vi || defCh.content_vi,
-              content_id: existingCh.content_id || defCh.content_id,
-              image_url: existingCh.image_url || defCh.image_url,
-              image_caption: existingCh.image_caption || defCh.image_caption,
-              references: existingCh.references || defCh.references
-            }
-          : defCh;
-      })
-    };
+  const defaultBooksById = new Map<string, EBookProject>(
+    DEFAULT_EBOOK_STORE.books.map((b) => [b.id, b])
+  );
+
+  const hydratedBooks = parsedStore.books.map((b: EBookProject) => {
+    const defBook = defaultBooksById.get(b.id);
+    return defBook ? mergeBookDefaults(defBook, b) : b;
   });
+
+  // 確保旗艦新書 (AGY_BUFFER_EBOOK) 自動出現在書庫首位，即使舊版雲端資料尚未存入
+  if (!hydratedBooks.some((b) => b.id === AGY_BUFFER_EBOOK.id)) {
+    hydratedBooks.unshift(AGY_BUFFER_EBOOK);
+  }
+
+  parsedStore.books = hydratedBooks;
   return parsedStore;
 }

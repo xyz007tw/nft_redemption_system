@@ -168,10 +168,17 @@ export async function POST(req: Request) {
 
     // 🎓 若為 AI 頂配教材 (DIRECT_COURSE)，無條件先完成 VIP 雲教室開通與簽章下載連結生成
     let directCourseEnroll: Awaited<ReturnType<typeof autoEnrollVipStudent>> | null = null;
+    let bundledEbookResult: Awaited<ReturnType<typeof import('@/lib/ebookSettlement').grantVipBundleEBookAccess>> | null = null;
     const redeemCourseTxnId = `WEB3_${walletAddress.slice(0, 10)}_${Date.now()}`;
     if (productType === 'DIRECT_COURSE' && cleanEmail) {
       try {
         directCourseEnroll = await autoEnrollVipStudent(cleanEmail, purchasedPkgId, redeemCourseTxnId);
+        const { grantVipBundleEBookAccess } = await import('@/lib/ebookSettlement');
+        bundledEbookResult = await grantVipBundleEBookAccess({
+          email: cleanEmail,
+          pkgId: purchasedPkgId,
+          priceUsdt: pkgPrice
+        });
       } catch (enrollErr) {
         console.error('[Redeem] Error in VIP auto-enroll:', enrollErr);
       }
@@ -217,7 +224,9 @@ export async function POST(req: Request) {
               magicLoginUrl: directCourseEnroll.magic_login_url,
               downloadLinks: directCourseEnroll.download_links,
               courseName: pkgName,
-              priceUsdt: pkgPrice
+              priceUsdt: pkgPrice,
+              bundledEbookReaderUrl: bundledEbookResult?.readerUrl,
+              bundledEbookStoreUrl: bundledEbookResult?.storeUrl
             });
             clientEmailHandled = true;
           } catch (emailErr) {

@@ -3,9 +3,11 @@ import { generateStandaloneEBookHTML, type EBookExportLangMode } from '@/lib/ebo
 import { verifyAdminRequest } from '@/lib/adminAuth';
 import {
   hasPurchasedEBookInStore,
+  hasVip198BundleEntitlement,
   loadEBookCloudStore,
   verifyEBookAccess
 } from '@/lib/ebookAuth';
+import { AGY_BUFFER_EBOOK } from '@/lib/ebookCatalog/agyBufferBook';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,7 +78,12 @@ export async function GET(req: Request) {
   const hasValidSig =
     Boolean(cleanEmail && sig) &&
     (verifyEBookAccess(cleanEmail, book.id, sig) || verifyEBookAccess(cleanEmail, 'ALL_VIP', sig));
-  const hasDbPurchase = Boolean(cleanEmail) && hasPurchasedEBookInStore(store, cleanEmail, book.id);
+  const hasVip198Access =
+    Boolean(cleanEmail) &&
+    book.id === AGY_BUFFER_EBOOK.id &&
+    (await hasVip198BundleEntitlement(cleanEmail));
+  const hasDbPurchase =
+    (Boolean(cleanEmail) && hasPurchasedEBookInStore(store, cleanEmail, book.id)) || hasVip198Access;
 
   if (!isAdmin && book.status !== 'APPROVED_PUBLISHED') {
     return new NextResponse(renderPaywallHtml(book.title_zh || book.id, book.id, '本書尚在審核或未公開上架。'), {

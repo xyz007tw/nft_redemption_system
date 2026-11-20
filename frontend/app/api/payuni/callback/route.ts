@@ -166,6 +166,7 @@ export async function POST(req: Request) {
 
     let clientEmailHandled = false;
     let directEnrollResult: Awaited<ReturnType<typeof autoEnrollVipStudent>> | null = null;
+    let bundledEbookResult: Awaited<ReturnType<typeof import('@/lib/ebookSettlement').grantVipBundleEBookAccess>> | null = null;
     const isEbookOrder = pkgData?.product_type === 'EBOOK_PURCHASE' || Number(packageId) === 991 || Number(packageId) === 992;
 
     if (pkgData?.product_type === 'DIRECT_COURSE') {
@@ -173,6 +174,12 @@ export async function POST(req: Request) {
         try {
           const normPkgId = normalizeCoursePkgId(Number(packageId));
           directEnrollResult = await autoEnrollVipStudent(email, normPkgId, tradeKey);
+          const { grantVipBundleEBookAccess } = await import('@/lib/ebookSettlement');
+          bundledEbookResult = await grantVipBundleEBookAccess({
+            email,
+            pkgId: normPkgId,
+            priceUsdt: packagePriceUSDT
+          });
         } catch (enrollErr) {
           console.error('[PayUni Callback] Error in VIP auto-enroll:', enrollErr);
         }
@@ -288,7 +295,9 @@ export async function POST(req: Request) {
             magicLoginUrl: directEnrollResult.magic_login_url,
             downloadLinks: directEnrollResult.download_links,
             courseName: pkgData.name_zh,
-            priceUsdt: packagePriceUSDT
+            priceUsdt: packagePriceUSDT,
+            bundledEbookReaderUrl: bundledEbookResult?.readerUrl,
+            bundledEbookStoreUrl: bundledEbookResult?.storeUrl
           });
           clientEmailHandled = true;
         } catch (emailErr) {

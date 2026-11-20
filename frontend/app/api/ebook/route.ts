@@ -6,7 +6,8 @@ import crypto from 'crypto';
 import { EBookProject, FranchiseeProfile, scanBannedContent, generateStandaloneEBookHTML } from '@/lib/ebookEngine';
 import { putObjectToDedicatedR2, R2_PRIMARY_PUBLIC_DOMAIN, R2_DEV_PUBLIC_DOMAIN } from '@/lib/r2Storage';
 import { verifyAdminRequest } from '@/lib/adminAuth';
-import { buildSanitizedEBookStoreResponse, loadEBookCloudStore } from '@/lib/ebookAuth';
+import { buildSanitizedEBookStoreResponse, hasVip198BundleEntitlement, loadEBookCloudStore } from '@/lib/ebookAuth';
+import { AGY_BUFFER_EBOOK } from '@/lib/ebookCatalog/agyBufferBook';
 import { DEFAULT_EBOOK_STORE } from '@/lib/ebookDefaultStore';
 
 // 🤖 旗艦級電子書大腦模型序列 (優先採用 Google 4 Argon 系列，若遇更新或特定環境自動彈性容錯至最新旗艦序列)
@@ -90,12 +91,14 @@ export async function GET(req: Request) {
 
   const adminCheck = await verifyAdminRequest(req);
   const store = await loadCloudStore();
+  const hasVip198 = verifyReaderEmail ? await hasVip198BundleEntitlement(verifyReaderEmail) : false;
   const sanitized = buildSanitizedEBookStoreResponse(store, {
     isAdmin: adminCheck.authorized,
     authorKey,
     readerEmail: verifyReaderEmail,
     readerSig,
-    targetBookId
+    targetBookId,
+    extraUnlockedBookIds: hasVip198 ? [AGY_BUFFER_EBOOK.id] : []
   });
 
   return NextResponse.json(

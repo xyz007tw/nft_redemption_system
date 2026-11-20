@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { EBookProject, FranchiseeProfile } from '@/lib/ebookEngine';
-import { signEBookAccess } from '@/lib/ebookAuth';
+import { loadEBookCloudStore, signEBookAccess } from '@/lib/ebookAuth';
+import { DEFAULT_EBOOK_STORE } from '@/lib/ebookDefaultStore';
+import { AGY_BUFFER_EBOOK } from '@/lib/ebookCatalog/agyBufferBook';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -22,22 +24,12 @@ export async function settleRealEBookPurchase(params: {
   readerEmail?: string;
 }) {
   try {
-    const { data, error } = await supabase
-      .from('packages')
-      .select('roi_text')
-      .eq('id', STORE_PKG_ID)
-      .single();
-
-    if (error || !data || typeof data.roi_text !== 'string' || !data.roi_text.startsWith(STORE_PREFIX)) {
-      return null;
-    }
-
-    const store: EBookCloudStore = JSON.parse(data.roi_text.slice(STORE_PREFIX.length));
+    const store = (await loadEBookCloudStore(DEFAULT_EBOOK_STORE)) as EBookCloudStore;
     if (!store || !Array.isArray(store.books) || store.books.length === 0) {
       return null;
     }
 
-    const targetBookId = params.bookId || store.books[0]?.id || 'ebook-demo-001';
+    const targetBookId = params.bookId || store.books[0]?.id || 'ebook-agy-buffer-001';
     const book = store.books.find(b => b.id === targetBookId) || store.books[0];
     if (!book) return null;
 
@@ -129,6 +121,70 @@ export async function settleRealEBookPurchase(params: {
     };
   } catch (err) {
     console.error('[settleRealEBookPurchase] Error:', err);
+    return null;
+  }
+}
+
+/**
+ * 🎓 購買 AI 頂配教材 $198 終身旗艦合輯 (Pkg 100 或單筆金額 >= $198) 時，
+ * 自動將新書《不寫一行程式！用對話打造你的 24H AI 自動來客流》合併開通至買家信箱權限！
+ */
+export async function grantVipBundleEBookAccess(params: {
+  email: string;
+  pkgId: number;
+  priceUsdt: number;
+}): Promise<{
+  granted: boolean;
+  bookId: string;
+  bookTitle: string;
+  readerUrl: string;
+  storeUrl: string;
+} | null> {
+  const cleanEmail = (params.email || '').trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes('@')) return null;
+
+  const isBundle198 = Number(params.pkgId) === 100 || Number(params.priceUsdt) >= 198;
+  if (!isBundle198) return null;
+
+  try {
+    const store = (await loadEBookCloudStore(DEFAULT_EBOOK_STORE)) as EBookCloudStore;
+    if (!store.reader_purchases) store.reader_purchases = {};
+    if (!store.reader_purchases[cleanEmail]) store.reader_purchases[cleanEmail] = [];
+
+    const bundledBookId = AGY_BUFFER_EBOOK.id;
+    if (!store.reader_purchases[cleanEmail].includes(bundledBookId)) {
+      store.reader_purchases[cleanEmail].push(bundledBookId);
+    }
+
+    const payload = STORE_PREFIX + JSON.stringify(store);
+    await supabase.from('packages').upsert(
+      {
+        id: STORE_PKG_ID,
+        name_zh: '__SYSTEM_EBOOK_STORE__',
+        name_en: '__SYSTEM_EBOOK_STORE__',
+        amount: 1,
+        price: 990,
+        discount_text: 'SYSTEM_STORE',
+        roi_text: payload,
+        is_active: false
+      },
+      { onConflict: 'id' }
+    );
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nft1314.party';
+    const sig = signEBookAccess(cleanEmail, bundledBookId);
+    const readerUrl = `${siteUrl}/api/ebook/reader?book=${encodeURIComponent(bundledBookId)}&email=${encodeURIComponent(cleanEmail)}&sig=${encodeURIComponent(sig)}`;
+    const storeUrl = `${siteUrl}/ebook-store?book=${encodeURIComponent(bundledBookId)}&email=${encodeURIComponent(cleanEmail)}&sig=${encodeURIComponent(sig)}`;
+
+    return {
+      granted: true,
+      bookId: bundledBookId,
+      bookTitle: AGY_BUFFER_EBOOK.title_zh,
+      readerUrl,
+      storeUrl
+    };
+  } catch (err) {
+    console.error('[grantVipBundleEBookAccess] Error:', err);
     return null;
   }
 }
