@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { Providers } from './providers';
 import { Suspense } from 'react';
@@ -61,6 +62,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const cfBeaconToken =
+    process.env.NEXT_PUBLIC_CF_BEACON_TOKEN || 'c7ed5d34ef4141dd9d42482afba9b631';
+
   return (
     <html lang="zh-TW">
       <body className="bg-[#0a0a0f] text-white min-h-screen overflow-x-hidden">
@@ -72,6 +76,12 @@ export default function RootLayout({
           {children}
           <ChatWidget />
         </Providers>
+        <Script
+          id="cloudflare-web-analytics"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
