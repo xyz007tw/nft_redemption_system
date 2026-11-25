@@ -283,6 +283,42 @@ export async function POST(req: Request) {
       }
     }
 
+    // 8B. Notify System Admin (xyz007tw@gmail.com) & Backup Email (qqww0614@gmail.com) for ALL PayPal payments
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      try {
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.default.createTransport({
+          service: 'gmail',
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+        });
+        const adminToList = Array.from(
+          new Set(['xyz007tw@gmail.com', process.env.ADMIN_EMAIL, process.env.EMAIL_USER].filter(Boolean))
+        ).join(', ');
+
+        await transporter.sendMail({
+          from: `"WeiXiang AI 系統管理通知" <${process.env.EMAIL_USER}>`,
+          to: adminToList,
+          cc: 'qqww0614@gmail.com',
+          subject: `💰 【PayPal 收款通知】$${priceUsdt} USD｜${productType || 'DIRECT_COURSE'} (Pkg ${packageId})`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 640px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px;">
+              <h2 style="color: #0f172a; margin-top: 0;">💰 PayPal 即時收款與自動開通通知</h2>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0;">
+                <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #64748b;">交易編號 (Txn ID)</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${txnId}</td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #64748b;">付款金額</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold; color: #059669;">$${priceUsdt} USD</td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #64748b;">品項類型 / 編號</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${productType || 'DIRECT_COURSE'} (Package ID: ${packageId}${bookId ? `, Book: ${bookId}` : ''})</td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #64748b;">買家信箱</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${email || '未提供'}</td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #64748b;">歸戶錢包</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-family: monospace;">${walletAddress}</td></tr>
+              </table>
+              <p style="color: #6b7280; font-size: 12px; margin-bottom: 0;">此通知已自動寄送至 xyz007tw@gmail.com 並副本 (CC) 至 qqww0614@gmail.com。</p>
+            </div>
+          `
+        });
+      } catch (adminMailErr) {
+        console.error('[PayPal IPN] Admin notification email error:', adminMailErr);
+      }
+    }
+
     // 9. Mark payment processed
     await markPaymentProcessed({
       tradeKey: txnId,
